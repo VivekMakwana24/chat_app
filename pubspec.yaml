@@ -1,0 +1,96 @@
+name: flutter_demo_structure
+description: A new Flutter project.
+
+# The following line prevents the package from being accidentally published to
+# pub.dev using `pub publish`. This is preferred for private packages.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+# The following defines the version and build number for your application.
+# A version number is three numbers separated by dots, like 1.2.43
+# followed by an optional build number separated by a +.
+# Both the version and the builder number may be overridden in flutter
+# build by specifying --build-name and --build-number, respectively.
+# In Android, build-name is used as versionName while build-number used as versionCode.
+# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
+# In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
+# Read more about iOS versioning at
+# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.12.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  #Core
+  flutter_screenutil: ^5.0.0+2
+  get_it: ^7.2.0
+  hive: ^2.0.4
+  hive_flutter: ^1.0.0
+  path_provider: ^2.0.10
+  json_serializable: ^5.0.2
+  dio: ^4.0.0
+  dio_http_cache: ^0.3.0
+  connectivity: ^3.0.6
+  pretty_dio_logger: ^1.1.1
+  encrypt: ^5.0.1
+  crypto: ^3.0.1
+  mobx: ^2.0.4
+  flutter_mobx: ^2.0.2
+  cached_network_image: ^3.1.0
+  form_field_validator: ^1.1.0
+  another_flushbar: ^1.10.24
+  #  country_code_picker: ^2.0.2
+  country_pickers: ^2.0.0
+  google_fonts: ^3.0.1
+  images_picker: ^1.2.4
+  webview_flutter: ^3.0.4
+  device_info: ^2.0.2
+
+  #web
+  url_strategy: ^0.2.0
+  platform: ^3.1.0
+
+  #Firebase
+  flutter_local_notifications:
+  firebase_auth: ^4.1.0
+  cloud_firestore: ^4.0.3
+  firebase_storage: ^11.0.4
+  firebase_messaging: ^14.1.0
+  firebase_core:
+  intl: ^0.17.0
+  local_auth: ^2.1.2
+  fl_chart: ^0.55.2
+  syncfusion_flutter_charts: ^20.3.61
+  velocity_x: ^3.4.0
+  lottie: ^1.3.0
+  flutter_expandable_fab: ^1.7.1
+
+dev_dependencies:
+  build_runner: ^2.1.2
+  hive_generator: ^1.1.1
+  mobx_codegen: ^2.0.3
+  flutter_launcher_icons: ^0.9.2
+  flutter_native_splash: ^2.2.14
+  flutter_test:
+    sdk: flutter
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+
+dependency_overrides:
+  json_serializable: ^5.0.2
+  firebase_core_platform_interface: ^4.5.2
+
+# The following section is specific to Flutter.
+flutter:
+
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+
+  assets:
+    - assets/image/

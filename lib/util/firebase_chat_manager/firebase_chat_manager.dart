@@ -1,0 +1,286 @@
+import 'dart:async';
+import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_demo_structure/core/db/app_db.dart';
+import 'package:flutter_demo_structure/core/di/api/req_params.dart';
+import 'package:flutter_demo_structure/core/navigation/navigation_service.dart';
+import 'package:flutter_demo_structure/core/navigation/routes.dart';
+import 'package:flutter_demo_structure/main.dart';
+import 'package:flutter_demo_structure/util/date_time_helper.dart';
+import 'package:flutter_demo_structure/util/firebase_chat_manager/constants/firebase_collection_enum.dart';
+import 'package:flutter_demo_structure/util/firebase_chat_manager/constants/firestore_constants.dart';
+import 'package:flutter_demo_structure/util/firebase_chat_manager/models/chat_message.dart';
+import 'package:flutter_demo_structure/util/firebase_chat_manager/models/firebase_chat_user.dart';
+import 'package:flutter_demo_structure/util/firebase_chat_manager/models/message_chat.dart';
+
+class FirebaseChatManager {
+  /// Logout User
+  Future<void> logoutUser() async {
+    await FirebaseAuth.instance.signOut();
+    navigator.pushNamedAndRemoveUntil(RouteName.loginPage);
+  }
+
+  /*Future<int?> fetchUserId(String email) async {
+    final QuerySnapshot result = await FirebaseFirestore.instance
+        .collection(FirebaseCollection.users.name)
+        .orderBy('createdAt', descending: true)
+        .limitToLast(1)
+        .get();
+
+    final List<DocumentSnapshot> documents = result.docs;
+
+    if (documents.isEmpty) {
+      debugPrint('ItS EMPTY');
+      return 1;
+    } else {
+      debugPrint('==> Not empty ==> ${documents.last.data()}');
+      FirebaseChatUser user = FirebaseChatUser.fromDocument(documents.last);
+
+      if (user.userEmail == email)
+        return Future.value((user.userId ?? 0));
+      else
+        return Future.value((user.userId ?? 0) + 1);
+      // return Future.value(documents.last.data())
+    }
+  }*/
+
+  /*
+  * Firebase Login
+  * */
+  Future<User?> firebaseUserLogin(FirebaseChatUser user) async {
+    try {
+      User? firebaseUser =
+          (await FirebaseAuth.instance.signInWithEmailAndPassword(email: user.userEmail ?? '', password: user.password ?? 'password'))
+              .user;
+
+      if (firebaseUser != null) {
+        // Check is already sign up
+        final QuerySnapshot result = await FirebaseFirestore.instance
+            .collection(FirebaseCollection.users.name)
+            .where(userId, isEqualTo: firebaseUser.uid)
+            .get();
+
+        final List<DocumentSnapshot> documents = result.docs;
+
+        if (documents.isEmpty) {
+          // Update data to server if new user
+          user.userId = firebaseUser.uid;
+          FirebaseFirestore.instance.collection(FirebaseCollection.users.name).doc(firebaseUser.uid).set(user.toJson());
+
+          return Future.value(firebaseUser);
+        } else {
+          return Future.value(firebaseUser);
+        }
+      } else {
+        debugPrint('User Found Returning user');
+        return Future.error('');
+      }
+    } on FirebaseAuthException catch (e) {
+      debugPrint('Firebase No User Found $e');
+
+      ///SignUp the user into firebase
+      return firebaseUserSignup(user);
+    }
+  }
+
+  /*
+  * Firebase SignUp
+  * */
+  Future<User?> firebaseUserSignup(FirebaseChatUser user) async {
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: user.userEmail ?? '', password: user.password ?? 'password');
+
+      debugPrint('### - Creating User ${user.toJson()}');
+
+      user.userId = userCredential.user?.uid;
+
+      FirebaseFirestore.instance
+          .collection(FirebaseCollection.users.name)
+          .doc(userCredential.user?.uid)
+          .set(user.toJson());
+
+      return Future.value(userCredential.user);
+    } on FirebaseAuthException catch (e) {
+      debugPrint('Firebase No User Found $e');
+      throw Exception('Something went wrong, Please try again later');
+    }
+  }
+
+  /*
+  * Get User Listing
+  * */
+  Stream<QuerySnapshot> getStreamFireStore(String pathCollection, int limit, String? textSearch) {
+    if (textSearch?.isNotEmpty == true) {
+      return firebaseFirestore
+          .collection(pathCollection)
+          .limit(limit)
+          .where(FirestoreConstants.user_name, isEqualTo: textSearch)
+          .snapshots();
+    } else {
+      return firebaseFirestore.collection(pathCollection).limit(limit).snapshots();
+    }
+  }
+
+  Future<void> updateDataFirestore(String collectionPath, String docPath, Map<String, dynamic> dataNeedUpdate) {
+    debugPrint('#### updateDataFirestore ######');
+    debugPrint('## collectionPath = $collectionPath');
+    debugPrint('## docPath = $docPath');
+    debugPrint('##########');
+
+    return firebaseFirestore.collection(collectionPath).doc(docPath).update(dataNeedUpdate);
+  }
+
+  /*
+  * Fetch Chat Stream
+  * */
+  Stream<QuerySnapshot> getChatStream(String chatId, int limit) {
+    debugPrint('#### getChatStream ######');
+    debugPrint('## GetChatStream = ${FirebaseCollection.chat.name}');
+    debugPrint('## chatId = $chatId');
+    debugPrint('##########');
+    return firebaseFirestore
+        .collection(FirebaseCollection.chat.name)
+        .where(FirestoreConstants.chatId, isEqualTo: chatId)
+        .orderBy(FirestoreConstants.createdAt, descending: true)
+        .limit(limit)
+        .snapshots();
+  }
+
+  /*
+  * Fetch Recent Chat Stream
+  * */
+  Stream<QuerySnapshot> getRecentChatStream(int limit) {
+    debugPrint('#### getRecentChatStream ######');
+    debugPrint('## GetRecentChatStream = ${FirebaseCollection.recent_chat.name} ${appDB.user.userId}');
+    debugPrint('##########');
+    return firebaseFirestore
+        .collection(FirebaseCollection.recent_chat.name)
+        .where(FirestoreConstants.participants, arrayContains: appDB.user.userId)
+        // .orderBy(FirestoreConstants.timestamp, descending: true)
+        .limit(limit)
+        .snapshots();
+  }
+
+  /*
+  * Send Chat Message
+  * */
+  void sendMessageOld(String content, int type, String groupChatId, String currentUserId, String peerId) {
+    debugPrint('#### sendMessage ######');
+    debugPrint('## content = $content');
+    debugPrint('## type = $type');
+    debugPrint('## currentUserId = $currentUserId');
+    debugPrint('## peerId = $peerId');
+    debugPrint('##########');
+    DocumentReference documentReference = firebaseFirestore
+        .collection(FirebaseCollection.chat.name)
+        .doc(groupChatId)
+        .collection(groupChatId)
+        .doc(DateTime.now().millisecondsSinceEpoch.toString());
+
+    MessageChat messageChat = MessageChat(
+      idFrom: currentUserId,
+      idTo: peerId,
+      timestamp: DateTime.now().millisecondsSinceEpoch.toString(),
+      content: content,
+      type: type,
+    );
+
+    FirebaseFirestore.instance.runTransaction(
+      (transaction) async {
+        transaction.set(
+          documentReference,
+          messageChat.toJson(),
+        );
+      },
+    );
+  }
+
+  Future<void> sendMessage(
+    ChatMessage messageChat,
+    FirebaseChatUser? receiverUser,
+  ) async {
+    debugPrint('#### sendMessage ######');
+    debugPrint('## content = ${messageChat.message}');
+    debugPrint('## type = ${messageChat.messageType}');
+    debugPrint('## receiverId = ${messageChat.receiverId}');
+
+    ChatMessage? recentChat = await getRecentChatDetails(messageChat.chatId ?? '');
+
+    messageChat
+      ..senderId = appDB.currentUserId
+      ..createdAt = generateUTC(DateTime.now().toUtc())
+      ..chatId = messageChat.chatId
+      ..participants = [appDB.currentUserId, receiverUser?.userId]
+      ..receiverProfile = receiverUser?.userImage
+      ..receiverName = receiverUser?.userName
+      ..receiverId = receiverUser?.userId
+      ..senderName = appDB.user.userName
+      ..openChatIds = recentChat?.openChatIds
+      ..senderProfile = appDB.user.userImage;
+
+    ///INITIALLY FILL THE DATA
+    if (messageChat.unreadCountList == null) messageChat.unreadCountList = Map();
+
+    messageChat.unreadCountList?[FirestoreConstants.getUnreadCountKey(appDB.user.userId)] = 0;
+
+    messageChat.participants?.where((element) => element != appDB.user.userId).forEach((e) {
+      messageChat.unreadCountList?[FirestoreConstants.getUnreadCountKey(e)] = 1;
+    });
+
+    ///MODIFY UNREAD COUNT IF AVAILABLE
+    recentChat?.unreadCountList?.entries
+        .where((e) => e.key != FirestoreConstants.getUnreadCountKey(appDB.user.userId))
+        .forEach((element) {
+      messageChat.unreadCountList?[element.key] = (element.value) + 1;
+    });
+
+    //Add message in chat collection
+    await FirebaseFirestore.instance.collection(FirebaseCollection.chat.name).doc().set(messageChat.toJson());
+
+    //Add message in recent chat collection
+    await updateRecentChat(messageChat);
+  }
+
+  ///GET RECENT CHAT LISTING
+  Future<ChatMessage?> getRecentChatDetails(String chatId) async {
+    try {
+      DocumentSnapshot recentChatDetails =
+          await FirebaseFirestore.instance.collection(FirebaseCollection.recent_chat.name).doc(chatId).get();
+
+      return Future.value(ChatMessage.toDocumentToClass(recentChatDetails));
+    } catch (e) {
+      return Future.value(null);
+    }
+  }
+
+  Future<void> updateRecentChat(ChatMessage recentChat) async {
+    await FirebaseFirestore.instance
+        .collection(FirebaseCollection.recent_chat.name)
+        .doc(recentChat.chatId)
+        .set(recentChat.toJson());
+  }
+
+  ///GET RECENT CHAT UNREAD COUNTS
+  Stream<QuerySnapshot> getRecentChatUnreadCounts() {
+    return firebaseFirestore
+        .collection(FirebaseCollection.recent_chat.name)
+        .where(FirestoreConstants.participants, arrayContains: appDB.user.userId)
+        .snapshots();
+  }
+
+  ///GET RECENT CHAT
+  Stream<DocumentSnapshot<Map<String, dynamic>>> getRecentChatDocStream(String chatId) {
+    return firebaseFirestore.collection(FirebaseCollection.recent_chat.name).doc(chatId).snapshots();
+  }
+
+  UploadTask uploadFile(File image, String fileName) {
+    Reference reference = firebaseStorage.ref().child(fileName);
+    UploadTask uploadTask = reference.putFile(image);
+    return uploadTask;
+  }
+}
