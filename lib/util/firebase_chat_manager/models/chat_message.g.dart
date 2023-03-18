@@ -16,24 +16,19 @@ ChatMessage _$ChatMessageFromJson(Map<String, dynamic> json) => ChatMessage(
       createdAt: json['created_at'] as String?,
       receiverProfile: json['receiver_profile'] as String?,
       receiverName: json['receiver_name'] as String?,
-      participants: (json['participants'] as List<dynamic>?)
-          ?.map((e) => e as String?)
-          .toList(),
-      openChatIds: (json['open_chats_ids'] as List<dynamic>?)
-          ?.map((e) => e as int?)
-          .toList(),
-      usernamesIsTyping: (json['usernames_is_typing'] as List<dynamic>?)
-          ?.map((e) => e as String?)
-          .toList(),
+      participants: (json['participants'] as List<dynamic>?)?.map((e) => e as String?).toList(),
+      openChatIds: (json['open_chats_ids'] as List<dynamic>?)?.map((e) => e as int?).toList(),
+      usernamesIsTyping: (json['usernames_is_typing'] as List<dynamic>?)?.map((e) => e as String?).toList(),
       senderName: json['sender_name'] as String?,
       senderProfile: json['sender_profile'] as String?,
       unreadCountList: json['unread_count_list'] as Map<String, dynamic>?,
       postTypeString: json['post_type'] as String?,
+      groupName: json['group_name'] as String?,
       isAdmin: json['is_admin'] as bool?,
+      isGroup: json['is_group'] as bool?,
     );
 
-Map<String, dynamic> _$ChatMessageToJson(ChatMessage instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$ChatMessageToJson(ChatMessage instance) => <String, dynamic>{
       'chat_id': instance.chatId,
       'sender_id': instance.senderId,
       'receiver_id': instance.receiverId,
@@ -51,4 +46,6 @@ Map<String, dynamic> _$ChatMessageToJson(ChatMessage instance) =>
       'usernames_is_typing': instance.usernamesIsTyping,
       'unread_count_list': instance.unreadCountList,
       'post_type': instance.postTypeString,
+      'is_group': instance.isGroup,
+      'group_name': instance.groupName,
     };

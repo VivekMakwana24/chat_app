@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_demo_structure/core/db/app_db.dart';
 import 'package:flutter_demo_structure/main.dart';
 import 'package:flutter_demo_structure/ui/home/chat_detail/chat_details.dart';
+import 'package:flutter_demo_structure/ui/home/new_group/new_group_page.dart';
 import 'package:flutter_demo_structure/util/firebase_chat_manager/constants/firebase_collection_enum.dart';
 import 'package:flutter_demo_structure/util/firebase_chat_manager/models/chat_message.dart';
 import 'package:flutter_demo_structure/util/firebase_chat_manager/models/firebase_chat_user.dart';
@@ -12,6 +13,7 @@ import 'package:flutter_demo_structure/util/firebase_chat_manager/models/popup_c
 import 'package:flutter_demo_structure/util/utilities.dart';
 import 'package:flutter_demo_structure/values/colors.dart';
 import 'package:flutter_demo_structure/values/extensions/widget_ext.dart';
+import 'package:flutter_demo_structure/widget/app_utils.dart';
 import 'package:flutter_demo_structure/widget/base_app_bar.dart';
 import 'package:flutter_demo_structure/widget/debouncer.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -84,6 +86,7 @@ class _UserListPageState extends State<UserListPage> {
           title: widget.isForGroup ? 'New Group' : 'Users',
           action: [],
         ),
+        floatingActionButton: widget.isForGroup ? buildFloatingAction(context) : null,
         body: Stack(
           children: <Widget>[
             // List
@@ -136,76 +139,6 @@ class _UserListPageState extends State<UserListPage> {
     );
   }
 
-  Widget buildParticipantsList() {
-    return ValueListenableBuilder(
-      valueListenable: _participantsList,
-      builder: (BuildContext context, List<FirebaseChatUser> participants, Widget? child) {
-        return SizedBox(
-          height: 100,
-          child: ListView.builder(
-            itemCount: participants.length,
-            scrollDirection: Axis.horizontal,
-            itemBuilder: (context, index) {
-              FirebaseChatUser userChat = participants[index];
-              return _buildParticipantsItem(userChat);
-            },
-          ),
-        ).visiblity(participants.isNotEmpty);
-      },
-    );
-  }
-
-  Column _buildParticipantsItem(FirebaseChatUser userChat) {
-    return Column(
-      children: [
-        Material(
-          child: !(userChat.userImage?.isEmptyOrNull ?? true)
-              ? Image.network(
-                  userChat.userImage ?? '',
-                  fit: BoxFit.cover,
-                  width: 50,
-                  height: 50,
-                  loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Container(
-                      width: 50,
-                      height: 50,
-                      child: Center(
-                        child: CircularProgressIndicator(
-                          color: AppColor.primaryColor,
-                          value: loadingProgress.expectedTotalBytes != null
-                              ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                              : null,
-                        ),
-                      ),
-                    );
-                  },
-                  errorBuilder: (context, object, stackTrace) {
-                    return Icon(
-                      Icons.account_circle,
-                      size: 50,
-                      color: AppColor.greyColor,
-                    );
-                  },
-                )
-              : Icon(
-                  Icons.account_circle,
-                  size: 50,
-                  color: AppColor.greyColor,
-                ),
-          borderRadius: BorderRadius.all(Radius.circular(25)),
-          clipBehavior: Clip.hardEdge,
-        ),
-        10.verticalSpace,
-        Text(
-          '${userChat.userName}',
-          maxLines: 1,
-          style: TextStyle(color: AppColor.primaryColor),
-        )
-      ],
-    );
-  }
-
   // endregion
 
   /*
@@ -220,6 +153,130 @@ class _UserListPageState extends State<UserListPage> {
       child: CircularProgressIndicator.adaptive(
         valueColor: AlwaysStoppedAnimation<Color>(AppColor.primaryColor),
       ),
+    );
+  }
+
+  FloatingActionButton buildFloatingAction(BuildContext context) {
+    return FloatingActionButton(
+      child: Icon(
+        Icons.arrow_forward,
+        color: AppColor.white,
+      ),
+      backgroundColor: AppColor.primaryColor,
+      onPressed: () {
+        if (_participantsList.value.isEmpty) {
+          showMessage('At least 1 contact must be selected');
+        } else {
+          //navigate to group screen
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => NewGroupPage(
+                participantsList: _participantsList.value,
+              ),
+            ),
+          );
+        }
+      },
+    );
+  }
+
+  Widget buildParticipantsList() {
+    return ValueListenableBuilder(
+      valueListenable: _participantsList,
+      builder: (BuildContext context, List<FirebaseChatUser> participants, Widget? child) {
+        return Container(
+          margin: EdgeInsets.only(top: 10),
+          child: SizedBox(
+            height: 100,
+            child: ListView.builder(
+              itemCount: participants.length,
+              scrollDirection: Axis.horizontal,
+              itemBuilder: (context, index) {
+                FirebaseChatUser userChat = participants[index];
+                return Padding(
+                  padding: EdgeInsets.only(left: index == 0 ? 16 : 0),
+                  child: _buildParticipantsItem(userChat),
+                );
+              },
+            ),
+          ).visiblity(participants.isNotEmpty),
+        );
+      },
+    );
+  }
+
+  Column _buildParticipantsItem(FirebaseChatUser userChat) {
+    return Column(
+      children: [
+        SizedBox(
+          width: 50,
+          height: 50,
+          child: Stack(
+            children: [
+              Material(
+                child: !(userChat.userImage?.isEmptyOrNull ?? true)
+                    ? Image.network(
+                        userChat.userImage ?? '',
+                        fit: BoxFit.cover,
+                        width: 50,
+                        height: 50,
+                        loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Container(
+                            width: 50,
+                            height: 50,
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                color: AppColor.primaryColor,
+                                value: loadingProgress.expectedTotalBytes != null
+                                    ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                    : null,
+                              ),
+                            ),
+                          );
+                        },
+                        errorBuilder: (context, object, stackTrace) {
+                          return Icon(
+                            Icons.account_circle,
+                            size: 50,
+                            color: AppColor.greyColor,
+                          );
+                        },
+                      )
+                    : Icon(
+                        Icons.account_circle,
+                        size: 50,
+                        color: AppColor.greyColor,
+                      ),
+                borderRadius: BorderRadius.all(Radius.circular(25)),
+                clipBehavior: Clip.hardEdge,
+              ),
+              Positioned(
+                right: 0,
+                bottom: 0,
+                child: Container(
+                  decoration: BoxDecoration(color: AppColor.primaryColor, shape: BoxShape.circle),
+                  child: Icon(
+                    Icons.close_rounded,
+                    size: 20,
+                    color: AppColor.greyColor,
+                  ),
+                ).addGestureTap(() {
+                  _participantsList.value.remove(userChat);
+                  _participantsList.notifyListeners();
+                }),
+              )
+            ],
+          ),
+        ),
+        10.verticalSpace,
+        Text(
+          '${userChat.userName}',
+          maxLines: 1,
+          style: TextStyle(color: AppColor.primaryColor),
+        )
+      ],
     );
   }
 

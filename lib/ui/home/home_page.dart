@@ -353,10 +353,17 @@ class _HomePageState extends State<HomePage> {
                           );
                         },
                       )
-                    : Icon(
-                        Icons.account_circle,
-                        size: 50,
-                        color: AppColor.greyColor,
+                    : Container(
+                        padding: const EdgeInsets.all(6.0),
+                        decoration: BoxDecoration(
+                          color: AppColor.primaryColor,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          (itemData.isGroup ?? false) ? Icons.group : Icons.account_circle,
+                          size: 30,
+                          color: AppColor.greyColor,
+                        ),
                       ),
                 borderRadius: BorderRadius.all(Radius.circular(25)),
                 clipBehavior: Clip.hardEdge,
@@ -368,7 +375,7 @@ class _HomePageState extends State<HomePage> {
                     children: <Widget>[
                       Container(
                         child: Text(
-                          '${itemData.getName}',
+                          (itemData.isGroup ?? false) ? '${itemData.groupName}' : '${itemData.getName}',
                           maxLines: 1,
                           style: TextStyle(color: AppColor.primaryColor),
                         ),
@@ -376,7 +383,7 @@ class _HomePageState extends State<HomePage> {
                         margin: EdgeInsets.fromLTRB(0, 0, 0, 5),
                       ),
                       Text(
-                        '${itemData.message}',
+                        (itemData.isGroup ?? false) ? 'new group' : '${itemData.message}',
                         maxLines: 1,
                         style: TextStyle(color: AppColor.greyColor, fontSize: 12),
                       )

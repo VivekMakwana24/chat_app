@@ -79,7 +79,13 @@ class ChatMessage {
   @JsonKey(name: 'post_type')
   String? postTypeString;
 
-  int get unreadCount => (unreadCountList?[FirestoreConstants.getUnreadCountKey(appDB.user?.userId)] ?? 0);
+  @JsonKey(name: 'group_name')
+  String? groupName;
+
+  @JsonKey(name: 'is_group',defaultValue: false)
+  bool? isGroup;
+
+  int get unreadCount => (unreadCountList?[FirestoreConstants.getUnreadCountKey(appDB.user.userId)] ?? 0);
 
   bool isFailed;
   bool isFromComment;
@@ -162,6 +168,8 @@ class ChatMessage {
     this.unreadCountList,
     this.postTypeString,
     this.isAdmin,
+    this.isGroup,
+    this.groupName,
   });
 
   factory ChatMessage.fromJson(Map<String, dynamic> json) => _$ChatMessageFromJson(json);
