@@ -5,6 +5,7 @@ class FirestoreConstants {
   static const aboutMe = "aboutMe";
   static const photoUrl = "photoUrl";
   static const id = "id";
+  static const userId = "user_id";
   static const chattingWith = "chatting_with";
   static const idFrom = "idFrom";
   static const idTo = "idTo";

@@ -53,9 +53,9 @@ class FirebaseChatManager {
   * */
   Future<User?> firebaseUserLogin(FirebaseChatUser user) async {
     try {
-      User? firebaseUser =
-          (await FirebaseAuth.instance.signInWithEmailAndPassword(email: user.userEmail ?? '', password: user.password ?? 'password'))
-              .user;
+      User? firebaseUser = (await FirebaseAuth.instance
+              .signInWithEmailAndPassword(email: user.userEmail ?? '', password: user.password ?? 'password'))
+          .user;
 
       if (firebaseUser != null) {
         // Check is already sign up
@@ -149,6 +149,29 @@ class FirebaseChatManager {
         .orderBy(FirestoreConstants.createdAt, descending: true)
         .limit(limit)
         .snapshots();
+  }
+
+  /*
+  * Fetch Chat Stream
+  * */
+  Stream<List<FirebaseChatUser>> getUsers(List<String?> participantsList) {
+    debugPrint('#### Fetch Users ######');
+    debugPrint('## getUsers = ${FirebaseCollection.users.name}');
+    debugPrint('## participantsList = $participantsList');
+    debugPrint('##########');
+    Stream<QuerySnapshot> stream = firebaseFirestore
+        .collection(FirebaseCollection.users.name)
+        // .where(FirestoreConstants.userId, whereIn: participantsList)
+        // .orderBy(FirestoreConstants.createdAt, descending: true)
+        .snapshots();
+
+    debugPrint('Stream $stream');
+    return stream.map((qShot) => qShot.docs
+        .map((document) => FirebaseChatUser(
+              userName: document['user_name'],
+              userId: document['user_id'],
+            ))
+        .toList());
   }
 
   /*

@@ -173,6 +173,7 @@ class _UserListPageState extends State<UserListPage> {
             MaterialPageRoute(
               builder: (context) => NewGroupPage(
                 participantsList: _participantsList.value,
+                isGroupDetails: false,
               ),
             ),
           );
@@ -467,6 +468,7 @@ class _UserListPageState extends State<UserListPage> {
                     builder: (context) => ChatDetailsPage(
                       arguments: ChatPageArguments(
                         chatUser: userChat,
+                        isGroup: false
                       ),
                     ),
                   ),

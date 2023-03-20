@@ -29,7 +29,7 @@ class BaseAppBar extends StatefulWidget implements PreferredSizeWidget {
     this.titleWidget,
     this.leadingWidget,
     this.leadingWidgetColor,
-    this.titleWidgetColor,
+    this.titleWidgetColor = AppColor.white,
     this.preferredSize = const Size.fromHeight(kToolbarHeight),
   }) : assert(title == null || titleWidget == null, "Title and Title widget both can't be null");
 

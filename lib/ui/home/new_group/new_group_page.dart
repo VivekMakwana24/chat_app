@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_demo_structure/core/db/app_db.dart';
+import 'package:flutter_demo_structure/main.dart';
 import 'package:flutter_demo_structure/ui/home/home_page.dart';
 import 'package:flutter_demo_structure/util/date_time_helper.dart';
 import 'package:flutter_demo_structure/util/firebase_chat_manager/constants/firebase_collection_enum.dart';
@@ -17,11 +18,15 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class NewGroupPage extends StatefulWidget {
-  final List<FirebaseChatUser> participantsList;
+  List<FirebaseChatUser> participantsList;
+  final bool isGroupDetails;
+  ChatMessage? groupDetails;
 
-  const NewGroupPage({
+  NewGroupPage({
     required this.participantsList,
+    required this.isGroupDetails,
     Key? key,
+    this.groupDetails,
   }) : super(key: key);
 
   @override
@@ -33,13 +38,27 @@ class _NewGroupPageState extends State<NewGroupPage> {
 
   TextEditingController _groupNameController = TextEditingController();
 
+  bool get _isGroupDetails => widget.isGroupDetails;
+
+  ChatMessage? get _groupDetails => widget.isGroupDetails ? widget.groupDetails : null;
+
+  @override
+  void initState() {
+    super.initState();
+    if (_isGroupDetails) {
+      _groupNameController.text = widget.groupDetails?.groupName ?? '';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    debugPrint('widget.participantsList ${widget.participantsList}');
+    if (widget.participantsList.isEmpty) _fetchUserDetails();
     return Scaffold(
       appBar: BaseAppBar(
         showTitle: true,
         leadingIcon: true,
-        title: 'New Group',
+        title: _isGroupDetails ? _groupDetails?.groupName ?? '' : 'New Group',
         action: [],
       ),
       floatingActionButton: buildFloatingAction(context),
@@ -50,7 +69,11 @@ class _NewGroupPageState extends State<NewGroupPage> {
             20.verticalSpace,
             buildGroupImageView(),
             20.verticalSpace,
-            AppTextField(label: 'Type your group subject here..', hint: 'Type your group subject here..'),
+            AppTextField(
+              controller: _groupNameController,
+              label: 'Type your group subject here..',
+              hint: 'Type your group subject here..',
+            ),
             20.verticalSpace,
             buildParticipantsTitle(),
             20.verticalSpace,
@@ -238,5 +261,19 @@ class _NewGroupPageState extends State<NewGroupPage> {
         ),
       ),
     );*/
+  }
+
+  Future<void> _fetchUserDetails() async {
+    Stream<List<FirebaseChatUser>> stream = firebaseChatManager.getUsers(widget.groupDetails?.participants ?? []);
+
+    debugPrint('==> stream ${stream.toList()}');
+    widget.participantsList = [];
+    await stream.forEach((element) {
+      if (widget.participantsList.isEmpty) {
+        debugPrint('Element $element');
+        widget.participantsList = element;
+        setState(() {});
+      }
+    });
   }
 }
