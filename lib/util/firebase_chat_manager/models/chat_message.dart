@@ -2,18 +2,16 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_demo_structure/core/db/app_db.dart';
-import 'package:flutter_demo_structure/ui/home/direct_message_item_view.dart';
 import 'package:flutter_demo_structure/util/date_time_enum.dart';
 import 'package:flutter_demo_structure/util/date_time_helper.dart';
 import 'package:flutter_demo_structure/util/firebase_chat_manager/constants/firestore_constants.dart';
 import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:json_annotation/json_annotation.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 part 'chat_message.g.dart';
 
-enum SendMessageType { text,image }
+enum SendMessageType { text, image }
 
 extension SendMessageTypeExtension on SendMessageType {
   String get typeValue {
@@ -82,7 +80,7 @@ class ChatMessage {
   @JsonKey(name: 'group_name')
   String? groupName;
 
-  @JsonKey(name: 'is_group',defaultValue: false)
+  @JsonKey(name: 'is_group', defaultValue: false)
   bool? isGroup;
 
   int get unreadCount => (unreadCountList?[FirestoreConstants.getUnreadCountKey(appDB.user.userId)] ?? 0);
@@ -92,7 +90,7 @@ class ChatMessage {
   bool isPlaying = false;
   bool isLoading = false;
 
-  bool get isLeftSide => appDB.user?.userId != senderId;
+  bool get isLeftSide => appDB.user.userId != senderId;
 
   SendMessageType get type => SendMessageType.values.byName(messageType?.lowerCamelCase ?? '');
 
@@ -113,11 +111,11 @@ class ChatMessage {
   }
 
   String? get getName {
-    debugPrint('=> ${appDB.user?.userId}');
+    debugPrint('=> ${appDB.user.userId}');
     debugPrint('=> $senderId');
     debugPrint('=> $receiverName');
     debugPrint('=> $senderName');
-    if (appDB.user?.userId == senderId) {
+    if (appDB.user.userId == senderId) {
       return receiverName;
     } else {
       return senderName;
@@ -125,10 +123,18 @@ class ChatMessage {
   }
 
   String get getChatIcon {
-    if (appDB.user?.userId == senderId) {
+    if (appDB.user.userId == senderId) {
       return receiverProfile ?? '';
     } else {
       return senderProfile ?? '';
+    }
+  }
+
+  String get getGroupSenderName {
+    if (appDB.user.userId == senderId) {
+      return 'You';
+    } else {
+      return senderName ?? '';
     }
   }
 

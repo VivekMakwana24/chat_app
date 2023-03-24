@@ -14,6 +14,13 @@ final textRegular = TextStyle(
   color: Colors.black,
 );
 
+final textRegular14 = TextStyle(
+  decoration: TextDecoration.none,
+  fontWeight: FontWeight.w400,
+  fontSize: 14.sp,
+  color: Colors.black,
+);
+
 final textRegular10 = TextStyle(
   decoration: TextDecoration.none,
   fontWeight: FontWeight.w400,

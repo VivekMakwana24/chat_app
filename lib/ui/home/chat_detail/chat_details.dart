@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -6,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_demo_structure/core/db/app_db.dart';
 import 'package:flutter_demo_structure/main.dart';
 import 'package:flutter_demo_structure/ui/home/new_group/new_group_page.dart';
+import 'package:flutter_demo_structure/util/date_time_helper.dart';
 import 'package:flutter_demo_structure/util/firebase_chat_manager/constants/firebase_collection_enum.dart';
 import 'package:flutter_demo_structure/util/firebase_chat_manager/constants/firestore_constants.dart';
 import 'package:flutter_demo_structure/util/firebase_chat_manager/models/chat_message.dart';
@@ -14,6 +16,7 @@ import 'package:flutter_demo_structure/values/colors.dart';
 import 'package:flutter_demo_structure/values/export.dart';
 import 'package:flutter_demo_structure/widget/base_app_bar.dart';
 import 'package:flutter_demo_structure/widget/image_picker_dialog.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:images_picker/images_picker.dart';
 
 class ChatPageArguments {
@@ -110,7 +113,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with MediaPickerListe
       appBar: BaseAppBar(
         showTitle: true,
         leadingIcon: true,
-        title: _isGroup ? this.widget.arguments.chatUser.userName : _groupName,
+        // title: _isGroup ? this.widget.arguments.chatUser.userName : _groupName,
         titleWidget: Text(
           _isGroup ? (_groupName ?? '') : (this.widget.arguments.chatUser.userName ?? ''),
           style: textBold.copyWith(color: AppColor.white),
@@ -124,7 +127,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with MediaPickerListe
               builder: (context) => NewGroupPage(
                 participantsList: [],
                 isGroupDetails: true,
-                groupDetails : widget.arguments.recentChat,
+                groupDetails: widget.arguments.recentChat,
               ),
             ),
           );
@@ -182,6 +185,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with MediaPickerListe
               builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (snapshot.hasData) {
                   listMessage = snapshot.data!.docs;
+                  //Remove unread count
+                  firebaseChatManager.removeUnreadCount(_chatId);
+
                   if (listMessage.length > 0) {
                     return ListView.builder(
                       padding: EdgeInsets.all(10),
@@ -223,11 +229,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with MediaPickerListe
                 ? Container(
                     child: Text(
                       messageChat.message ?? '',
-                      style: TextStyle(color: AppColor.blackColor),
+                      style: textRegular14.copyWith(color: AppColor.white),
                     ),
                     padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
                     width: 200,
-                    decoration: BoxDecoration(color: AppColor.greyTealColor, borderRadius: BorderRadius.circular(8)),
+                    decoration: BoxDecoration(color: AppColor.primaryColor, borderRadius: BorderRadius.circular(8)),
                     margin: EdgeInsets.only(bottom: !messageChat.isLeftSide ? 20 : 10, right: 10),
                   )
                 : messageChat.messageType == SendMessageType.image.typeValue
@@ -236,7 +242,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with MediaPickerListe
                         child: OutlinedButton(
                           child: Material(
                             child: Image.network(
-                              messageChat.mediaPath ?? '',
+                              messageChat.message ?? '',
                               loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
                                 if (loadingProgress == null) return child;
                                 return Container(
@@ -296,7 +302,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with MediaPickerListe
                     // Sticker
                     : Container(
                         child: Image.asset(
-                          'images/${messageChat.mediaPath}.gif',
+                          'images/${messageChat.message}.gif',
                           width: 100,
                           height: 100,
                           fit: BoxFit.cover,
@@ -347,14 +353,30 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with MediaPickerListe
                       : Container(width: 35),
                   messageChat.messageType == SendMessageType.text.typeValue
                       ? Container(
-                          child: Text(
-                            messageChat.message ?? '',
-                            style: TextStyle(color: Colors.white),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (_isGroup) ...[
+                                Text(
+                                  messageChat.senderName ?? '',
+                                  style: textBold.copyWith(
+                                      fontSize: 14,
+                                      color: Color((Random().nextDouble() * 0xFFFFFF).toInt()).withOpacity(1.0)),
+                                ),
+                                5.h.VBox,
+                              ],
+                              Text(
+                                messageChat.message ?? '',
+                                style: textRegular14,
+                              ),
+                            ],
                           ),
                           padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
                           width: 200,
-                          decoration:
-                              BoxDecoration(color: AppColor.primaryColor, borderRadius: BorderRadius.circular(8)),
+                          decoration: BoxDecoration(
+                            color: AppColor.greyTealColor,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                           margin: EdgeInsets.only(left: 10),
                         )
                       : messageChat.messageType == SendMessageType.image.typeValue
@@ -362,7 +384,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with MediaPickerListe
                               child: TextButton(
                                 child: Material(
                                   child: Image.network(
-                                    messageChat.mediaPath ?? '',
+                                    messageChat.message ?? '',
                                     loadingBuilder:
                                         (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
                                       if (loadingProgress == null) return child;
@@ -419,7 +441,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with MediaPickerListe
                             )
                           : Container(
                               child: Image.asset(
-                                'images/${messageChat.mediaPath}.gif',
+                                'images/${messageChat.message}.gif',
                                 width: 100,
                                 height: 100,
                                 fit: BoxFit.cover,
@@ -524,14 +546,30 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with MediaPickerListe
   void onSendMessage(String content, String type) {
     if (content.trim().isNotEmpty) {
       textEditingController.clear();
-      ChatMessage sendMessageRequest = ChatMessage(
-        message: content,
-        messageType: type.toString(),
-        chatId: _chatId,
-        receiverId: widget.arguments.chatUser.userId,
-        // mediaPath: _downloadUrl,
-      );
-      firebaseChatManager.sendMessage(sendMessageRequest, widget.arguments.chatUser);
+      if (_isGroup) {
+        ChatMessage sendMessageRequest = ChatMessage(
+          message: content,
+          messageType: type.toString(),
+          chatId: _chatId,
+          createdAt: generateUTC(DateTime.now().toUtc()),
+          isGroup: true,
+          groupName: widget.arguments.recentChat?.groupName,
+          participants: widget.arguments.recentChat?.participants,
+        );
+
+        firebaseChatManager.sendGroupMessage(sendMessageRequest, widget.arguments.chatUser);
+      } else {
+        ChatMessage sendMessageRequest = ChatMessage(
+          message: content,
+          messageType: type.toString(),
+          chatId: _chatId,
+          receiverId: widget.arguments.chatUser.userId,
+          // mediaPath: _downloadUrl,
+        );
+
+        firebaseChatManager.sendMessage(sendMessageRequest, widget.arguments.chatUser);
+      }
+
       if (listScrollController.hasClients) {
         listScrollController.animateTo(0, duration: Duration(milliseconds: 300), curve: Curves.easeOut);
       }

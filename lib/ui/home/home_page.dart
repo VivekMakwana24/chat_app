@@ -383,7 +383,11 @@ class _HomePageState extends State<HomePage> {
                         margin: EdgeInsets.fromLTRB(0, 0, 0, 5),
                       ),
                       Text(
-                        (itemData.isGroup ?? false) ? 'new group' : '${itemData.message}',
+                        (itemData.isGroup ?? false)
+                            ? itemData.message != null
+                                ? '${itemData.getGroupSenderName} : ${itemData.messageType == SendMessageType.text.typeValue ? itemData.message : 'sent an image'}'
+                                : 'new group'
+                            : '${itemData.messageType == SendMessageType.text.typeValue ? itemData.message : 'Sent an image'}',
                         maxLines: 1,
                         style: TextStyle(color: AppColor.greyColor, fontSize: 12),
                       )
@@ -440,7 +444,7 @@ class _HomePageState extends State<HomePage> {
                     isGroup: (itemData.isGroup ?? false),
                     groupName: (itemData.isGroup ?? false) ? itemData.groupName : '',
                     chatId: (itemData.isGroup ?? false) ? itemData.chatId : '',
-                    recentChat:itemData,
+                    recentChat: itemData,
                   ),
                 ),
               ),

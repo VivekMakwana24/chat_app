@@ -73,6 +73,7 @@ class FirebaseChatManager {
 
           return Future.value(firebaseUser);
         } else {
+          user.userId = firebaseUser.uid;
           return Future.value(firebaseUser);
         }
       } else {
@@ -161,7 +162,7 @@ class FirebaseChatManager {
     debugPrint('##########');
     Stream<QuerySnapshot> stream = firebaseFirestore
         .collection(FirebaseCollection.users.name)
-        // .where(FirestoreConstants.userId, whereIn: participantsList)
+        .where(FirestoreConstants.userId, whereIn: participantsList)
         // .orderBy(FirestoreConstants.createdAt, descending: true)
         .snapshots();
 
@@ -184,7 +185,7 @@ class FirebaseChatManager {
     return firebaseFirestore
         .collection(FirebaseCollection.recent_chat.name)
         .where(FirestoreConstants.participants, arrayContains: appDB.user.userId)
-        // .orderBy(FirestoreConstants.timestamp, descending: true)
+        .orderBy(FirestoreConstants.createdAt, descending: true)
         .limit(limit)
         .snapshots();
   }
@@ -269,6 +270,55 @@ class FirebaseChatManager {
     await updateRecentChat(messageChat);
   }
 
+  Future<void> sendGroupMessage(
+    ChatMessage messageChat,
+    FirebaseChatUser? receiverUser,
+  ) async {
+    debugPrint('#### sendMessage ######');
+    debugPrint('## content = ${messageChat.message}');
+    debugPrint('## type = ${messageChat.messageType}');
+    debugPrint('## receiverId = ${messageChat.receiverId}');
+
+    ChatMessage? recentChat = await getRecentChatDetails(messageChat.chatId ?? '');
+
+    messageChat
+      ..senderId = appDB.currentUserId
+      ..createdAt = generateUTC(DateTime.now().toUtc())
+      ..chatId = messageChat.chatId
+      ..participants =
+          (messageChat.isGroup ?? false) ? messageChat.participants : [appDB.currentUserId, receiverUser?.userId]
+      ..receiverProfile = receiverUser?.userImage
+      ..receiverName = receiverUser?.userName
+      ..receiverId = receiverUser?.userId
+      ..senderName = appDB.user.userName
+      ..openChatIds = recentChat?.openChatIds
+      ..senderProfile = appDB.user.userImage
+      ..isGroup = messageChat.isGroup
+      ..groupName = messageChat.groupName;
+
+    ///INITIALLY FILL THE DATA
+    if (messageChat.unreadCountList == null) messageChat.unreadCountList = Map();
+
+    messageChat.unreadCountList?[FirestoreConstants.getUnreadCountKey(appDB.user.userId)] = 0;
+
+    messageChat.participants?.where((element) => element != appDB.user.userId).forEach((e) {
+      messageChat.unreadCountList?[FirestoreConstants.getUnreadCountKey(e)] = 1;
+    });
+
+    ///MODIFY UNREAD COUNT IF AVAILABLE
+    recentChat?.unreadCountList?.entries
+        .where((e) => e.key != FirestoreConstants.getUnreadCountKey(appDB.user.userId))
+        .forEach((element) {
+      messageChat.unreadCountList?[element.key] = (element.value) + 1;
+    });
+
+    //Add message in chat collection
+    await FirebaseFirestore.instance.collection(FirebaseCollection.chat.name).doc().set(messageChat.toJson());
+
+    //Add message in recent chat collection
+    await updateRecentChat(messageChat);
+  }
+
   ///GET RECENT CHAT LISTING
   Future<ChatMessage?> getRecentChatDetails(String chatId) async {
     try {
@@ -294,6 +344,28 @@ class FirebaseChatManager {
         .collection(FirebaseCollection.recent_chat.name)
         .where(FirestoreConstants.participants, arrayContains: appDB.user.userId)
         .snapshots();
+  }
+
+  /*
+  * Firebase Update User Details
+  * */
+  void removeUnreadCount(String chatId) {
+    debugPrint('here we are remove unread counts');
+    try {
+      Future.delayed(
+        const Duration(milliseconds: 500),
+            () {
+          FirebaseFirestore.instance.collection(FirebaseCollection.recent_chat.name).doc(chatId).update(
+            Map.of(
+              {FirestoreConstants.unreadCountList + '.${FirestoreConstants.getUnreadCountKey(appDB.user.userId)}': 0},
+            ),
+          );
+        },
+      );
+    } on FirebaseAuthException catch (e) {
+      debugPrint('Firebase No User Found $e');
+      //throw Exception('Something went wrong, Please try again later');
+    }
   }
 
   ///GET RECENT CHAT

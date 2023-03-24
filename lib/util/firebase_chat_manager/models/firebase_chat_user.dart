@@ -24,7 +24,7 @@ class FirebaseChatUser {
     userName = json['user_name'];
     userImage = json['user_image'];
     userEmail = json['user_email'];
-    userId = json['id'];
+    userId = json['user_id'];
     chattingWith = json['chatting_with'];
     createdAt = json['createdAt'];
   }
@@ -58,7 +58,6 @@ class FirebaseChatUser {
     map['user_name'] = userName;
     map['user_image'] = userImage;
     map['user_email'] = userEmail;
-    map['id'] = userId;
     map['chatting_with'] = chattingWith;
     map['createdAt'] = createdAt;
     map['password'] = password;
@@ -72,7 +71,7 @@ class FirebaseChatUser {
     String userEmail = "";
     String userName = "";
     String createdAt = "";
-    int userId = 1;
+    String userId = '';
     try {
       deviceToken = doc.get('device_token');
     } catch (e) {}
