@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_demo_structure/core/db/app_db.dart';
 import 'package:flutter_demo_structure/main.dart';
 import 'package:flutter_demo_structure/ui/home/chat_detail/chat_details.dart';
+import 'package:flutter_demo_structure/ui/home/new_group/new_group_page.dart';
 import 'package:flutter_demo_structure/ui/home/user_list_page.dart';
 import 'package:flutter_demo_structure/util/date_time_helper.dart';
 import 'package:flutter_demo_structure/util/firebase_chat_manager/constants/firebase_collection_enum.dart';
@@ -101,7 +102,10 @@ class _HomePageState extends State<HomePage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => UserListPage(isForGroup: true),
+                    builder: (context) => UserListPage(
+                      isForGroup: true,
+                      pageType: PageType.NEW_GROUP,
+                    ),
                   ),
                 );
               },
@@ -117,7 +121,10 @@ class _HomePageState extends State<HomePage> {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => UserListPage(isForGroup: false),
+                      builder: (context) => UserListPage(
+                        isForGroup: false,
+                        pageType: PageType.USERS,
+                      ),
                     ));
               },
             ),
@@ -483,5 +490,4 @@ class _HomePageState extends State<HomePage> {
 // region LiveData observers
 
 // endregion
-
 }

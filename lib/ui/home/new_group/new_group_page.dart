@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_demo_structure/core/db/app_db.dart';
 import 'package:flutter_demo_structure/main.dart';
 import 'package:flutter_demo_structure/ui/home/home_page.dart';
+import 'package:flutter_demo_structure/ui/home/user_list_page.dart';
 import 'package:flutter_demo_structure/util/date_time_helper.dart';
 import 'package:flutter_demo_structure/util/firebase_chat_manager/constants/firebase_collection_enum.dart';
 import 'package:flutter_demo_structure/util/firebase_chat_manager/models/chat_message.dart';
@@ -17,16 +18,20 @@ import 'package:flutter_demo_structure/widget/text_form_filed.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:velocity_x/velocity_x.dart';
 
+enum PageType { NEW_GROUP, EDIT_GROUP, USERS, ADD_PARTICIPANTS }
+
 class NewGroupPage extends StatefulWidget {
   List<FirebaseChatUser> participantsList;
   final bool isGroupDetails;
   ChatMessage? groupDetails;
+  PageType pageType;
 
   NewGroupPage({
     required this.participantsList,
     required this.isGroupDetails,
-    Key? key,
+    required this.pageType,
     this.groupDetails,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -45,7 +50,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
   @override
   void initState() {
     super.initState();
-    if (_isGroupDetails) {
+    if (widget.pageType != PageType.NEW_GROUP) {
       _groupNameController.text = widget.groupDetails?.groupName ?? '';
     }
   }
@@ -58,7 +63,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
       appBar: BaseAppBar(
         showTitle: true,
         leadingIcon: true,
-        title: _isGroupDetails ? _groupDetails?.groupName ?? '' : 'New Group',
+        title: widget.pageType == PageType.NEW_GROUP ? 'New Group' : 'Edit group',
         action: [],
       ),
       floatingActionButton: buildFloatingAction(context),
@@ -217,12 +222,16 @@ class _NewGroupPageState extends State<NewGroupPage> {
   FloatingActionButton buildFloatingAction(BuildContext context) {
     return FloatingActionButton(
       child: Icon(
-        Icons.arrow_forward,
+        (widget.pageType == PageType.NEW_GROUP) ? Icons.arrow_forward : Icons.add,
         color: AppColor.white,
       ),
       backgroundColor: AppColor.primaryColor,
       onPressed: () {
-        _createGroupAndNavigate();
+        if (widget.pageType == PageType.NEW_GROUP)
+          _createGroupAndNavigate();
+        else
+          navigateAndAddParticipants();
+        return;
       },
     );
   }
@@ -251,16 +260,6 @@ class _NewGroupPageState extends State<NewGroupPage> {
         return HomePage();
       },
     ), (route) => false);
-    /*Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ChatDetailsPage(
-          arguments: ChatPageArguments(
-            chatUser: FirebaseChatUser(),
-          ),
-        ),
-      ),
-    );*/
   }
 
   Future<void> _fetchUserDetails() async {
@@ -275,5 +274,29 @@ class _NewGroupPageState extends State<NewGroupPage> {
         setState(() {});
       }
     });
+  }
+
+  Future<void> navigateAndAddParticipants() async {
+    List<FirebaseChatUser> result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => UserListPage(
+          isForGroup: false,
+          pageType: PageType.ADD_PARTICIPANTS,
+        ),
+      ),
+    );
+
+    if (result.isNotEmpty) {
+      List<String?> participantsList = result.map((e) => e.userId).toList();
+
+      await FirebaseFirestore.instance
+          .collection(FirebaseCollection.recent_chat.name)
+          .doc(widget.groupDetails?.chatId ?? '')
+          .update({'participants': participantsList});
+
+      widget.participantsList.addAll(result);
+      _fetchUserDetails();
+    }
   }
 }

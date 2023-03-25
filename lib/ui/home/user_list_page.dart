@@ -21,9 +21,11 @@ import 'package:velocity_x/velocity_x.dart';
 
 class UserListPage extends StatefulWidget {
   final bool isForGroup;
+  final PageType pageType;
 
   const UserListPage({
     required this.isForGroup,
+    required this.pageType,
     Key? key,
   }) : super(key: key);
 
@@ -83,16 +85,20 @@ class _UserListPageState extends State<UserListPage> {
         appBar: BaseAppBar(
           showTitle: true,
           leadingIcon: true,
-          title: widget.isForGroup ? 'New Group' : 'Users',
+          title: widget.pageType == PageType.NEW_GROUP
+              ? 'New Group'
+              : (widget.pageType == PageType.USERS)
+                  ? 'Users'
+                  : 'Add Participants',
           action: [],
         ),
-        floatingActionButton: widget.isForGroup ? buildFloatingAction(context) : null,
+        floatingActionButton: (widget.pageType != PageType.USERS) ? buildFloatingAction(context) : null,
         body: Stack(
           children: <Widget>[
             // List
             Column(
               children: [
-                if (widget.isForGroup) buildParticipantsList(),
+                if (widget.pageType != PageType.USERS) buildParticipantsList(),
                 buildSearchBar(),
                 Expanded(
                   child: StreamBuilder<QuerySnapshot>(
@@ -168,15 +174,20 @@ class _UserListPageState extends State<UserListPage> {
           showMessage('At least 1 contact must be selected');
         } else {
           //navigate to group screen
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => NewGroupPage(
-                participantsList: _participantsList.value,
-                isGroupDetails: false,
+          if (widget.pageType == PageType.NEW_GROUP) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => NewGroupPage(
+                  participantsList: _participantsList.value,
+                  isGroupDetails: false,
+                  pageType: PageType.NEW_GROUP,
+                ),
               ),
-            ),
-          );
+            );
+          } else {
+            Navigator.pop(context, _participantsList.value);
+          }
         }
       },
     );
@@ -450,7 +461,7 @@ class _UserListPageState extends State<UserListPage> {
               if (Utilities.isKeyboardShowing()) {
                 Utilities.closeKeyboard(context);
               }
-              if (widget.isForGroup) {
+              if (widget.pageType != PageType.USERS) {
                 if (_participantsList.value.contains(userChat)) {
                   debugPrint('DATA REmoved');
 
@@ -466,10 +477,7 @@ class _UserListPageState extends State<UserListPage> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => ChatDetailsPage(
-                      arguments: ChatPageArguments(
-                        chatUser: userChat,
-                        isGroup: false
-                      ),
+                      arguments: ChatPageArguments(chatUser: userChat, isGroup: false),
                     ),
                   ),
                 );
@@ -503,5 +511,4 @@ class _UserListPageState extends State<UserListPage> {
 // region LiveData observers
 
 // endregion
-
 }

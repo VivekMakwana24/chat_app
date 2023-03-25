@@ -127,6 +127,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with MediaPickerListe
               builder: (context) => NewGroupPage(
                 participantsList: [],
                 isGroupDetails: true,
+                pageType: PageType.EDIT_GROUP,
                 groupDetails: widget.arguments.recentChat,
               ),
             ),
