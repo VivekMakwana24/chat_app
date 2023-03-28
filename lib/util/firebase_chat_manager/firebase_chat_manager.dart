@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_demo_structure/core/db/app_db.dart';
 import 'package:flutter_demo_structure/core/di/api/req_params.dart';
 import 'package:flutter_demo_structure/core/navigation/navigation_service.dart';
@@ -80,9 +80,10 @@ class FirebaseChatManager {
         debugPrint('User Found Returning user');
         return Future.error('');
       }
-    } on FirebaseAuthException catch (e) {
+    } on Exception catch (e) {
       debugPrint('Firebase No User Found $e');
 
+      throw Exception('$e');
       ///SignUp the user into firebase
       return firebaseUserSignup(user);
     }
@@ -115,12 +116,17 @@ class FirebaseChatManager {
   /*
   * Get User Listing
   * */
-  Stream<QuerySnapshot> getStreamFireStore(String pathCollection, int limit, String? textSearch) {
-    if (textSearch?.isNotEmpty == true) {
+  Stream<QuerySnapshot> getStreamFireStore(String pathCollection, int limit, String? textSearch,
+      [List<String>? participantsList]) {
+    debugPrint('### - getStreamFireStore ${textSearch}');
+    debugPrint('### - participantsList ${participantsList}');
+
+    if (textSearch?.isNotEmpty ?? false) {
       return firebaseFirestore
           .collection(pathCollection)
           .limit(limit)
           .where(FirestoreConstants.user_name, isEqualTo: textSearch)
+          .where(FirestoreConstants.participants, whereNotIn: participantsList)
           .snapshots();
     } else {
       return firebaseFirestore.collection(pathCollection).limit(limit).snapshots();
@@ -178,16 +184,27 @@ class FirebaseChatManager {
   /*
   * Fetch Recent Chat Stream
   * */
-  Stream<QuerySnapshot> getRecentChatStream(int limit) {
+  Stream<QuerySnapshot> getRecentChatStream(int limit, String textSearch) {
     debugPrint('#### getRecentChatStream ######');
     debugPrint('## GetRecentChatStream = ${FirebaseCollection.recent_chat.name} ${appDB.user.userId}');
     debugPrint('##########');
-    return firebaseFirestore
-        .collection(FirebaseCollection.recent_chat.name)
-        .where(FirestoreConstants.participants, arrayContains: appDB.user.userId)
-        .orderBy(FirestoreConstants.createdAt, descending: true)
-        .limit(limit)
-        .snapshots();
+    if (textSearch.isNotEmpty) {
+      return firebaseFirestore
+          .collection(FirebaseCollection.recent_chat.name)
+          .where(FirestoreConstants.participants, arrayContains: appDB.user.userId)
+          .where(FirestoreConstants.receiver_name, isEqualTo: textSearch)
+          .where(FirestoreConstants.group_name, isEqualTo: textSearch)
+          .orderBy(FirestoreConstants.createdAt, descending: true)
+          .limit(limit)
+          .snapshots();
+    } else {
+      return firebaseFirestore
+          .collection(FirebaseCollection.recent_chat.name)
+          .where(FirestoreConstants.participants, arrayContains: appDB.user.userId)
+          .orderBy(FirestoreConstants.createdAt, descending: true)
+          .limit(limit)
+          .snapshots();
+    }
   }
 
   /*
@@ -354,12 +371,15 @@ class FirebaseChatManager {
     try {
       Future.delayed(
         const Duration(milliseconds: 500),
-            () {
+        () {
           FirebaseFirestore.instance.collection(FirebaseCollection.recent_chat.name).doc(chatId).update(
-            Map.of(
-              {FirestoreConstants.unreadCountList + '.${FirestoreConstants.getUnreadCountKey(appDB.user.userId)}': 0},
-            ),
-          );
+                Map.of(
+                  {
+                    FirestoreConstants.unreadCountList + '.${FirestoreConstants.getUnreadCountKey(appDB.user.userId)}':
+                        0
+                  },
+                ),
+              );
         },
       );
     } on FirebaseAuthException catch (e) {

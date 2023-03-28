@@ -64,33 +64,6 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    addDisposer();
-  }
-
-  addDisposer() {
-    debugPrint("Add reaction");
-    _disposers ??= [
-      // success reaction
-      reaction((_) => authStore.loginResponse, (SingleResponse response) {
-        showLoading.value = false;
-
-        debugPrint("ONResponse Login: called $response");
-        if (response.code == "1") {
-          navigator.pushNamedAndRemoveUntil(RouteName.homePage);
-          appDB.isLogin = true;
-          //showMessage(response.message, type: MessageType.INFO);
-        }
-      }),
-      // error reaction
-      reaction((_) => authStore.errorMessage, (String? errorMessage) {
-        showLoading.value = false;
-        debugPrint("OnError Callled");
-        if (errorMessage != null) {
-          showMessage(errorMessage.toString(), type: MessageType.INFO);
-        }
-      }),
-    ];
-    debugPrint(_disposers?.length.toString());
   }
 
   @override
@@ -156,7 +129,7 @@ class _LoginPageState extends State<LoginPage> {
         child: Column(
           children: [
             25.0.VBox,
-            AppTextField(
+            /*AppTextField(
               controller: nameController,
               label: StringConstant.name,
               hint: StringConstant.name,
@@ -172,7 +145,7 @@ class _LoginPageState extends State<LoginPage> {
                   width: 26.0,
                 ),
               ),
-            ).wrapPaddingHorizontal(20),
+            ).wrapPaddingHorizontal(20),*/
             10.0.VBox,
             AppTextField(
               controller: emailController,
@@ -203,22 +176,6 @@ class _LoginPageState extends State<LoginPage> {
               keyboardAction: TextInputAction.done,
               maxLines: 1,
               maxLength: 15,
-              suffixIcon: Align(
-                alignment: Alignment.centerRight,
-                heightFactor: 1.0,
-                widthFactor: 1.0,
-                child: Text(
-                  StringConstant.forgot,
-                  style: textMedium.copyWith(
-                    color: AppColor.brownColor,
-                    fontSize: 14.0.sp,
-                  ),
-                ).wrapPaddingAll(12.0).addGestureTap(() => {
-                      Future.delayed(Duration.zero, () {
-                        passwordNode.unfocus();
-                      }),
-                    }),
-              ),
               prefixIcon: IconButton(
                 onPressed: null,
                 icon: Image.asset(
@@ -280,6 +237,10 @@ class _LoginPageState extends State<LoginPage> {
     } on Exception catch (e) {
       showLoading.value = false;
 
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Email or password is invalid! Please try again.'),
+        duration: const Duration(seconds: 2),
+      ));
       debugPrint('Error In Firebase $e');
     }
   }

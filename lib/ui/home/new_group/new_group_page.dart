@@ -14,6 +14,7 @@ import 'package:flutter_demo_structure/util/utilities.dart';
 import 'package:flutter_demo_structure/values/colors.dart';
 import 'package:flutter_demo_structure/values/style.dart';
 import 'package:flutter_demo_structure/widget/base_app_bar.dart';
+import 'package:flutter_demo_structure/widget/loading.dart';
 import 'package:flutter_demo_structure/widget/text_form_filed.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:velocity_x/velocity_x.dart';
@@ -44,6 +45,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
   TextEditingController _groupNameController = TextEditingController();
 
   bool get _isGroupDetails => widget.isGroupDetails;
+  ValueNotifier<bool> _showLoading = ValueNotifier<bool>(false);
 
   ChatMessage? get _groupDetails => widget.isGroupDetails ? widget.groupDetails : null;
 
@@ -67,23 +69,30 @@ class _NewGroupPageState extends State<NewGroupPage> {
         action: [],
       ),
       floatingActionButton: buildFloatingAction(context),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Column(
-          children: [
-            20.verticalSpace,
-            buildGroupImageView(),
-            20.verticalSpace,
-            AppTextField(
-              controller: _groupNameController,
-              label: 'Type your group subject here..',
-              hint: 'Type your group subject here..',
-            ),
-            20.verticalSpace,
-            buildParticipantsTitle(),
-            20.verticalSpace,
-            _buildParticipantsList(),
-          ],
+      body: ValueListenableBuilder(
+        valueListenable: _showLoading,
+        builder: (BuildContext context, bool value, Widget? child) {
+          return Loading(status: value, child: child!);
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Column(
+            children: [
+              20.verticalSpace,
+              buildGroupImageView(),
+              20.verticalSpace,
+              AppTextField(
+                controller: _groupNameController,
+                label: 'Type your group subject here..',
+                hint: 'Type your group subject here..',
+                enabled: widget.pageType== PageType.NEW_GROUP,
+              ),
+              20.verticalSpace,
+              buildParticipantsTitle(),
+              20.verticalSpace,
+              _buildParticipantsList(),
+            ],
+          ),
         ),
       ),
     );
@@ -237,6 +246,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
   }
 
   Future<void> _createGroupAndNavigate() async {
+    _showLoading.value = true;
     List<String?> participantsList = widget.participantsList.map((e) => e.userId).toList();
     participantsList.insert(0, appDB.currentUserId);
 
@@ -254,6 +264,8 @@ class _NewGroupPageState extends State<NewGroupPage> {
         .collection(FirebaseCollection.recent_chat.name)
         .doc(sendMessageRequest.chatId)
         .set(sendMessageRequest.toJson());
+
+    _showLoading.value = false;
 
     Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
       builder: (context) {
@@ -277,25 +289,38 @@ class _NewGroupPageState extends State<NewGroupPage> {
   }
 
   Future<void> navigateAndAddParticipants() async {
-    List<FirebaseChatUser> result = await Navigator.push(
+    List<String> participantsListOld = widget.participantsList.map((e) => e.userId ?? '').toList();
+
+    List<FirebaseChatUser>? result = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => UserListPage(
           isForGroup: false,
           pageType: PageType.ADD_PARTICIPANTS,
+          participantsList: participantsListOld,
         ),
       ),
     );
 
-    if (result.isNotEmpty) {
-      List<String?> participantsList = result.map((e) => e.userId).toList();
+    if (result?.isNotEmpty??false) {
+      debugPrint('RESULT => $result');
+      List<String>? participantsList = result?.map((e) => e.userId ?? '').toList();
+
+      participantsListOld.addAll(participantsList??[]);
+
+      debugPrint('participantsList $participantsList');
 
       await FirebaseFirestore.instance
           .collection(FirebaseCollection.recent_chat.name)
           .doc(widget.groupDetails?.chatId ?? '')
-          .update({'participants': participantsList});
+          .update({'participants': participantsListOld});
 
-      widget.participantsList.addAll(result);
+      widget.participantsList.addAll(result!);
+
+      debugPrint('widget.participantsList ${widget.participantsList}');
+
+      widget.groupDetails?.participants = participantsListOld;
+
       _fetchUserDetails();
     }
   }

@@ -30,11 +30,16 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  final appDocumentDir = await getApplicationDocumentsDirectory();
 
-  Hive
-    ..init(appDocumentDir.path)
-    ..registerAdapter(FirebaseChatUserAdapter());
+  if(!kIsWeb){
+    final appDocumentDir = await getApplicationDocumentsDirectory();
+
+    Hive
+      ..init(appDocumentDir.path)
+      ..registerAdapter(FirebaseChatUserAdapter());
+  }else{
+    Hive.registerAdapter(FirebaseChatUserAdapter());
+  }
 
   await setupLocator();
   await locator.isReady<AppDB>();
@@ -60,11 +65,14 @@ Future<void> main() async {
 }
 
 class MyApp extends StatelessWidget {
+  static GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
       builder: (_, __) => MaterialApp(
         title: StringConstant.appName,
+        scaffoldMessengerKey: rootScaffoldMessengerKey,
         theme: appTheme,
         debugShowCheckedModeBanner: false,
         navigatorKey: NavigationService.navigatorKey,

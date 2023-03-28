@@ -135,10 +135,11 @@ class _HomePageState extends State<HomePage> {
             // List
             Column(
               children: [
-                buildSearchBar(),
+                // buildSearchBar(),
+                10.h.verticalSpace,
                 Expanded(
                   child: StreamBuilder<QuerySnapshot>(
-                    stream: firebaseChatManager.getRecentChatStream(_limit),
+                    stream: firebaseChatManager.getRecentChatStream(_limit,searchBarTec.text.trim()),
                     builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
                       if (snapshot.hasData) {
                         _recentChatList.clear();

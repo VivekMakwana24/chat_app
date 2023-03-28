@@ -22,10 +22,12 @@ import 'package:velocity_x/velocity_x.dart';
 class UserListPage extends StatefulWidget {
   final bool isForGroup;
   final PageType pageType;
+  List<String>? participantsList;
 
-  const UserListPage({
+  UserListPage({
     required this.isForGroup,
     required this.pageType,
+    this.participantsList,
     Key? key,
   }) : super(key: key);
 
@@ -102,9 +104,13 @@ class _UserListPageState extends State<UserListPage> {
                 buildSearchBar(),
                 Expanded(
                   child: StreamBuilder<QuerySnapshot>(
-                    stream: firebaseChatManager.getStreamFireStore(FirebaseCollection.users.name, _limit, _textSearch),
+                    stream: firebaseChatManager.getStreamFireStore(
+                        FirebaseCollection.users.name, _limit, _textSearch, widget.participantsList),
                     builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                      debugPrint('HasDaTA ${snapshot.hasData}');
+
                       if (snapshot.hasData) {
+                        debugPrint('HasDaTA ${(snapshot.data?.docs.length ?? 0) > 0}');
                         if ((snapshot.data?.docs.length ?? 0) > 0) {
                           return ListView.builder(
                             padding: EdgeInsets.all(10),
@@ -392,7 +398,8 @@ class _UserListPageState extends State<UserListPage> {
       debugPrint('USERS ==> ${userChat.userId} ${userChat.userName}');
       debugPrint('MyuseriD ==> ${appDB.user.userId}');
 
-      if (userChat.userId == appDB.user.userId) {
+      if (userChat.userId == appDB.user.userId ||
+          (widget.participantsList != null && (widget.participantsList?.contains(userChat.userId ?? '') ?? false))) {
         return SizedBox.shrink();
       } else {
         return Container(
