@@ -12,5 +12,15 @@ class Assets {
   static const String imagePassword = 'assets/image/password.png';
   static const String imageUser = 'assets/image/user.png';
   static const String jsonTypingLoader = 'assets/json/typing_loader.json';
+  static const String svgsAdd = 'assets/svgs/add.svg';
+  static const String svgsAvatar = 'assets/svgs/avatar.svg';
+  static const String svgsBackArrow = 'assets/svgs/back-arrow.svg';
+  static const String svgsGallery = 'assets/svgs/gallery.svg';
+  static const String svgsGroups = 'assets/svgs/groups.svg';
+  static const String svgsLogo = 'assets/svgs/logo.svg';
+  static const String svgsLogout = 'assets/svgs/logout.svg';
+  static const String svgsMessage = 'assets/svgs/message.svg';
+  static const String svgsSearch = 'assets/svgs/search.svg';
+  static const String svgsSend = 'assets/svgs/send.svg';
 
 }

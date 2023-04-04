@@ -87,6 +87,7 @@ class ChatMessage {
 
   bool isFailed;
   bool isFromComment;
+  bool isSelected=false;
   bool isPlaying = false;
   bool isLoading = false;
 

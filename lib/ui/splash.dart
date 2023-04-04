@@ -4,8 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_demo_structure/core/db/app_db.dart';
 import 'package:flutter_demo_structure/core/navigation/navigation_service.dart';
 import 'package:flutter_demo_structure/core/navigation/routes.dart';
-import 'package:flutter_demo_structure/util/biometric_service.dart';
-import 'package:flutter_demo_structure/values/colors.dart';
+import 'package:flutter_demo_structure/generated/assets.dart';
+import 'package:flutter_demo_structure/ui/navbar/navbar.dart';
+import 'package:flutter_demo_structure/ui/web/chat_screen/chat_screen.dart';
+import 'package:flutter_demo_structure/values/colors_new.dart';
+import 'package:flutter_demo_structure/values/export.dart';
+import 'package:flutter_demo_structure/widget/responsive_layout.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:velocity_x/velocity_x.dart';
 
 class Splash extends StatefulWidget {
   @override
@@ -42,12 +49,27 @@ class _SplashState extends State<Splash> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Container(
-        color: AppColor.white,
-        child: Center(
-          child: FlutterLogo(),
-        ),
+    return Scaffold(
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Center(
+            child: SvgPicture.asset(
+              Assets.svgsLogo,
+              height: context.height * .106,
+            ),
+          ),
+          40.heightBox,
+          Text(
+            "Transport Management System",
+            style: GoogleFonts.nunito(
+              fontSize: context.height * .026,
+              fontWeight: FontWeight.w800,
+              color: ColorData.black,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }

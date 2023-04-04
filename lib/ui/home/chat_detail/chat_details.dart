@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_demo_structure/core/db/app_db.dart';
+import 'package:flutter_demo_structure/generated/assets.dart';
 import 'package:flutter_demo_structure/main.dart';
 import 'package:flutter_demo_structure/ui/home/new_group/new_group_page.dart';
 import 'package:flutter_demo_structure/util/date_time_helper.dart';
@@ -12,7 +13,6 @@ import 'package:flutter_demo_structure/util/firebase_chat_manager/constants/fire
 import 'package:flutter_demo_structure/util/firebase_chat_manager/constants/firestore_constants.dart';
 import 'package:flutter_demo_structure/util/firebase_chat_manager/models/chat_message.dart';
 import 'package:flutter_demo_structure/util/firebase_chat_manager/models/firebase_chat_user.dart';
-import 'package:flutter_demo_structure/values/colors.dart';
 import 'package:flutter_demo_structure/values/export.dart';
 import 'package:flutter_demo_structure/widget/base_app_bar.dart';
 import 'package:flutter_demo_structure/widget/image_picker_dialog.dart';
@@ -108,11 +108,24 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with MediaPickerListe
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    debugPrint('didChangeDependencies');
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (_isGroup) {
+      _chatId = widget.arguments.chatId ?? '';
+    } else {
+      _chatId = FirestoreConstants.getChatId(widget.arguments.chatUser.userId);
+    }
+
     return Scaffold(
       appBar: BaseAppBar(
         showTitle: true,
-        leadingIcon: true,
+        leadingIcon: false,
         // title: _isGroup ? this.widget.arguments.chatUser.userName : _groupName,
         titleWidget: Text(
           _isGroup ? (_groupName ?? '') : (this.widget.arguments.chatUser.userName ?? ''),
@@ -268,7 +281,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with MediaPickerListe
                               errorBuilder: (context, object, stackTrace) {
                                 return Material(
                                   child: Image.asset(
-                                    'images/img_not_available.jpeg',
+                                    Assets.imageImgNotAvailable,
                                     width: 200,
                                     height: 200,
                                     fit: BoxFit.cover,
@@ -675,5 +688,4 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with MediaPickerListe
   }
 
 // endregion
-
 }

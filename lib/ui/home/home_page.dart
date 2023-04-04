@@ -7,6 +7,7 @@ import 'package:flutter_demo_structure/main.dart';
 import 'package:flutter_demo_structure/ui/home/chat_detail/chat_details.dart';
 import 'package:flutter_demo_structure/ui/home/new_group/new_group_page.dart';
 import 'package:flutter_demo_structure/ui/home/user_list_page.dart';
+import 'package:flutter_demo_structure/ui/web/widgets/contactlist_appbar.dart';
 import 'package:flutter_demo_structure/util/date_time_helper.dart';
 import 'package:flutter_demo_structure/util/firebase_chat_manager/constants/firebase_collection_enum.dart';
 import 'package:flutter_demo_structure/util/firebase_chat_manager/models/chat_message.dart';
@@ -14,10 +15,11 @@ import 'package:flutter_demo_structure/util/firebase_chat_manager/models/firebas
 import 'package:flutter_demo_structure/util/firebase_chat_manager/models/popup_choices.dart';
 import 'package:flutter_demo_structure/util/utilities.dart';
 import 'package:flutter_demo_structure/values/colors.dart';
+import 'package:flutter_demo_structure/values/colors_new.dart';
 import 'package:flutter_demo_structure/values/extensions/widget_ext.dart';
 import 'package:flutter_demo_structure/values/style.dart';
-import 'package:flutter_demo_structure/widget/base_app_bar.dart';
 import 'package:flutter_demo_structure/widget/debouncer.dart';
+import 'package:flutter_demo_structure/widget/search_bar.dart';
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:velocity_x/velocity_x.dart';
@@ -38,6 +40,7 @@ class _HomePageState extends State<HomePage> {
 
   // region Class members
   ValueNotifier<bool> showLoading = ValueNotifier<bool>(false);
+  ValueNotifier<bool> _isDataUpdated = ValueNotifier<bool>(false);
   final ScrollController listScrollController = ScrollController();
   StreamController<bool> btnClearController = StreamController<bool>();
   TextEditingController searchBarTec = TextEditingController();
@@ -48,6 +51,8 @@ class _HomePageState extends State<HomePage> {
   int _limit = 20;
   int _limitIncrement = 20;
   String _textSearch = "";
+
+  ChatMessage? _selectedItem;
 
   List<PopupChoices> choices = <PopupChoices>[
     PopupChoices(title: 'Log out', icon: Icons.exit_to_app),
@@ -77,127 +82,111 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: BaseAppBar(
-          showTitle: true,
-          leadingIcon: false,
-          title: 'Recent Chats',
-          action: [buildPopupMenu()],
-        ),
-        floatingActionButtonLocation: ExpandableFab.location,
-        floatingActionButton: ExpandableFab(
-          overlayStyle: ExpandableFabOverlayStyle(
-            blur: 5,
-          ),
-          foregroundColor: AppColor.white,
-          backgroundColor: AppColor.primaryColor,
-          closeButtonStyle: ExpandableFabCloseButtonStyle(
-            foregroundColor: AppColor.white,
-            backgroundColor: AppColor.primaryColor,
-          ),
-          children: [
-            FloatingActionButton.small(
-              heroTag: null,
-              child: const Icon(Icons.group_add),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => UserListPage(
-                      isForGroup: true,
-                      pageType: PageType.NEW_GROUP,
-                    ),
-                  ),
-                );
-              },
-              foregroundColor: AppColor.white,
-              backgroundColor: AppColor.primaryColor,
-            ),
-            FloatingActionButton.small(
-              heroTag: null,
-              child: const Icon(Icons.supervised_user_circle),
-              foregroundColor: AppColor.white,
-              backgroundColor: AppColor.primaryColor,
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => UserListPage(
-                        isForGroup: false,
-                        pageType: PageType.USERS,
-                      ),
-                    ));
-              },
-            ),
-          ],
-        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerTop,
+        // floatingActionButton: buildFab(context),
         body: Stack(
           children: <Widget>[
             // List
-            Column(
+            Row(
               children: [
-                // buildSearchBar(),
-                10.h.verticalSpace,
                 Expanded(
-                  child: StreamBuilder<QuerySnapshot>(
-                    stream: firebaseChatManager.getRecentChatStream(_limit,searchBarTec.text.trim()),
-                    builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                      if (snapshot.hasData) {
-                        _recentChatList.clear();
+                  flex: 1,
+                  child: Column(
+                    children: [
+                      //WEB PROFILE
+                      ContactlistAppBar(),
 
-                        _recentChatList
-                            .addAll((snapshot.data?.docs.map((e) => ChatMessage.toDocumentToClass(e)).toList() ?? []));
+                      //SEARCH
+                      Padding(
+                        padding: EdgeInsets.all(20),
+                        child: SearchBar(hintText: "Search..."),
+                      ),
 
-                        return (_recentChatList.isNotEmpty)
-                            ? ListView.separated(
-                                itemCount: _recentChatList.length,
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemBuilder: (context, index) {
-                                  return buildItem(context, _recentChatList[index]);
-                                },
-                                separatorBuilder: (context, index) {
-                                  return 15.sm.verticalSpace;
-                                },
-                              )
-                            : Center(
-                                child: 'No Recent Messages'.text.make(),
-                              );
-                      } else {
-                        return _buildLoader();
-                      }
-                    },
+                      // buildSearchBar(),
+                      10.h.verticalSpace,
+                      Flexible(
+                        child: StreamBuilder<QuerySnapshot>(
+                          stream: firebaseChatManager.getRecentChatStream(_limit, searchBarTec.text.trim()),
+                          builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                            if (snapshot.hasData) {
+                              _recentChatList.clear();
+
+                              _recentChatList.addAll(
+                                  (snapshot.data?.docs.map((e) => ChatMessage.toDocumentToClass(e)).toList() ?? []));
+
+                              return (_recentChatList.isNotEmpty)
+                                  ? ListView.separated(
+                                      itemCount: _recentChatList.length,
+                                      shrinkWrap: true,
+                                      physics: const NeverScrollableScrollPhysics(),
+                                      itemBuilder: (context, index) {
+                                        return buildItem(context, _recentChatList[index]);
+                                      },
+                                      separatorBuilder: (context, index) {
+                                        return 15.sm.verticalSpace;
+                                      },
+                                    )
+                                  : Center(
+                                      child: 'No Recent Messages'.text.make(),
+                                    );
+                            } else {
+                              return _buildLoader();
+                            }
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                 ),
 
-                /*Expanded(
-                  child: StreamBuilder<QuerySnapshot>(
-                    stream: firebaseChatManager.getStreamFireStore(FirebaseCollection.users.name, _limit, _textSearch),
-                    builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                      if (snapshot.hasData) {
-                        if ((snapshot.data?.docs.length ?? 0) > 0) {
-                          return ListView.builder(
-                            padding: EdgeInsets.all(10),
-                            itemBuilder: (context, index) => buildItem(context, snapshot.data?.docs[index]),
-                            itemCount: snapshot.data?.docs.length,
-                            controller: listScrollController,
-                          );
-                        } else {
-                          return Center(
-                            child: Text("No users"),
-                          );
-                        }
-                      } else {
-                        return Center(
-                          child: CircularProgressIndicator(
-                            color: AppColor.primaryColor,
+                //DiVIDER
+                Container(
+                  height: double.infinity,
+                  decoration: const BoxDecoration(
+                    border: Border(
+                      right: BorderSide(color: ColorData.lightGrey),
+                      bottom: BorderSide(color: ColorData.lightGrey),
+                    ),
+                    color: ColorData.white,
+                  ),
+                ),
+
+                if (_selectedItem != null)
+                  Expanded(
+                    flex: 2,
+                    child: ValueListenableBuilder(
+                      valueListenable: _isDataUpdated,
+                      builder: (BuildContext context, bool value, Widget? child) {
+                        debugPrint('DATA is UPDATED');
+                        return ChatDetailsPage(
+                          arguments: ChatPageArguments(
+                            chatUser: FirebaseChatUser(
+                              isOnline: false,
+                              userId: _selectedItem?.getOtherUserId,
+                              userEmail: '',
+                              userName: _selectedItem?.getName,
+                              createdAt: _selectedItem?.createdAt,
+                            ),
+                            isGroup: (_selectedItem?.isGroup ?? false),
+                            groupName: (_selectedItem?.isGroup ?? false) ? _selectedItem?.groupName : '',
+                            chatId: (_selectedItem?.isGroup ?? false) ? _selectedItem?.chatId : '',
+                            recentChat: _selectedItem,
                           ),
                         );
-                      }
-                    },
-                  ),
-                ),*/
+                      },
+                    ),
+                  )
+                else
+                  Expanded(
+                    flex: 2,
+                    child: Container(
+                      child: Text('Welcome to Chat app'),
+                    ).centered(),
+                  )
               ],
             ),
+
+            Positioned(bottom: 0, left: 40, child: buildFab(context)),
 
             // Loading
             Positioned(
@@ -211,6 +200,55 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
+    );
+  }
+
+  ExpandableFab buildFab(BuildContext context) {
+    return ExpandableFab(
+      overlayStyle: ExpandableFabOverlayStyle(
+        blur: 5,
+      ),
+      foregroundColor: AppColor.white,
+      backgroundColor: AppColor.primaryColor,
+      closeButtonStyle: ExpandableFabCloseButtonStyle(
+        foregroundColor: AppColor.white,
+        backgroundColor: AppColor.primaryColor,
+      ),
+      children: [
+        FloatingActionButton.small(
+          heroTag: null,
+          child: const Icon(Icons.group_add),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => UserListPage(
+                  isForGroup: true,
+                  pageType: PageType.NEW_GROUP,
+                ),
+              ),
+            );
+          },
+          foregroundColor: AppColor.white,
+          backgroundColor: AppColor.primaryColor,
+        ),
+        FloatingActionButton.small(
+          heroTag: null,
+          child: const Icon(Icons.supervised_user_circle),
+          foregroundColor: AppColor.white,
+          backgroundColor: AppColor.primaryColor,
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => UserListPage(
+                    isForGroup: false,
+                    pageType: PageType.USERS,
+                  ),
+                ));
+          },
+        ),
+      ],
     );
   }
 
@@ -325,6 +363,16 @@ class _HomePageState extends State<HomePage> {
     } else {}
   }
 
+// endregion
+
+// region LiveData observers
+
+/*
+    * *****************************************************
+    * LiveData observers
+    * *****************************************************
+
+    * */
   Widget buildItem(BuildContext context, ChatMessage itemData) {
     if (itemData != null) {
       return Container(
@@ -437,7 +485,18 @@ class _HomePageState extends State<HomePage> {
               Utilities.closeKeyboard(context);
             }
 
-            Navigator.push(
+            if (_selectedItem != null) {
+              _selectedItem?.isSelected = false;
+              _selectedItem = null;
+            }
+            itemData.isSelected = true;
+            _selectedItem = itemData;
+
+            debugPrint('SelectedITem = ${_selectedItem?.chatId}');
+            debugPrint('SelectedITem = ${_selectedItem?.isSelected}');
+            setState(() {});
+
+            /*Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => ChatDetailsPage(
@@ -456,7 +515,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
               ),
-            );
+            );*/
           },
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all<Color>(AppColor.greyTealColor),
@@ -479,16 +538,6 @@ class _HomePageState extends State<HomePage> {
       return SizedBox.shrink();
     }
   }
-
-// endregion
-
-/*
-    * *****************************************************
-    * LiveData observers
-    * *****************************************************
-    * */
-
-// region LiveData observers
 
 // endregion
 }
