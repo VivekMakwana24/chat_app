@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'package:collection/collection.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_demo_structure/core/db/app_db.dart';
 import 'package:flutter_demo_structure/main.dart';
@@ -12,6 +14,7 @@ import 'package:flutter_demo_structure/util/firebase_chat_manager/models/firebas
 import 'package:flutter_demo_structure/util/firebase_chat_manager/models/popup_choices.dart';
 import 'package:flutter_demo_structure/util/utilities.dart';
 import 'package:flutter_demo_structure/values/colors.dart';
+import 'package:flutter_demo_structure/values/extensions/context_ext.dart';
 import 'package:flutter_demo_structure/values/extensions/widget_ext.dart';
 import 'package:flutter_demo_structure/widget/app_utils.dart';
 import 'package:flutter_demo_structure/widget/base_app_bar.dart';
@@ -21,7 +24,7 @@ import 'package:velocity_x/velocity_x.dart';
 
 class UserListPage extends StatefulWidget {
   final bool isForGroup;
-  final PageType pageType;
+  PageType pageType;
   List<String>? participantsList;
 
   UserListPage({
@@ -86,7 +89,7 @@ class _UserListPageState extends State<UserListPage> {
       child: Scaffold(
         appBar: BaseAppBar(
           showTitle: true,
-          leadingIcon: true,
+          leadingIcon: false,
           title: widget.pageType == PageType.NEW_GROUP
               ? 'New Group'
               : (widget.pageType == PageType.USERS)
@@ -181,16 +184,42 @@ class _UserListPageState extends State<UserListPage> {
         } else {
           //navigate to group screen
           if (widget.pageType == PageType.NEW_GROUP) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => NewGroupPage(
-                  participantsList: _participantsList.value,
-                  isGroupDetails: false,
-                  pageType: PageType.NEW_GROUP,
+            if (kIsWeb)
+              showGeneralDialog(
+                context: context,
+                barrierColor: Colors.black54,
+                barrierDismissible: true,
+                barrierLabel: 'Label',
+                pageBuilder: (_, __, ___) {
+                  return Row(
+                    children: [
+                      Spacer(),
+                      SizedBox(
+                        width: context.width * 0.4,
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: NewGroupPage(
+                            participantsList: _participantsList.value,
+                            isGroupDetails: false,
+                            pageType: PageType.NEW_GROUP,
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              );
+            else
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => NewGroupPage(
+                    participantsList: _participantsList.value,
+                    isGroupDetails: false,
+                    pageType: PageType.NEW_GROUP,
+                  ),
                 ),
-              ),
-            );
+              );
           } else {
             Navigator.pop(context, _participantsList.value);
           }
@@ -469,7 +498,8 @@ class _UserListPageState extends State<UserListPage> {
                 Utilities.closeKeyboard(context);
               }
               if (widget.pageType != PageType.USERS) {
-                if (_participantsList.value.contains(userChat)) {
+                bool check = _participantsList.value.firstWhereOrNull((element) => element.userId == userChat.userId) !=null;
+                if (check) {
                   debugPrint('DATA REmoved');
 
                   _participantsList.value.remove(userChat);
@@ -489,6 +519,14 @@ class _UserListPageState extends State<UserListPage> {
                   ),
                 );
               }
+            },
+            onLongPress: () {
+              if (widget.pageType == PageType.NEW_GROUP) return;
+              widget.pageType = PageType.NEW_GROUP;
+              setState(() {});
+
+              _participantsList.value.add(userChat);
+              _participantsList.notifyListeners();
             },
             style: ButtonStyle(
               backgroundColor: MaterialStateProperty.all<Color>(AppColor.greyTealColor),

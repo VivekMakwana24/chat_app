@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_demo_structure/ui/common/contact_list/contact_list.dart';
 import 'package:flutter_demo_structure/ui/home/home_page.dart';
-import 'package:flutter_demo_structure/ui/web/widgets/contactlist_appbar.dart';
+import 'package:flutter_demo_structure/ui/home/new_group/new_group_page.dart';
+import 'package:flutter_demo_structure/ui/home/user_list_page.dart';
 import 'package:flutter_demo_structure/ui/web/widgets/left_navbar.dart';
-import 'package:flutter_demo_structure/ui/web/widgets/message_screen.dart';
 import 'package:flutter_demo_structure/values/colors_new.dart';
-import 'package:flutter_demo_structure/widget/search_bar.dart';
 
 class WebChatScreen extends StatefulWidget {
   const WebChatScreen({super.key});
@@ -26,8 +24,13 @@ class _WebChatScreenState extends State<WebChatScreen> {
         children: [
           //LEFT NAV BAR
           LeftNavBar(
-            selectedScreen: SelectedScreen.OneToOne,
-            onScreenChange: (screen) {},
+            selectedScreen: selectedScreen,
+            onScreenChange: (screen) {
+              selectedScreen = screen;
+              setState(() {
+
+              });
+            },
           ),
           //DEVIDER
           Container(
@@ -43,10 +46,15 @@ class _WebChatScreenState extends State<WebChatScreen> {
 
           //WEB PROFILE
           Expanded(
-            child: HomePage(),
+            child: selectedScreen == SelectedScreen.OneToOne
+                ? HomePage()
+                : UserListPage(
+                    isForGroup: false,
+                    pageType: PageType.USERS,
+                  ),
           ),
 
-         /* //DEVIDER
+          /* //DEVIDER
           Container(
             height: double.infinity,
             decoration: const BoxDecoration(

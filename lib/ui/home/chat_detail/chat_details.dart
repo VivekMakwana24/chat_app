@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_demo_structure/core/db/app_db.dart';
 import 'package:flutter_demo_structure/generated/assets.dart';
@@ -134,17 +135,44 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with MediaPickerListe
           if (!_isGroup) return;
           debugPrint('Navigate to group details');
 
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => NewGroupPage(
-                participantsList: [],
-                isGroupDetails: true,
-                pageType: PageType.EDIT_GROUP,
-                groupDetails: widget.arguments.recentChat,
+          if (kIsWeb)
+            showGeneralDialog(
+              context: context,
+              barrierColor: Colors.black54,
+              barrierDismissible: true,
+              barrierLabel: 'Label',
+              pageBuilder: (_, __, ___) {
+                return Row(
+                  children: [
+                    Spacer(),
+                    SizedBox(
+                      width: context.width * 0.6,
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: NewGroupPage(
+                          participantsList: [],
+                          isGroupDetails: true,
+                          pageType: PageType.EDIT_GROUP,
+                          groupDetails: widget.arguments.recentChat,
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            );
+          else
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => NewGroupPage(
+                  participantsList: [],
+                  isGroupDetails: true,
+                  pageType: PageType.EDIT_GROUP,
+                  groupDetails: widget.arguments.recentChat,
+                ),
               ),
-            ),
-          );
+            );
         }),
       ),
       body: SafeArea(

@@ -5,14 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_demo_structure/core/db/app_db.dart';
 import 'package:flutter_demo_structure/generated/assets.dart';
 import 'package:flutter_demo_structure/main.dart';
-import 'package:flutter_demo_structure/ui/home/chat_detail/chat_details.dart';
 import 'package:flutter_demo_structure/ui/home/new_group/new_group_page.dart';
 import 'package:flutter_demo_structure/ui/home/user_list_page.dart';
-import 'package:flutter_demo_structure/ui/web/widgets/contactlist_appbar.dart';
 import 'package:flutter_demo_structure/util/date_time_helper.dart';
 import 'package:flutter_demo_structure/util/firebase_chat_manager/constants/firebase_collection_enum.dart';
 import 'package:flutter_demo_structure/util/firebase_chat_manager/models/chat_message.dart';
-import 'package:flutter_demo_structure/util/firebase_chat_manager/models/firebase_chat_user.dart';
 import 'package:flutter_demo_structure/util/firebase_chat_manager/models/popup_choices.dart';
 import 'package:flutter_demo_structure/util/utilities.dart';
 import 'package:flutter_demo_structure/values/colors.dart';
@@ -20,6 +17,7 @@ import 'package:flutter_demo_structure/values/colors_new.dart';
 import 'package:flutter_demo_structure/values/extensions/context_ext.dart';
 import 'package:flutter_demo_structure/values/extensions/widget_ext.dart';
 import 'package:flutter_demo_structure/values/style.dart';
+import 'package:flutter_demo_structure/widget/base_app_bar.dart';
 import 'package:flutter_demo_structure/widget/debouncer.dart';
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -27,14 +25,14 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:velocity_x/velocity_x.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+class MessagePageMobile extends StatefulWidget {
+  const MessagePageMobile({Key? key}) : super(key: key);
 
   @override
-  _HomePageState createState() => _HomePageState();
+  _MessagePageMobileState createState() => _MessagePageMobileState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _MessagePageMobileState extends State<MessagePageMobile> {
   /*
    * *****************************************************
    * Class members
@@ -86,115 +84,59 @@ class _HomePageState extends State<HomePage> {
     return SafeArea(
       child: Scaffold(
         floatingActionButtonLocation: FloatingActionButtonLocation.centerTop,
-        // floatingActionButton: buildFab(context),
-        body: Stack(
-          children: <Widget>[
-            // List
-            Row(
-              children: [
-                Expanded(
-                  flex: 1,
-                  child: Column(
-                    children: [
-                      //WEB PROFILE
-                      ContactlistAppBar(),
+        floatingActionButton: buildFab(context),
+        appBar: BaseAppBar(
+          title: 'Messages',
+          showTitle: true,
+          leadingIcon: false,
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Stack(
+            children: <Widget>[
+              // List
+              Column(
+                children: [
+                  //SEARCH
+                  buildSearchBar(),
 
-                      //SEARCH
-                      Padding(
-                        padding: EdgeInsets.all(20),
-                        child: buildSearchBar(),
-                      ),
+                  // buildSearchBar(),
+                  10.h.verticalSpace,
+                  Flexible(
+                    child: StreamBuilder<QuerySnapshot>(
+                      stream: firebaseChatManager.getRecentChatStream(_limit, searchBarTec.text.trim()),
+                      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                        if (snapshot.hasData) {
+                          _recentChatList.clear();
 
-                      // buildSearchBar(),
-                      10.h.verticalSpace,
-                      Flexible(
-                        child: StreamBuilder<QuerySnapshot>(
-                          stream: firebaseChatManager.getRecentChatStream(_limit, searchBarTec.text.trim()),
-                          builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                            if (snapshot.hasData) {
-                              _recentChatList.clear();
+                          _recentChatList
+                              .addAll((snapshot.data?.docs.map((e) => ChatMessage.toDocumentToClass(e)).toList() ?? []));
 
-                              _recentChatList.addAll(
-                                  (snapshot.data?.docs.map((e) => ChatMessage.toDocumentToClass(e)).toList() ?? []));
-
-                              return (_recentChatList.isNotEmpty)
-                                  ? ListView.separated(
-                                      itemCount: _recentChatList.length,
-                                      shrinkWrap: true,
-                                      physics: const NeverScrollableScrollPhysics(),
-                                      itemBuilder: (context, index) {
-                                        return buildItem(context, _recentChatList[index]);
-                                      },
-                                      separatorBuilder: (context, index) {
-                                        return 15.sm.verticalSpace;
-                                      },
-                                    )
-                                  : Center(
-                                      child: 'No Recent Messages'.text.make(),
-                                    );
-                            } else {
-                              return _buildLoader();
-                            }
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                //DiVIDER
-                Container(
-                  height: double.infinity,
-                  decoration: const BoxDecoration(
-                    border: Border(
-                      right: BorderSide(color: ColorData.lightGrey),
-                      bottom: BorderSide(color: ColorData.lightGrey),
+                          return (_recentChatList.isNotEmpty)
+                              ? ListView.separated(
+                                  itemCount: _recentChatList.length,
+                                  shrinkWrap: true,
+                                  itemBuilder: (context, index) {
+                                    return buildItem(context, _recentChatList[index]);
+                                  },
+                                  separatorBuilder: (context, index) {
+                                    return 15.sm.verticalSpace;
+                                  },
+                                )
+                              : Center(
+                                  child: 'No Recent Messages'.text.make(),
+                                );
+                        } else {
+                          return _buildLoader();
+                        }
+                      },
                     ),
-                    color: ColorData.white,
                   ),
-                ),
-
-                if (_selectedItem != null)
-                  Expanded(
-                    flex: 2,
-                    child: ChatDetailsPage(
-                      arguments: ChatPageArguments(
-                        chatUser: FirebaseChatUser(
-                          isOnline: false,
-                          userId: _selectedItem?.getOtherUserId,
-                          userEmail: '',
-                          userName: _selectedItem?.getName,
-                          createdAt: _selectedItem?.createdAt,
-                        ),
-                        isGroup: (_selectedItem?.isGroup ?? false),
-                        groupName: (_selectedItem?.isGroup ?? false) ? _selectedItem?.groupName : '',
-                        chatId: (_selectedItem?.isGroup ?? false) ? _selectedItem?.chatId : '',
-                        recentChat: _selectedItem,
-                      ),
-                    ),
-                  )
-                else
-                  Expanded(
-                    flex: 2,
-                    child: Container(
-                      child: Text('Welcome to Chat app'),
-                    ).centered(),
-                  )
-              ],
-            ),
-
-            Positioned(bottom: 0, left: 40, child: buildFab(context)),
-
-            // Loading
-            Positioned(
-              child: ValueListenableBuilder(
-                valueListenable: showLoading,
-                builder: (BuildContext context, bool isLoading, Widget? child) {
-                  return isLoading ? CircularProgressIndicator.adaptive() : SizedBox.shrink();
-                },
+                ],
               ),
-            )
-          ],
+              // Positioned(bottom: 0, left: 40, child: buildFab(context)),
+            ],
+          ),
         ),
       ),
     );
@@ -517,27 +459,6 @@ class _HomePageState extends State<HomePage> {
             debugPrint('SelectedITem = ${_selectedItem?.chatId}');
             debugPrint('SelectedITem = ${_selectedItem?.isSelected}');
             setState(() {});
-
-            /*Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ChatDetailsPage(
-                  arguments: ChatPageArguments(
-                    chatUser: FirebaseChatUser(
-                      isOnline: false,
-                      userId: itemData.getOtherUserId,
-                      userEmail: '',
-                      userName: itemData.getName,
-                      createdAt: itemData.createdAt,
-                    ),
-                    isGroup: (itemData.isGroup ?? false),
-                    groupName: (itemData.isGroup ?? false) ? itemData.groupName : '',
-                    chatId: (itemData.isGroup ?? false) ? itemData.chatId : '',
-                    recentChat: itemData,
-                  ),
-                ),
-              ),
-            );*/
           },
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all<Color>(AppColor.greyTealColor),

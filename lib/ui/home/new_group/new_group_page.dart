@@ -1,11 +1,14 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_demo_structure/core/db/app_db.dart';
+import 'package:flutter_demo_structure/generated/assets.dart';
 import 'package:flutter_demo_structure/main.dart';
 import 'package:flutter_demo_structure/ui/home/home_page.dart';
 import 'package:flutter_demo_structure/ui/home/user_list_page.dart';
+import 'package:flutter_demo_structure/ui/web/chat_screen/chat_screen.dart';
 import 'package:flutter_demo_structure/util/date_time_helper.dart';
 import 'package:flutter_demo_structure/util/firebase_chat_manager/constants/firebase_collection_enum.dart';
 import 'package:flutter_demo_structure/util/firebase_chat_manager/models/chat_message.dart';
@@ -85,7 +88,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
                 controller: _groupNameController,
                 label: 'Type your group subject here..',
                 hint: 'Type your group subject here..',
-                enabled: widget.pageType== PageType.NEW_GROUP,
+                enabled: widget.pageType == PageType.NEW_GROUP,
               ),
               20.verticalSpace,
               buildParticipantsTitle(),
@@ -100,28 +103,51 @@ class _NewGroupPageState extends State<NewGroupPage> {
 
   Center buildGroupImageView() {
     return Center(
-      child: Image.file(
-        File(_selectedImagePath ?? ''),
-        fit: BoxFit.cover,
-        width: 100,
-        height: 100,
-        errorBuilder: (context, object, stackTrace) {
-          return Container(
-            decoration: BoxDecoration(
-              color: AppColor.primaryColor,
-              shape: BoxShape.circle,
+      child: kIsWeb
+          ? Image.asset(
+              Assets.imageImgNotAvailable,
+              fit: BoxFit.cover,
+              width: 100,
+              height: 100,
+              errorBuilder: (context, object, stackTrace) {
+                return Container(
+                  decoration: BoxDecoration(
+                    color: AppColor.primaryColor,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Icon(
+                      Icons.group,
+                      size: 100,
+                      color: AppColor.greyColor,
+                    ),
+                  ),
+                );
+              },
+            )
+          : Image.file(
+              File(_selectedImagePath ?? ''),
+              fit: BoxFit.cover,
+              width: 100,
+              height: 100,
+              errorBuilder: (context, object, stackTrace) {
+                return Container(
+                  decoration: BoxDecoration(
+                    color: AppColor.primaryColor,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Icon(
+                      Icons.group,
+                      size: 100,
+                      color: AppColor.greyColor,
+                    ),
+                  ),
+                );
+              },
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Icon(
-                Icons.group,
-                size: 100,
-                color: AppColor.greyColor,
-              ),
-            ),
-          );
-        },
-      ),
     );
   }
 
@@ -269,7 +295,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
 
     Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
       builder: (context) {
-        return HomePage();
+        return kIsWeb ? WebChatScreen() : HomePage();
       },
     ), (route) => false);
   }
@@ -302,11 +328,11 @@ class _NewGroupPageState extends State<NewGroupPage> {
       ),
     );
 
-    if (result?.isNotEmpty??false) {
+    if (result?.isNotEmpty ?? false) {
       debugPrint('RESULT => $result');
       List<String>? participantsList = result?.map((e) => e.userId ?? '').toList();
 
-      participantsListOld.addAll(participantsList??[]);
+      participantsListOld.addAll(participantsList ?? []);
 
       debugPrint('participantsList $participantsList');
 

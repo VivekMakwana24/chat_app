@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_demo_structure/generated/assets.dart';
+import 'package:flutter_demo_structure/ui/home/new_group/new_group_page.dart';
+import 'package:flutter_demo_structure/ui/home/user_list_page.dart';
 import 'package:flutter_demo_structure/ui/mobile/chat_screen/chat_screen.dart';
+import 'package:flutter_demo_structure/ui/mobile/message_page_mobile.dart';
 import 'package:flutter_demo_structure/values/colors_new.dart';
 import 'package:flutter_demo_structure/values/extensions/context_ext.dart';
 import 'package:flutter_svg/svg.dart';
@@ -17,12 +20,12 @@ class MyBottomNavigationBar extends StatefulWidget {
 class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
   int currentTab = 1;
   final List<Widget> screens = [
-    const MobileChatScreen(),
-    const Placeholder(),
+    const MessagePageMobile(),
+    UserListPage(isForGroup: false, pageType: PageType.USERS),
   ];
 
   final PageStorageBucket bucket = PageStorageBucket();
-  Widget currentScreen = const MobileChatScreen();
+  Widget currentScreen = const MessagePageMobile();
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +48,7 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
                 onPressed: () {
                   setState(
                     () {
-                      currentScreen = const Placeholder();
+                      currentScreen = screens.first;
                       currentTab = 1;
                       HapticFeedback.heavyImpact();
                     },
@@ -80,7 +83,7 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
                 onPressed: () {
                   setState(
                     () {
-                      currentScreen = const MobileChatScreen();
+                      currentScreen = screens.last;
                       currentTab = 2;
                       HapticFeedback.heavyImpact();
                     },
