@@ -234,7 +234,10 @@ class _LoginPageState extends State<LoginPage> {
       if (user != null) {
         appDB.currentUserId = userModel.userId.toString();
         appDB.isLogin = true;
-        appDB.user = userModel;
+
+        appDB.user = (await firebaseChatManager.getUserDetails(userModel.userId.toString()))!;
+
+        debugPrint('LOGGED IN USER ${appDB.user.toJson()}');
 
         Navigator.pushReplacement(
           context,

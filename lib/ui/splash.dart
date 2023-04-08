@@ -30,8 +30,18 @@ class _SplashState extends State<Splash> {
     // bool isAuthenticated = await AuthService.authenticateUser();
     if (true) {
       Timer(Duration(seconds: 2), () {
-        if (appDB.isLogin)
-          navigator.pushReplacementNamed(RouteName.homePage);
+        if (appDB.isLogin){
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const ResponsiveLayout(
+                webScreenLayout: WebChatScreen(),
+                tabletScreenLayout: MyBottomNavigationBar(),
+                mobileScreenLayout: MyBottomNavigationBar(),
+              ),
+            ),
+          );
+        }
         else {
           navigator.pushReplacementNamed(RouteName.loginPage);
         }

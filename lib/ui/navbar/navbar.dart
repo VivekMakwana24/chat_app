@@ -5,8 +5,10 @@ import 'package:flutter_demo_structure/ui/home/new_group/new_group_page.dart';
 import 'package:flutter_demo_structure/ui/home/user_list_page.dart';
 import 'package:flutter_demo_structure/ui/mobile/chat_screen/chat_screen.dart';
 import 'package:flutter_demo_structure/ui/mobile/message_page_mobile.dart';
+import 'package:flutter_demo_structure/values/colors.dart';
 import 'package:flutter_demo_structure/values/colors_new.dart';
 import 'package:flutter_demo_structure/values/extensions/context_ext.dart';
+import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -114,6 +116,7 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
           ),
         ),
       ),
+      // floatingActionButton: buildFab(context),
       floatingActionButton: SizedBox(
         height: 68,
         width: 68,
@@ -125,11 +128,60 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
             height: 24,
           ),
           onPressed: () {
-            HapticFeedback.heavyImpact();
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => UserListPage(
+                  isForGroup: true,
+                  pageType: PageType.NEW_GROUP,
+                ),
+              ),
+            );
           },
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+    );
+  }
+
+  ExpandableFab buildFab(BuildContext context) {
+    return ExpandableFab(
+      overlayStyle: ExpandableFabOverlayStyle(
+        blur: 5,
+      ),
+      foregroundColor: AppColor.white,
+      backgroundColor: AppColor.primaryColor,
+      closeButtonStyle: ExpandableFabCloseButtonStyle(
+        foregroundColor: AppColor.white,
+        backgroundColor: AppColor.primaryColor,
+      ),
+      children: [
+        FloatingActionButton.small(
+          heroTag: null,
+          child: const Icon(Icons.group_add),
+          onPressed: () {
+
+          },
+          foregroundColor: AppColor.white,
+          backgroundColor: AppColor.primaryColor,
+        ),
+        FloatingActionButton.small(
+          heroTag: null,
+          child: const Icon(Icons.supervised_user_circle),
+          foregroundColor: AppColor.white,
+          backgroundColor: AppColor.primaryColor,
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => UserListPage(
+                    isForGroup: false,
+                    pageType: PageType.USERS,
+                  ),
+                ));
+          },
+        ),
+      ],
     );
   }
 }

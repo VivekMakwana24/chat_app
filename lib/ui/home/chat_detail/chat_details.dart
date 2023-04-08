@@ -26,10 +26,12 @@ class ChatPageArguments {
   final String? groupName;
   final String? chatId;
   final ChatMessage? recentChat;
+  final bool isDialog;
 
   ChatPageArguments({
     required this.chatUser,
     required this.isGroup,
+    required this.isDialog,
     this.groupName,
     this.chatId,
     this.recentChat,
@@ -126,7 +128,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with MediaPickerListe
     return Scaffold(
       appBar: BaseAppBar(
         showTitle: true,
-        leadingIcon: false,
+        leadingIcon: widget.arguments.isDialog ? false : true,
         // title: _isGroup ? this.widget.arguments.chatUser.userName : _groupName,
         titleWidget: Text(
           _isGroup ? (_groupName ?? '') : (this.widget.arguments.chatUser.userName ?? ''),
@@ -135,7 +137,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with MediaPickerListe
           if (!_isGroup) return;
           debugPrint('Navigate to group details');
 
-          if (kIsWeb)
+          if (kIsWeb && widget.arguments.isDialog)
             showGeneralDialog(
               context: context,
               barrierColor: Colors.black54,

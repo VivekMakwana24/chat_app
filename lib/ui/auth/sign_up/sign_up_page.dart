@@ -10,6 +10,8 @@ import 'package:flutter_demo_structure/core/navigation/routes.dart';
 import 'package:flutter_demo_structure/main.dart';
 import 'package:flutter_demo_structure/res.dart';
 import 'package:flutter_demo_structure/ui/auth/login/store/login_store.dart';
+import 'package:flutter_demo_structure/ui/navbar/navbar.dart';
+import 'package:flutter_demo_structure/ui/web/chat_screen/chat_screen.dart';
 import 'package:flutter_demo_structure/util/date_time_helper.dart';
 import 'package:flutter_demo_structure/util/firebase_chat_manager/models/firebase_chat_user.dart';
 import 'package:flutter_demo_structure/values/export.dart';
@@ -18,6 +20,7 @@ import 'package:flutter_demo_structure/widget/app_utils.dart';
 import 'package:flutter_demo_structure/widget/base_app_bar.dart';
 import 'package:flutter_demo_structure/widget/button_widget_inverse.dart';
 import 'package:flutter_demo_structure/widget/loading.dart';
+import 'package:flutter_demo_structure/widget/responsive_layout.dart';
 import 'package:flutter_demo_structure/widget/text_form_filed.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mobx/mobx.dart';
@@ -229,7 +232,16 @@ class _SignUpPageState extends State<SignUpPage> {
         appDB.currentUserId = userModel.userId.toString();
         appDB.isLogin = true;
         appDB.user = userModel;
-        navigator.pushReplacementNamed(RouteName.homePage);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const ResponsiveLayout(
+              webScreenLayout: WebChatScreen(),
+              tabletScreenLayout: MyBottomNavigationBar(),
+              mobileScreenLayout: MyBottomNavigationBar(),
+            ),
+          ),
+        );
       }
     } on Exception catch (e) {
       showLoading.value = false;

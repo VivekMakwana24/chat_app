@@ -170,6 +170,7 @@ class _HomePageState extends State<HomePage> {
                         groupName: (_selectedItem?.isGroup ?? false) ? _selectedItem?.groupName : '',
                         chatId: (_selectedItem?.isGroup ?? false) ? _selectedItem?.chatId : '',
                         recentChat: _selectedItem,
+                        isDialog: true,
                       ),
                     ),
                   )
@@ -483,16 +484,18 @@ class _HomePageState extends State<HomePage> {
                     style: textRegular10.copyWith(color: AppColor.greyColor),
                   ),
                   if (itemData.unreadCount > 0) ...[
-                    DecoratedBox(
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: AppColor.redColor,
-                      ),
-                      child: Text(
-                        '${itemData.unreadCount}',
-                        style: textMedium.copyWith(fontSize: 10.sm, color: AppColor.white),
-                      ).wrapPadding(
-                        padding: EdgeInsets.only(top: 8.w, bottom: 8.w, left: 8.w, right: 6.w),
+                    SizedBox(
+                      height: 20.sm,
+                      width: 20.sm,
+                      child: DecoratedBox(
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: AppColor.redColor,
+                        ),
+                        child: Text(
+                          '${itemData.unreadCount}',
+                          style: textMedium.copyWith(fontSize: 10.sp, color: AppColor.white),
+                        ).centered(),
                       ),
                     ),
                   ],

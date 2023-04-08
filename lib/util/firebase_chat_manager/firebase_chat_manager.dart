@@ -84,6 +84,7 @@ class FirebaseChatManager {
       debugPrint('Firebase No User Found $e');
 
       throw Exception('$e');
+
       ///SignUp the user into firebase
       return firebaseUserSignup(user);
     }
@@ -131,6 +132,24 @@ class FirebaseChatManager {
     } else {
       return firebaseFirestore.collection(pathCollection).limit(limit).snapshots();
     }
+  }
+
+  Future<FirebaseChatUser>? getUserDetails(String userId) async {
+    debugPrint('### - getUserDetails ${userId}');
+
+    final QuerySnapshot result = await firebaseFirestore
+        .collection(FirebaseCollection.users.name)
+        .limit(1)
+        .where(FirestoreConstants.userId, isEqualTo: userId)
+        .get();
+
+    final List<DocumentSnapshot> documents = result.docs;
+
+    if (documents.isNotEmpty) {
+      FirebaseChatUser messageChat = FirebaseChatUser.fromDocument(documents[0]);
+      return Future.value(messageChat);
+    }
+    return Future.error('');
   }
 
   Future<void> updateDataFirestore(String collectionPath, String docPath, Map<String, dynamic> dataNeedUpdate) {
@@ -295,6 +314,7 @@ class FirebaseChatManager {
     debugPrint('## content = ${messageChat.message}');
     debugPrint('## type = ${messageChat.messageType}');
     debugPrint('## receiverId = ${messageChat.receiverId}');
+    debugPrint('## SenderName = ${appDB.user.userName}');
 
     ChatMessage? recentChat = await getRecentChatDetails(messageChat.chatId ?? '');
 

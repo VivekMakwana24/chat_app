@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'package:collection/collection.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_demo_structure/core/db/app_db.dart';
@@ -89,7 +89,7 @@ class _UserListPageState extends State<UserListPage> {
       child: Scaffold(
         appBar: BaseAppBar(
           showTitle: true,
-          leadingIcon: false,
+          leadingIcon: context.width >= 1024 ? false : true,
           title: widget.pageType == PageType.NEW_GROUP
               ? 'New Group'
               : (widget.pageType == PageType.USERS)
@@ -498,7 +498,8 @@ class _UserListPageState extends State<UserListPage> {
                 Utilities.closeKeyboard(context);
               }
               if (widget.pageType != PageType.USERS) {
-                bool check = _participantsList.value.firstWhereOrNull((element) => element.userId == userChat.userId) !=null;
+                bool check =
+                    _participantsList.value.firstWhereOrNull((element) => element.userId == userChat.userId) != null;
                 if (check) {
                   debugPrint('DATA REmoved');
 
@@ -514,7 +515,7 @@ class _UserListPageState extends State<UserListPage> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => ChatDetailsPage(
-                      arguments: ChatPageArguments(chatUser: userChat, isGroup: false),
+                      arguments: ChatPageArguments(chatUser: userChat, isGroup: false, isDialog: false),
                     ),
                   ),
                 );

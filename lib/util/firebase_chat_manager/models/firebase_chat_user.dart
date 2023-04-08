@@ -76,6 +76,9 @@ class FirebaseChatUser {
       deviceToken = doc.get('device_token');
     } catch (e) {}
     try {
+      userId = doc.get('user_id');
+    } catch (e) {}
+    try {
       userImage = doc.get('user_image');
     } catch (e) {}
     try {
@@ -91,7 +94,7 @@ class FirebaseChatUser {
       userId = doc.get('user_id');
     } catch (e) {}
     return FirebaseChatUser(
-      userId: doc.id,
+      userId: userId,
       deviceToken: deviceToken,
       userEmail: userEmail,
       userName: userName,

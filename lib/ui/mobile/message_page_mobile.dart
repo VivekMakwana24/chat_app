@@ -5,16 +5,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_demo_structure/core/db/app_db.dart';
 import 'package:flutter_demo_structure/generated/assets.dart';
 import 'package:flutter_demo_structure/main.dart';
+import 'package:flutter_demo_structure/ui/home/chat_detail/chat_details.dart';
 import 'package:flutter_demo_structure/ui/home/new_group/new_group_page.dart';
 import 'package:flutter_demo_structure/ui/home/user_list_page.dart';
 import 'package:flutter_demo_structure/util/date_time_helper.dart';
 import 'package:flutter_demo_structure/util/firebase_chat_manager/constants/firebase_collection_enum.dart';
 import 'package:flutter_demo_structure/util/firebase_chat_manager/models/chat_message.dart';
+import 'package:flutter_demo_structure/util/firebase_chat_manager/models/firebase_chat_user.dart';
 import 'package:flutter_demo_structure/util/firebase_chat_manager/models/popup_choices.dart';
 import 'package:flutter_demo_structure/util/utilities.dart';
 import 'package:flutter_demo_structure/values/colors.dart';
 import 'package:flutter_demo_structure/values/colors_new.dart';
-import 'package:flutter_demo_structure/values/extensions/context_ext.dart';
 import 'package:flutter_demo_structure/values/extensions/widget_ext.dart';
 import 'package:flutter_demo_structure/values/style.dart';
 import 'package:flutter_demo_structure/widget/base_app_bar.dart';
@@ -89,6 +90,7 @@ class _MessagePageMobileState extends State<MessagePageMobile> {
           title: 'Messages',
           showTitle: true,
           leadingIcon: false,
+          action: [buildPopupMenu()],
         ),
         body: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -109,8 +111,8 @@ class _MessagePageMobileState extends State<MessagePageMobile> {
                         if (snapshot.hasData) {
                           _recentChatList.clear();
 
-                          _recentChatList
-                              .addAll((snapshot.data?.docs.map((e) => ChatMessage.toDocumentToClass(e)).toList() ?? []));
+                          _recentChatList.addAll(
+                              (snapshot.data?.docs.map((e) => ChatMessage.toDocumentToClass(e)).toList() ?? []));
 
                           return (_recentChatList.isNotEmpty)
                               ? ListView.separated(
@@ -210,7 +212,6 @@ class _MessagePageMobileState extends State<MessagePageMobile> {
 
   Widget buildSearchBar() {
     return Container(
-      height: 40,
       width: double.infinity,
       // height: 60,
       decoration: BoxDecoration(
@@ -221,36 +222,35 @@ class _MessagePageMobileState extends State<MessagePageMobile> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Expanded(
-              child: TextFormField(
-            cursorColor: ColorData.black,
-            cursorHeight: (context.height) * .021,
-            keyboardType: TextInputType.text,
-            controller: searchBarTec,
-            onChanged: (value) {
-              searchDebouncer.run(() {
-                if (value.isNotEmpty) {
-                  btnClearController.add(true);
-                  setState(() {
-                    _textSearch = value;
-                  });
-                } else {
-                  btnClearController.add(false);
-                  setState(() {
-                    _textSearch = "";
-                  });
-                }
-              });
-            },
-            decoration: InputDecoration(
-              counterText: '',
-              border: const OutlineInputBorder(),
-              prefixIcon: Padding(
-                padding: const EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 8),
-                child: SvgPicture.asset(
-                  Assets.svgsSearch,
+            child: TextFormField(
+              cursorColor: ColorData.black,
+              keyboardType: TextInputType.text,
+              controller: searchBarTec,
+              onChanged: (value) {
+                searchDebouncer.run(() {
+                  if (value.isNotEmpty) {
+                    btnClearController.add(true);
+                    setState(() {
+                      _textSearch = value;
+                    });
+                  } else {
+                    btnClearController.add(false);
+                    setState(() {
+                      _textSearch = "";
+                    });
+                  }
+                });
+              },
+              decoration: InputDecoration(
+                counterText: '',
+                border: const OutlineInputBorder(),
+                prefixIcon: Padding(
+                  padding: const EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 8),
+                  child: SvgPicture.asset(
+                    Assets.svgsSearch,
+                  ),
                 ),
-              ),
-              suffixIcon: StreamBuilder<bool>(
+                suffixIcon: StreamBuilder<bool>(
                   stream: btnClearController.stream,
                   builder: (context, snapshot) {
                     return snapshot.data == true
@@ -262,32 +262,35 @@ class _MessagePageMobileState extends State<MessagePageMobile> {
                                 _textSearch = "";
                               });
                             },
-                            child: Icon(Icons.clear_rounded, color: AppColor.greyColor, size: 20))
+                            child: Icon(Icons.clear_rounded, color: AppColor.greyColor, size: 20),
+                          )
                         : SizedBox.shrink();
-                  }),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(7),
-                borderSide: const BorderSide(color: Colors.transparent),
+                  },
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(7),
+                  borderSide: const BorderSide(color: Colors.transparent),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(7),
+                  borderSide: const BorderSide(color: Colors.transparent),
+                ),
+                hintText: 'Search here...',
+                labelStyle: GoogleFonts.nunito(
+                  color: ColorData.black,
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                hintStyle: GoogleFonts.nunito(
+                  color: ColorData.black,
+                  fontSize: 16,
+                ),
               ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(7),
-                borderSide: const BorderSide(color: Colors.transparent),
-              ),
-              hintText: 'Search here...',
-              labelStyle: GoogleFonts.nunito(
-                color: ColorData.black,
-              ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-              hintStyle: GoogleFonts.nunito(
+              style: GoogleFonts.nunito(
                 color: ColorData.black,
                 fontSize: 16,
               ),
             ),
-            style: GoogleFonts.nunito(
-              color: ColorData.black,
-              fontSize: 16,
-            ),
-          )),
+          ),
         ],
       ),
     );
@@ -455,6 +458,26 @@ class _MessagePageMobileState extends State<MessagePageMobile> {
             }
             itemData.isSelected = true;
             _selectedItem = itemData;
+
+            Navigator.push(context, MaterialPageRoute(
+              builder: (context) {
+                return ChatDetailsPage(
+                  arguments: ChatPageArguments(
+                      chatUser: FirebaseChatUser(
+                        isOnline: false,
+                        userId: _selectedItem?.getOtherUserId,
+                        userEmail: '',
+                        userName: _selectedItem?.getName,
+                        createdAt: _selectedItem?.createdAt,
+                      ),
+                      isGroup: (_selectedItem?.isGroup ?? false),
+                      groupName: (_selectedItem?.isGroup ?? false) ? _selectedItem?.groupName : '',
+                      chatId: (_selectedItem?.isGroup ?? false) ? _selectedItem?.chatId : '',
+                      recentChat: _selectedItem,
+                      isDialog: false),
+                );
+              },
+            ));
 
             debugPrint('SelectedITem = ${_selectedItem?.chatId}');
             debugPrint('SelectedITem = ${_selectedItem?.isSelected}');
