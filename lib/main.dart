@@ -22,6 +22,7 @@ import 'package:url_strategy/url_strategy.dart';
 import 'core/db/app_db.dart';
 import 'core/locator.dart';
 import 'core/navigation/routes.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,8 +45,12 @@ Future<void> main() async {
   await setupLocator();
   await locator.isReady<AppDB>();
   setPathUrlStrategy();
+  // usePathUrlStrategy();
+
   //await Firebase.initializeApp();
   // PushNotificationsManager().init();
+
+  // String para1 = Uri.base.queryParameters["para1"];
 
   // Fixing App Orientation.
   SystemChrome.setPreferredOrientations([

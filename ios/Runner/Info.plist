@@ -43,5 +43,9 @@
 	<false/>
 	<key>NSFaceIDUsageDescription</key>
     <string>Biometric authentication is required to authenticate user in the app</string>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
 </dict>
 </plist>

@@ -9,15 +9,12 @@ import 'package:flutter_demo_structure/core/navigation/routes.dart';
 import 'package:flutter_demo_structure/generated/assets.dart';
 import 'package:flutter_demo_structure/main.dart';
 import 'package:flutter_demo_structure/res.dart';
-import 'package:flutter_demo_structure/ui/navbar/navbar.dart';
-import 'package:flutter_demo_structure/ui/web/chat_screen/chat_screen.dart';
 import 'package:flutter_demo_structure/util/date_time_helper.dart';
 import 'package:flutter_demo_structure/util/firebase_chat_manager/models/firebase_chat_user.dart';
 import 'package:flutter_demo_structure/values/export.dart';
 import 'package:flutter_demo_structure/values/string_constants.dart';
 import 'package:flutter_demo_structure/widget/button_widget_inverse.dart';
 import 'package:flutter_demo_structure/widget/loading.dart';
-import 'package:flutter_demo_structure/widget/responsive_layout.dart';
 import 'package:flutter_demo_structure/widget/text_form_filed.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -66,6 +63,10 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    final settingsUri = Uri.parse(RouteName.homePage);
+//settingsUri.queryParameters is a map of all the query keys and values
+    final postID = settingsUri.queryParameters['id'];
+    debugPrint('POST=ID ==> $postID');
   }
 
   @override
@@ -239,7 +240,7 @@ class _LoginPageState extends State<LoginPage> {
 
         debugPrint('LOGGED IN USER ${appDB.user.toJson()}');
 
-        Navigator.pushReplacement(
+        /*Navigator.pushReplacement(
           context,
           MaterialPageRoute(
             builder: (context) => const ResponsiveLayout(
@@ -248,8 +249,8 @@ class _LoginPageState extends State<LoginPage> {
               mobileScreenLayout: MyBottomNavigationBar(),
             ),
           ),
-        );
-        // navigator.pushReplacementNamed(RouteName.homePage);
+        );*/
+        navigator.pushReplacementNamed(RouteName.homePage);
       }
     } on Exception catch (e) {
       showLoading.value = false;

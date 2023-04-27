@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_demo_structure/ui/auth/login/login_page.dart';
 import 'package:flutter_demo_structure/ui/auth/sign_up/sign_up_page.dart';
-import 'package:flutter_demo_structure/ui/home/home_page.dart';
-import 'package:flutter_demo_structure/ui/home/line_chart_page.dart';
 import 'package:flutter_demo_structure/ui/home/line_chart_summary.dart';
+import 'package:flutter_demo_structure/ui/navbar/navbar.dart';
 import 'package:flutter_demo_structure/ui/splash.dart';
+import 'package:flutter_demo_structure/ui/web/chat_screen/chat_screen.dart';
+import 'package:flutter_demo_structure/widget/responsive_layout.dart';
 import 'package:flutter_demo_structure/widget/web_widget.dart';
 
 abstract class RouteName {
@@ -24,10 +25,13 @@ class Routes {
   }
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
+    List<String> pathComponents = settings.name!.split('/');
+    debugPrint('pathComponents $pathComponents');
+
     final args = settings.arguments;
     debugPrint("Route Name ${settings.name} args $args ");
     var page;
-    switch (settings.name) {
+    switch ('/' + pathComponents[1]) {
       case RouteName.root:
         page = Splash();
         break;
@@ -42,8 +46,17 @@ class Routes {
         page = LineChartSummaryPage();
         break;
 
-      case RouteName.homePage:
+      /*case RouteName.homePage:
         page = HomePage();
+        break;*/
+
+      case RouteName.homePage:
+        var home = ResponsiveLayout(
+          webScreenLayout: WebChatScreen(path: pathComponents.length > 2 ? pathComponents[2] : null),
+          tabletScreenLayout: MyBottomNavigationBar(),
+          mobileScreenLayout: MyBottomNavigationBar(),
+        );
+        page = home;
         break;
 
       case RouteName.webViewPage:
