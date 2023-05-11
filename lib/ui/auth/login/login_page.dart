@@ -47,6 +47,8 @@ class _LoginPageState extends State<LoginPage> {
     nameNode = FocusNode();
     emailNode = FocusNode();
     passwordNode = FocusNode();
+
+    loginAndNavigateToHome();
   }
 
   @override
@@ -224,9 +226,9 @@ class _LoginPageState extends State<LoginPage> {
                 : 'A',
         isOnline: false,
         //await firebaseChatManager.fetchUserId(emailController.text.trim()),
-        userEmail: emailController.text.trim(),
-        userName: nameController.text.trim(),
-        password: passwordController.text.trim(),
+        userEmail: 'ray@yopmail.com',//emailController.text.trim(),
+        userName: 'Ray',
+        password: '111111',
         createdAt: generateUTC(DateTime.now().toUtc()),
       );
 

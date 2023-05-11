@@ -121,37 +121,7 @@ class _HomePageState extends State<HomePage> {
                                   ? ListView.separated(
                                       itemCount: _recentChatList.length,
                                       shrinkWrap: true,
-                                      physics: const NeverScrollableScrollPhysics(),
-                                      itemBuilder: (context, index) {
-                                        return buildItem(context, _recentChatList[index]);
-                                      },
-                                      separatorBuilder: (context, index) {
-                                        return 15.sm.verticalSpace;
-                                      },
-                                    )
-                                  : Center(
-                                      child: 'No Recent Messages'.text.make(),
-                                    );
-                            } else {
-                              return _buildLoader();
-                            }
-                          },
-                        ),
-                      ),Flexible(
-                        child: StreamBuilder<QuerySnapshot>(
-                          stream: firebaseChatManager.getRecentChatStream(_limit, searchBarTec.text.trim()),
-                          builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                            if (snapshot.hasData) {
-                              _recentChatList.clear();
-
-                              _recentChatList.addAll(
-                                  (snapshot.data?.docs.map((e) => ChatMessage.toDocumentToClass(e)).toList() ?? []));
-
-                              return (_recentChatList.isNotEmpty)
-                                  ? ListView.separated(
-                                      itemCount: _recentChatList.length,
-                                      shrinkWrap: true,
-                                      physics: const NeverScrollableScrollPhysics(),
+                                      // physics: const NeverScrollableScrollPhysics(),
                                       itemBuilder: (context, index) {
                                         return buildItem(context, _recentChatList[index]);
                                       },

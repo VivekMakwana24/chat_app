@@ -33,12 +33,9 @@ class _WebChatScreenState extends State<WebChatScreen> {
   void initState() {
     super.initState();
 
-    debugPrint(
-        'DECODE ==> ${utf8.decode(base64Decode(base64.normalize(widget.path ?? 'ewogICAgInVzZXJfZW1haWwiOiJ2aXZla0B5b3BtYWlsLmNvbSIsCiAgICAiZ3JvdXBfaWQiOiIiCn0=')))}');
-
-    if (appDB.user != null) {
-      loginAndNavigateToHome();
-    }
+    // debugPrint(
+    //     'DECODE ==> ${utf8.decode(base64Decode(base64.normalize(widget.path ?? 'ewogICAgInVzZXJfZW1haWwiOiJ2aXZla0B5b3BtYWlsLmNvbSIsCiAgICAiZ3JvdXBfaWQiOiIiCn0=')))}');
+    // loginAndNavigateToHome();
   }
 
   @override
@@ -106,10 +103,10 @@ class _WebChatScreenState extends State<WebChatScreen> {
 
   Future<void> loginAndNavigateToHome() async {
     try {
-      Map<String, dynamic> map = jsonDecode(utf8.decode(base64Decode(base64.normalize(
-          widget.path ?? 'ewogICAgInVzZXJfZW1haWwiOiJ2aXZla0B5b3BtYWlsLmNvbSIsCiAgICAiZ3JvdXBfaWQiOiIiCn0='))));
+      // Map<String, dynamic> map = jsonDecode(utf8.decode(base64Decode(base64.normalize(
+      //     widget.path ?? 'ewogICAgInVzZXJfZW1haWwiOiJ2aXZla0B5b3BtYWlsLmNvbSIsCiAgICAiZ3JvdXBfaWQiOiIiCn0='))));
 
-      debugPrint('===> USER EMAIL ' + map['user_email']);
+      // debugPrint('===> USER EMAIL ' + map['user_email']);
       // showLoading.value = true;
       var userModel = FirebaseChatUser(
         deviceToken: '0',
@@ -120,7 +117,7 @@ class _WebChatScreenState extends State<WebChatScreen> {
                 : 'A',
         isOnline: false,
         //await firebaseChatManager.fetchUserId(emailController.text.trim()),
-        userEmail: map['user_email'],
+        userEmail: 'ray@yopmail.com',
         password: '111111',
         createdAt: generateUTC(DateTime.now().toUtc()),
       );

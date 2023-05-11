@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_demo_structure/generated/assets.dart';
+import 'package:flutter_demo_structure/main.dart';
+import 'package:flutter_demo_structure/ui/auth/login/login_page.dart';
 import 'package:flutter_demo_structure/values/colors_new.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:velocity_x/velocity_x.dart';
@@ -82,7 +84,15 @@ class _LeftNavBarState extends State<LeftNavBar> {
           //LOGOUT ICON
           InkWell(
             hoverColor: Colors.transparent,
-            onTap: () {},
+            onTap: () {
+              firebaseChatManager.logoutUser();
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => LoginPage(),
+                  ),
+                  (route) => false);
+            },
             child: SvgPicture.asset(
               Assets.svgsLogout,
               height: 30,
