@@ -78,7 +78,7 @@ class _UserListPageState extends State<UserListPage> {
     super.initState();
     /* firebaseChatManager.updateDataFirestore(
       FirebaseCollection.users.name,
-      appDB.user.userId.toString(),
+      appDB.user?.userId.toString(),
       {'pushToken': appDB.fcmToken},
     );*/
   }
@@ -425,9 +425,9 @@ class _UserListPageState extends State<UserListPage> {
     if (document != null) {
       FirebaseChatUser userChat = FirebaseChatUser.fromDocument(document);
       debugPrint('USERS ==> ${userChat.userId} ${userChat.userName}');
-      debugPrint('MyuseriD ==> ${appDB.user.userId}');
+      debugPrint('MyuseriD ==> ${appDB.user?.userId}');
 
-      if (userChat.userId == appDB.user.userId ||
+      if (userChat.userId == appDB.user?.userId ||
           (widget.participantsList != null && (widget.participantsList?.contains(userChat.userId ?? '') ?? false))) {
         return SizedBox.shrink();
       } else {

@@ -43,17 +43,17 @@ class _SplashState extends State<Splash> {
           );
         }
         else {
-          navigator.pushReplacementNamed(RouteName.loginPage);
-          // Navigator.pushReplacement(
-          //   context,
-          //   MaterialPageRoute(
-          //     builder: (context) => const ResponsiveLayout(
-          //       webScreenLayout: WebChatScreen(),
-          //       tabletScreenLayout: MyBottomNavigationBar(),
-          //       mobileScreenLayout: MyBottomNavigationBar(),
-          //     ),
-          //   ),
-          // );
+          // navigator.pushReplacementNamed(RouteName.loginPage);
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const ResponsiveLayout(
+                webScreenLayout: WebChatScreen(),
+                tabletScreenLayout: MyBottomNavigationBar(),
+                mobileScreenLayout: MyBottomNavigationBar(),
+              ),
+            ),
+          );
         }
       });
     } else {

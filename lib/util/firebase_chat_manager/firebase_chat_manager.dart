@@ -205,12 +205,12 @@ class FirebaseChatManager {
   * */
   Stream<QuerySnapshot> getRecentChatStream(int limit, String textSearch) {
     debugPrint('#### getRecentChatStream ######');
-    debugPrint('## GetRecentChatStream = ${FirebaseCollection.recent_chat.name} ${appDB.user.userId}');
+    debugPrint('## GetRecentChatStream = ${FirebaseCollection.recent_chat.name} ${appDB.user?.userId}');
     debugPrint('##########');
     if (textSearch.isNotEmpty) {
       return firebaseFirestore
           .collection(FirebaseCollection.recent_chat.name)
-          .where(FirestoreConstants.participants, arrayContains: appDB.user.userId)
+          .where(FirestoreConstants.participants, arrayContains: appDB.user?.userId)
           .where(FirestoreConstants.receiver_name, isEqualTo: textSearch)
           .where(FirestoreConstants.group_name, isEqualTo: textSearch)
           .orderBy(FirestoreConstants.createdAt, descending: true)
@@ -219,7 +219,7 @@ class FirebaseChatManager {
     } else {
       return firebaseFirestore
           .collection(FirebaseCollection.recent_chat.name)
-          .where(FirestoreConstants.participants, arrayContains: appDB.user.userId)
+          .where(FirestoreConstants.participants, arrayContains: appDB.user?.userId)
           .orderBy(FirestoreConstants.createdAt, descending: true)
           .limit(limit)
           .snapshots();
@@ -279,22 +279,22 @@ class FirebaseChatManager {
       ..receiverProfile = receiverUser?.userImage
       ..receiverName = receiverUser?.userName
       ..receiverId = receiverUser?.userId
-      ..senderName = appDB.user.userName
+      ..senderName = appDB.user?.userName
       ..openChatIds = recentChat?.openChatIds
-      ..senderProfile = appDB.user.userImage;
+      ..senderProfile = appDB.user?.userImage;
 
     ///INITIALLY FILL THE DATA
     if (messageChat.unreadCountList == null) messageChat.unreadCountList = Map();
 
-    messageChat.unreadCountList?[FirestoreConstants.getUnreadCountKey(appDB.user.userId)] = 0;
+    messageChat.unreadCountList?[FirestoreConstants.getUnreadCountKey(appDB.user?.userId)] = 0;
 
-    messageChat.participants?.where((element) => element != appDB.user.userId).forEach((e) {
+    messageChat.participants?.where((element) => element != appDB.user?.userId).forEach((e) {
       messageChat.unreadCountList?[FirestoreConstants.getUnreadCountKey(e)] = 1;
     });
 
     ///MODIFY UNREAD COUNT IF AVAILABLE
     recentChat?.unreadCountList?.entries
-        .where((e) => e.key != FirestoreConstants.getUnreadCountKey(appDB.user.userId))
+        .where((e) => e.key != FirestoreConstants.getUnreadCountKey(appDB.user?.userId))
         .forEach((element) {
       messageChat.unreadCountList?[element.key] = (element.value) + 1;
     });
@@ -314,7 +314,7 @@ class FirebaseChatManager {
     debugPrint('## content = ${messageChat.message}');
     debugPrint('## type = ${messageChat.messageType}');
     debugPrint('## receiverId = ${messageChat.receiverId}');
-    debugPrint('## SenderName = ${appDB.user.userName}');
+    debugPrint('## SenderName = ${appDB.user?.userName}');
 
     ChatMessage? recentChat = await getRecentChatDetails(messageChat.chatId ?? '');
 
@@ -327,24 +327,24 @@ class FirebaseChatManager {
       ..receiverProfile = receiverUser?.userImage
       ..receiverName = receiverUser?.userName
       ..receiverId = receiverUser?.userId
-      ..senderName = appDB.user.userName
+      ..senderName = appDB.user?.userName
       ..openChatIds = recentChat?.openChatIds
-      ..senderProfile = appDB.user.userImage
+      ..senderProfile = appDB.user?.userImage
       ..isGroup = messageChat.isGroup
       ..groupName = messageChat.groupName;
 
     ///INITIALLY FILL THE DATA
     if (messageChat.unreadCountList == null) messageChat.unreadCountList = Map();
 
-    messageChat.unreadCountList?[FirestoreConstants.getUnreadCountKey(appDB.user.userId)] = 0;
+    messageChat.unreadCountList?[FirestoreConstants.getUnreadCountKey(appDB.user?.userId)] = 0;
 
-    messageChat.participants?.where((element) => element != appDB.user.userId).forEach((e) {
+    messageChat.participants?.where((element) => element != appDB.user?.userId).forEach((e) {
       messageChat.unreadCountList?[FirestoreConstants.getUnreadCountKey(e)] = 1;
     });
 
     ///MODIFY UNREAD COUNT IF AVAILABLE
     recentChat?.unreadCountList?.entries
-        .where((e) => e.key != FirestoreConstants.getUnreadCountKey(appDB.user.userId))
+        .where((e) => e.key != FirestoreConstants.getUnreadCountKey(appDB.user?.userId))
         .forEach((element) {
       messageChat.unreadCountList?[element.key] = (element.value) + 1;
     });
@@ -379,7 +379,7 @@ class FirebaseChatManager {
   Stream<QuerySnapshot> getRecentChatUnreadCounts() {
     return firebaseFirestore
         .collection(FirebaseCollection.recent_chat.name)
-        .where(FirestoreConstants.participants, arrayContains: appDB.user.userId)
+        .where(FirestoreConstants.participants, arrayContains: appDB.user?.userId)
         .snapshots();
   }
 
@@ -395,7 +395,7 @@ class FirebaseChatManager {
           FirebaseFirestore.instance.collection(FirebaseCollection.recent_chat.name).doc(chatId).update(
                 Map.of(
                   {
-                    FirestoreConstants.unreadCountList + '.${FirestoreConstants.getUnreadCountKey(appDB.user.userId)}':
+                    FirestoreConstants.unreadCountList + '.${FirestoreConstants.getUnreadCountKey(appDB.user?.userId)}':
                         0
                   },
                 ),

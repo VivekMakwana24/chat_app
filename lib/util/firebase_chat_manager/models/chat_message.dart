@@ -83,7 +83,7 @@ class ChatMessage {
   @JsonKey(name: 'is_group', defaultValue: false)
   bool? isGroup;
 
-  int get unreadCount => (unreadCountList?[FirestoreConstants.getUnreadCountKey(appDB.user.userId)] ?? 0);
+  int get unreadCount => (unreadCountList?[FirestoreConstants.getUnreadCountKey(appDB.user?.userId)] ?? 0);
 
   bool isFailed;
   bool isFromComment;
@@ -91,12 +91,12 @@ class ChatMessage {
   bool isPlaying = false;
   bool isLoading = false;
 
-  bool get isLeftSide => appDB.user.userId != senderId;
+  bool get isLeftSide => appDB.user?.userId != senderId;
 
   SendMessageType get type => SendMessageType.values.byName(messageType?.lowerCamelCase ?? '');
 
   String? get getChatName {
-    if (appDB.user.userId == senderId) {
+    if (appDB.user?.userId == senderId) {
       return receiverName;
     } else {
       return senderName;
@@ -104,7 +104,7 @@ class ChatMessage {
   }
 
   String? get getOtherUserId {
-    if (appDB.user.userId == senderId) {
+    if (appDB.user?.userId == senderId) {
       return receiverId;
     } else {
       return senderId;
@@ -112,11 +112,11 @@ class ChatMessage {
   }
 
   String? get getName {
-    debugPrint('=> ${appDB.user.userId}');
+    debugPrint('=> ${appDB.user?.userId}');
     debugPrint('=> $senderId');
     debugPrint('=> $receiverName');
     debugPrint('=> $senderName');
-    if (appDB.user.userId == senderId) {
+    if (appDB.user?.userId == senderId) {
       return receiverName;
     } else {
       return senderName;
@@ -124,7 +124,7 @@ class ChatMessage {
   }
 
   String get getChatIcon {
-    if (appDB.user.userId == senderId) {
+    if (appDB.user?.userId == senderId) {
       return receiverProfile ?? '';
     } else {
       return senderProfile ?? '';
@@ -132,7 +132,7 @@ class ChatMessage {
   }
 
   String get getGroupSenderName {
-    if (appDB.user.userId == senderId) {
+    if (appDB.user?.userId == senderId) {
       return 'You';
     } else {
       return senderName ?? '';

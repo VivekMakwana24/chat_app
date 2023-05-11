@@ -51,9 +51,9 @@ class AppDB {
 
   set apiKey(String update) => setValue("apiKey", update);
 
-  FirebaseChatUser get user => getValue("user");
+  FirebaseChatUser? get user => getValue("user");
 
-  set user(FirebaseChatUser user) => setValue("user", user);
+  set user(FirebaseChatUser? user) => setValue("user", user);
 
   logout() {
     token = "";
