@@ -43,7 +43,7 @@ class _WebProfileAppbarState extends State<WebProfileAppbar> {
               children: [
                 Text(
                   "User Name",
-                  style: GoogleFonts.nunito(
+                  style: GoogleFonts.openSans(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
                     color: ColorData.black,
@@ -52,7 +52,7 @@ class _WebProfileAppbarState extends State<WebProfileAppbar> {
                 03.heightBox,
                 Text(
                   "Online",
-                  style: GoogleFonts.nunito(
+                  style: GoogleFonts.openSans(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: ColorData.green,

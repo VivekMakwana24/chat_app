@@ -9,7 +9,7 @@ class ContactlistAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 72,
+      height: 56,
       width: MediaQuery.of(context).size.width * 0.35,
       decoration: const BoxDecoration(
         border: Border(
@@ -23,26 +23,10 @@ class ContactlistAppBar extends StatelessWidget {
             padding: const EdgeInsets.only(left: 24),
             child: Text(
               "Message",
-              style: GoogleFonts.nunito(
-                fontSize: 20,
-                fontWeight: FontWeight.w800,
+              style: GoogleFonts.openSans(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
                 color: ColorData.black,
-              ),
-            ),
-          ),
-          20.widthBox,
-          Container(
-            padding: const EdgeInsets.only(left: 12, right: 12, top: 4, bottom: 4),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(100),
-              color: ColorData.primary,
-            ),
-            child: Text(
-              "01",
-              style: GoogleFonts.nunito(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: ColorData.white,
               ),
             ),
           ),

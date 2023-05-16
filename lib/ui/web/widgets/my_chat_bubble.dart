@@ -24,7 +24,7 @@ class MyChatBubble extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         child: Text(
           message,
-          style: GoogleFonts.nunito(
+          style: GoogleFonts.openSans(
             fontSize: 16,
             fontWeight: FontWeight.w500,
             color: (ColorData.white),

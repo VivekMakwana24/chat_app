@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_demo_structure/core/db/app_db.dart';
 import 'package:flutter_demo_structure/core/di/api/req_params.dart';
 import 'package:flutter_demo_structure/core/navigation/navigation_service.dart';
@@ -416,6 +416,12 @@ class FirebaseChatManager {
   UploadTask uploadFile(File image, String fileName) {
     Reference reference = firebaseStorage.ref().child(fileName);
     UploadTask uploadTask = reference.putFile(image);
+    return uploadTask;
+  }
+
+  UploadTask uploadFileBytes(Uint8List? image, String fileName) {
+    Reference reference = firebaseStorage.ref().child(fileName);
+    UploadTask uploadTask = reference.putData(image!, SettableMetadata(contentType: 'image/jpeg'));
     return uploadTask;
   }
 }

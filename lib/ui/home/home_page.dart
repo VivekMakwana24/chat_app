@@ -17,7 +17,6 @@ import 'package:flutter_demo_structure/util/firebase_chat_manager/models/popup_c
 import 'package:flutter_demo_structure/util/utilities.dart';
 import 'package:flutter_demo_structure/values/colors.dart';
 import 'package:flutter_demo_structure/values/colors_new.dart';
-import 'package:flutter_demo_structure/values/extensions/context_ext.dart';
 import 'package:flutter_demo_structure/values/extensions/widget_ext.dart';
 import 'package:flutter_demo_structure/values/style.dart';
 import 'package:flutter_demo_structure/widget/debouncer.dart';
@@ -87,6 +86,7 @@ class _HomePageState extends State<HomePage> {
       child: Scaffold(
         floatingActionButtonLocation: FloatingActionButtonLocation.centerTop,
         // floatingActionButton: buildFab(context),
+        backgroundColor: AppColor.white,
         body: Stack(
           children: <Widget>[
             // List
@@ -280,73 +280,74 @@ class _HomePageState extends State<HomePage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Expanded(
-              child: TextFormField(
-            cursorColor: ColorData.black,
-            cursorHeight: (context.height) * .021,
-            keyboardType: TextInputType.text,
-            controller: searchBarTec,
-            onChanged: (value) {
-              searchDebouncer.run(() {
-                if (value.isNotEmpty) {
-                  btnClearController.add(true);
-                  setState(() {
-                    _textSearch = value;
-                  });
-                } else {
-                  btnClearController.add(false);
-                  setState(() {
-                    _textSearch = "";
-                  });
-                }
-              });
-            },
-            decoration: InputDecoration(
-              counterText: '',
-              border: const OutlineInputBorder(),
-              prefixIcon: Padding(
-                padding: const EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 8),
-                child: SvgPicture.asset(
-                  Assets.svgsSearch,
+            child: TextFormField(
+              cursorColor: ColorData.black,
+              keyboardType: TextInputType.text,
+              controller: searchBarTec,
+              onChanged: (value) {
+                searchDebouncer.run(() {
+                  if (value.isNotEmpty) {
+                    btnClearController.add(true);
+                    setState(() {
+                      _textSearch = value;
+                    });
+                  } else {
+                    btnClearController.add(false);
+                    setState(() {
+                      _textSearch = "";
+                    });
+                  }
+                });
+              },
+              decoration: InputDecoration(
+                counterText: '',
+                border: const OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(vertical: 10),
+                prefixIcon: Padding(
+                  padding: const EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 8),
+                  child: SvgPicture.asset(
+                    Assets.svgsSearch,
+                  ),
+                ),
+                suffixIcon: StreamBuilder<bool>(
+                    stream: btnClearController.stream,
+                    builder: (context, snapshot) {
+                      return snapshot.data == true
+                          ? GestureDetector(
+                              onTap: () {
+                                searchBarTec.clear();
+                                btnClearController.add(false);
+                                setState(() {
+                                  _textSearch = "";
+                                });
+                              },
+                              child: Icon(Icons.clear_rounded, color: AppColor.greyColor, size: 20))
+                          : SizedBox.shrink();
+                    }),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(7),
+                  borderSide: const BorderSide(color: Colors.transparent),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(7),
+                  borderSide: const BorderSide(color: Colors.transparent),
+                ),
+                hintText: 'Search here...',
+                labelStyle: GoogleFonts.openSans(
+                  color: ColorData.black,
+                ),
+                // contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                hintStyle: GoogleFonts.openSans(
+                  color: ColorData.black,
+                  fontSize: 14,
                 ),
               ),
-              suffixIcon: StreamBuilder<bool>(
-                  stream: btnClearController.stream,
-                  builder: (context, snapshot) {
-                    return snapshot.data == true
-                        ? GestureDetector(
-                            onTap: () {
-                              searchBarTec.clear();
-                              btnClearController.add(false);
-                              setState(() {
-                                _textSearch = "";
-                              });
-                            },
-                            child: Icon(Icons.clear_rounded, color: AppColor.greyColor, size: 20))
-                        : SizedBox.shrink();
-                  }),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(7),
-                borderSide: const BorderSide(color: Colors.transparent),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(7),
-                borderSide: const BorderSide(color: Colors.transparent),
-              ),
-              hintText: 'Search here...',
-              labelStyle: GoogleFonts.nunito(
+              style: GoogleFonts.openSans(
                 color: ColorData.black,
-              ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-              hintStyle: GoogleFonts.nunito(
-                color: ColorData.black,
-                fontSize: 16,
+                fontSize: 14,
               ),
             ),
-            style: GoogleFonts.nunito(
-              color: ColorData.black,
-              fontSize: 16,
-            ),
-          )),
+          ),
         ],
       ),
     );
@@ -358,22 +359,23 @@ class _HomePageState extends State<HomePage> {
       itemBuilder: (BuildContext context) {
         return choices.map((PopupChoices choice) {
           return PopupMenuItem<PopupChoices>(
-              value: choice,
-              child: Row(
-                children: <Widget>[
-                  Icon(
-                    choice.icon,
-                    color: AppColor.primaryColor,
-                  ),
-                  Container(
-                    width: 10,
-                  ),
-                  Text(
-                    choice.title,
-                    style: TextStyle(color: AppColor.primaryColor),
-                  ),
-                ],
-              ));
+            value: choice,
+            child: Row(
+              children: <Widget>[
+                Icon(
+                  choice.icon,
+                  color: AppColor.primaryColor,
+                ),
+                Container(
+                  width: 10,
+                ),
+                Text(
+                  choice.title,
+                  style: TextStyle(color: AppColor.primaryColor),
+                ),
+              ],
+            ),
+          );
         }).toList();
       },
     );
@@ -425,24 +427,17 @@ class _HomePageState extends State<HomePage> {
                           );
                         },
                         errorBuilder: (context, object, stackTrace) {
-                          return Icon(
-                            Icons.account_circle,
-                            size: 50,
-                            color: AppColor.greyColor,
+                          return SvgPicture.asset(
+                            (itemData.isGroup ?? false) ? Assets.svgsGroupIcon : Assets.svgsUserIcon,
+                            height: 40.sm,
+                            width: 40.sm,
                           );
                         },
                       )
-                    : Container(
-                        padding: const EdgeInsets.all(6.0),
-                        decoration: BoxDecoration(
-                          color: AppColor.primaryColor,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          (itemData.isGroup ?? false) ? Icons.group : Icons.account_circle,
-                          size: 30,
-                          color: AppColor.greyColor,
-                        ),
+                    : SvgPicture.asset(
+                        (itemData.isGroup ?? false) ? Assets.svgsGroupIcon : Assets.svgsUserIcon,
+                        height: 40.sm,
+                        width: 40.sm,
                       ),
                 borderRadius: BorderRadius.all(Radius.circular(25)),
                 clipBehavior: Clip.hardEdge,
@@ -520,30 +515,16 @@ class _HomePageState extends State<HomePage> {
             debugPrint('SelectedITem = ${_selectedItem?.chatId}');
             debugPrint('SelectedITem = ${_selectedItem?.isSelected}');
             setState(() {});
-
-            /*Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ChatDetailsPage(
-                  arguments: ChatPageArguments(
-                    chatUser: FirebaseChatUser(
-                      isOnline: false,
-                      userId: itemData.getOtherUserId,
-                      userEmail: '',
-                      userName: itemData.getName,
-                      createdAt: itemData.createdAt,
-                    ),
-                    isGroup: (itemData.isGroup ?? false),
-                    groupName: (itemData.isGroup ?? false) ? itemData.groupName : '',
-                    chatId: (itemData.isGroup ?? false) ? itemData.chatId : '',
-                    recentChat: itemData,
-                  ),
-                ),
-              ),
-            );*/
           },
           style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all<Color>(AppColor.greyTealColor),
+            padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.symmetric(vertical: 16, horizontal: 16)),
+            // backgroundColor: MaterialStateProperty.all<Color>(AppColor.greyTealColor),
+            backgroundColor: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
+              if (states.contains(MaterialState.focused)) return AppColor.lightPurple;
+              if (states.contains(MaterialState.hovered)) return AppColor.lightPurple;
+              if (states.contains(MaterialState.pressed)) return AppColor.white;
+              return Colors.white; // null throus error in flutter 2.2+.
+            }),
             shape: MaterialStateProperty.all<OutlinedBorder>(
               RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10)),

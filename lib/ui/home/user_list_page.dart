@@ -5,6 +5,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_demo_structure/core/db/app_db.dart';
+import 'package:flutter_demo_structure/generated/assets.dart';
 import 'package:flutter_demo_structure/main.dart';
 import 'package:flutter_demo_structure/ui/home/chat_detail/chat_details.dart';
 import 'package:flutter_demo_structure/ui/home/new_group/new_group_page.dart';
@@ -14,12 +15,15 @@ import 'package:flutter_demo_structure/util/firebase_chat_manager/models/firebas
 import 'package:flutter_demo_structure/util/firebase_chat_manager/models/popup_choices.dart';
 import 'package:flutter_demo_structure/util/utilities.dart';
 import 'package:flutter_demo_structure/values/colors.dart';
+import 'package:flutter_demo_structure/values/colors_new.dart';
 import 'package:flutter_demo_structure/values/extensions/context_ext.dart';
 import 'package:flutter_demo_structure/values/extensions/widget_ext.dart';
 import 'package:flutter_demo_structure/widget/app_utils.dart';
 import 'package:flutter_demo_structure/widget/base_app_bar.dart';
 import 'package:flutter_demo_structure/widget/debouncer.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class UserListPage extends StatefulWidget {
@@ -87,6 +91,7 @@ class _UserListPageState extends State<UserListPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        backgroundColor: AppColor.white,
         appBar: BaseAppBar(
           showTitle: true,
           leadingIcon: context.width >= 1024 ? false : true,
@@ -284,17 +289,17 @@ class _UserListPageState extends State<UserListPage> {
                           );
                         },
                         errorBuilder: (context, object, stackTrace) {
-                          return Icon(
-                            Icons.account_circle,
-                            size: 50,
-                            color: AppColor.greyColor,
+                          return SvgPicture.asset(
+                            Assets.svgsUserIcon,
+                            height: 30.sm,
+                            width: 30.sm,
                           );
                         },
                       )
-                    : Icon(
-                        Icons.account_circle,
-                        size: 50,
-                        color: AppColor.greyColor,
+                    : SvgPicture.asset(
+                        Assets.svgsUserIcon,
+                        height: 30.sm,
+                        width: 30.sm,
                       ),
                 borderRadius: BorderRadius.all(Radius.circular(25)),
                 clipBehavior: Clip.hardEdge,
@@ -330,13 +335,17 @@ class _UserListPageState extends State<UserListPage> {
   Widget buildSearchBar() {
     return Container(
       height: 40,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        color: ColorData.grey200.withOpacity(.4),
+      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Icon(Icons.search, color: AppColor.greyColor, size: 20),
-          SizedBox(width: 5),
           Expanded(
             child: TextFormField(
+              cursorColor: ColorData.black,
+              keyboardType: TextInputType.text,
               textInputAction: TextInputAction.search,
               controller: searchBarTec,
               onChanged: (value) {
@@ -354,14 +363,53 @@ class _UserListPageState extends State<UserListPage> {
                   }
                 });
               },
-              decoration: InputDecoration.collapsed(
-                hintText: 'Search user (you have to type exact string)',
-                hintStyle: TextStyle(fontSize: 13, color: AppColor.greyColor),
+              decoration: InputDecoration(
+                counterText: '',
+                contentPadding: EdgeInsets.symmetric(vertical: 10),
+                border: const OutlineInputBorder(),
+                prefixIcon: SvgPicture.asset(
+                  Assets.svgsSearch,
+                ),
+                suffixIcon: StreamBuilder<bool>(
+                    stream: btnClearController.stream,
+                    builder: (context, snapshot) {
+                      return snapshot.data == true
+                          ? GestureDetector(
+                          onTap: () {
+                            searchBarTec.clear();
+                            btnClearController.add(false);
+                            setState(() {
+                              _textSearch = "";
+                            });
+                          },
+                          child: Icon(Icons.clear_rounded, color: AppColor.greyColor, size: 20))
+                          : SizedBox.shrink();
+                    }),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(7),
+                  borderSide: const BorderSide(color: Colors.transparent),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(7),
+                  borderSide: const BorderSide(color: Colors.transparent),
+                ),
+                hintText: 'Search here...',
+                labelStyle: GoogleFonts.openSans(
+                  color: ColorData.black,
+                ),
+                // contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                hintStyle: GoogleFonts.openSans(
+                  color: ColorData.black,
+                  fontSize: 14,
+                ),
               ),
-              style: TextStyle(fontSize: 13),
+              style: GoogleFonts.openSans(
+                color: ColorData.black,
+                fontSize: 14,
+              ),
             ),
           ),
-          StreamBuilder<bool>(
+          /*StreamBuilder<bool>(
               stream: btnClearController.stream,
               builder: (context, snapshot) {
                 return snapshot.data == true
@@ -373,14 +421,11 @@ class _UserListPageState extends State<UserListPage> {
                             _textSearch = "";
                           });
                         },
-                        child: Icon(Icons.clear_rounded, color: AppColor.greyColor, size: 20))
+                        child: Icon(Icons.clear_rounded, color: AppColor.greyColor, size: 20),
+                      )
                     : SizedBox.shrink();
-              }),
+              }),*/
         ],
-      ),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        color: AppColor.greyTealColor,
       ),
       padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
       margin: EdgeInsets.fromLTRB(16, 8, 16, 8),
@@ -458,17 +503,17 @@ class _UserListPageState extends State<UserListPage> {
                             );
                           },
                           errorBuilder: (context, object, stackTrace) {
-                            return Icon(
-                              Icons.account_circle,
-                              size: 50,
-                              color: AppColor.greyColor,
+                            return SvgPicture.asset(
+                              Assets.svgsUserIcon,
+                              height: 40.sm,
+                              width: 40.sm,
                             );
                           },
                         )
-                      : Icon(
-                          Icons.account_circle,
-                          size: 50,
-                          color: AppColor.greyColor,
+                      : SvgPicture.asset(
+                          Assets.svgsUserIcon,
+                          height: 40.sm,
+                          width: 40.sm,
                         ),
                   borderRadius: BorderRadius.all(Radius.circular(25)),
                   clipBehavior: Clip.hardEdge,
@@ -530,7 +575,8 @@ class _UserListPageState extends State<UserListPage> {
               _participantsList.notifyListeners();
             },
             style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all<Color>(AppColor.greyTealColor),
+              padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.symmetric(vertical: 16,horizontal: 16)),
+              backgroundColor: MaterialStateProperty.all<Color>(AppColor.white),
               shape: MaterialStateProperty.all<OutlinedBorder>(
                 RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10)),

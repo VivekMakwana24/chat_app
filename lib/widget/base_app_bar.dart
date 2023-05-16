@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_demo_structure/res.dart';
+import 'package:flutter_demo_structure/values/colors_new.dart';
 import 'package:flutter_demo_structure/values/export.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -20,7 +21,7 @@ class BaseAppBar extends StatefulWidget implements PreferredSizeWidget {
   BaseAppBar({
     this.title,
     this.centerTitle = true,
-    this.backgroundColor = AppColor.primaryColor,
+    this.backgroundColor = AppColor.white,
     this.elevations = 0.0,
     this.action,
     this.leadingIcon = false,
@@ -28,8 +29,8 @@ class BaseAppBar extends StatefulWidget implements PreferredSizeWidget {
     this.backAction,
     this.titleWidget,
     this.leadingWidget,
-    this.leadingWidgetColor,
-    this.titleWidgetColor = AppColor.white,
+    this.leadingWidgetColor = AppColor.blackColor,
+    this.titleWidgetColor = AppColor.blackColor,
     this.preferredSize = const Size.fromHeight(kToolbarHeight),
   }) : assert(title == null || titleWidget == null, "Title and Title widget both can't be null");
 
@@ -71,6 +72,17 @@ class _BaseAppBarState extends State<BaseAppBar> {
   Widget build(BuildContext context) {
     return AppBar(
       centerTitle: widget.centerTitle,
+      bottom: PreferredSize(
+        preferredSize: Size(context.width, 1),
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(color: ColorData.lightGrey),
+            ),
+            color: ColorData.white,
+          ),
+        ),
+      ),
       brightness: Brightness.light,
       title: !widget.showTitle
           ? SizedBox.shrink()
@@ -83,6 +95,7 @@ class _BaseAppBarState extends State<BaseAppBar> {
       elevation: widget.elevations,
       automaticallyImplyLeading: false,
       //brightness: Brightness.dark,
+
       leading: widget.leadingIcon
           ? widget.leadingWidget ??
               IconButton(

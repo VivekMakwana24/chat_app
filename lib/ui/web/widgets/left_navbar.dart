@@ -3,6 +3,7 @@ import 'package:flutter_demo_structure/generated/assets.dart';
 import 'package:flutter_demo_structure/main.dart';
 import 'package:flutter_demo_structure/ui/auth/login/login_page.dart';
 import 'package:flutter_demo_structure/values/colors_new.dart';
+import 'package:flutter_demo_structure/values/extensions/widget_ext.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:velocity_x/velocity_x.dart';
 
@@ -33,7 +34,7 @@ class _LeftNavBarState extends State<LeftNavBar> {
         children: [
           //LOGO
           SvgPicture.asset(
-            Assets.svgsLogo,
+            Assets.svgsChatLogo,
             height: 40,
           ),
           50.heightBox,
@@ -51,8 +52,8 @@ class _LeftNavBarState extends State<LeftNavBar> {
                   setState(() {});
                 },
                 child: SvgPicture.asset(
-                  color: widget.selectedScreen == SelectedScreen.OneToOne ? ColorData.primary : ColorData.lightGrey,
-                  Assets.svgsMessage,
+                  color: widget.selectedScreen == SelectedScreen.OneToOne ? ColorData.primary : ColorData.grey,
+                  Assets.svgsChat,
                   height: 30,
                 ),
               ),
@@ -69,8 +70,8 @@ class _LeftNavBarState extends State<LeftNavBar> {
                   setState(() {});
                 },
                 child: SvgPicture.asset(
-                  color: widget.selectedScreen == SelectedScreen.Groups ? ColorData.primary : ColorData.lightGrey,
-                  Assets.svgsGroups,
+                  color: widget.selectedScreen == SelectedScreen.Groups ? ColorData.primary : ColorData.grey,
+                  Assets.svgsUsers,
                   height: 30,
                 ),
               ),
@@ -97,7 +98,7 @@ class _LeftNavBarState extends State<LeftNavBar> {
               Assets.svgsLogout,
               height: 30,
             ),
-          ),
+          ).visiblity(false),
           30.heightBox,
         ],
       ),

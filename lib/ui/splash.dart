@@ -30,7 +30,7 @@ class _SplashState extends State<Splash> {
     // bool isAuthenticated = await AuthService.authenticateUser();
     if (true) {
       Timer(Duration(seconds: 2), () {
-        if (appDB.isLogin){
+        if (appDB.isLogin) {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
@@ -41,8 +41,7 @@ class _SplashState extends State<Splash> {
               ),
             ),
           );
-        }
-        else {
+        } else {
           // navigator.pushReplacementNamed(RouteName.loginPage);
           Navigator.pushReplacement(
             context,
@@ -75,20 +74,11 @@ class _SplashState extends State<Splash> {
         children: [
           Center(
             child: SvgPicture.asset(
-              Assets.svgsLogo,
-              height: context.height * .106,
+              Assets.svgsSplashLogo,
+              height: context.height * .206,
             ),
           ),
           40.heightBox,
-          Text(
-            "Transport Management System",
-            style: GoogleFonts.nunito(
-              fontSize: context.height * .026,
-              fontWeight: FontWeight.w800,
-              color: ColorData.black,
-            ),
-            textAlign: TextAlign.center,
-          ),
         ],
       ),
     );

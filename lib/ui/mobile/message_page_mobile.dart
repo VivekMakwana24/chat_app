@@ -276,16 +276,16 @@ class _MessagePageMobileState extends State<MessagePageMobile> {
                   borderSide: const BorderSide(color: Colors.transparent),
                 ),
                 hintText: 'Search here...',
-                labelStyle: GoogleFonts.nunito(
+                labelStyle: GoogleFonts.openSans(
                   color: ColorData.black,
                 ),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                hintStyle: GoogleFonts.nunito(
+                hintStyle: GoogleFonts.openSans(
                   color: ColorData.black,
                   fontSize: 16,
                 ),
               ),
-              style: GoogleFonts.nunito(
+              style: GoogleFonts.openSans(
                 color: ColorData.black,
                 fontSize: 16,
               ),

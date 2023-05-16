@@ -45,16 +45,16 @@ class SearchBar extends StatelessWidget {
             borderSide: const BorderSide(color: Colors.transparent),
           ),
           hintText: hintText,
-          labelStyle: GoogleFonts.nunito(
+          labelStyle: GoogleFonts.openSans(
             color: ColorData.black,
           ),
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          hintStyle: GoogleFonts.nunito(
+          hintStyle: GoogleFonts.openSans(
             color: ColorData.black,
             fontSize: 16,
           ),
         ),
-        style: GoogleFonts.nunito(
+        style: GoogleFonts.openSans(
           color: ColorData.black,
           fontSize: 16,
         ),

@@ -18,7 +18,7 @@ class TextMessageItemView extends StatelessWidget {
         children: [
           DecoratedBox(
             decoration: BoxDecoration(
-              color: message.isLeftSide ? AppColor.primaryColorDark : AppColor.primaryColorDark,
+              color: message.isLeftSide ? AppColor.primaryColor : AppColor.primaryColor,
               /* border: Border.all(
                 color: message.isLeftSide
                     ? AppColor.whiteShade

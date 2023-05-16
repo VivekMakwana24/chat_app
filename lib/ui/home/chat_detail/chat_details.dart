@@ -1,7 +1,7 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -14,11 +14,16 @@ import 'package:flutter_demo_structure/util/firebase_chat_manager/constants/fire
 import 'package:flutter_demo_structure/util/firebase_chat_manager/constants/firestore_constants.dart';
 import 'package:flutter_demo_structure/util/firebase_chat_manager/models/chat_message.dart';
 import 'package:flutter_demo_structure/util/firebase_chat_manager/models/firebase_chat_user.dart';
+import 'package:flutter_demo_structure/values/colors_new.dart';
 import 'package:flutter_demo_structure/values/export.dart';
 import 'package:flutter_demo_structure/widget/base_app_bar.dart';
 import 'package:flutter_demo_structure/widget/image_picker_dialog.dart';
+import 'package:flutter_demo_structure/widget/image_viewer.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:images_picker/images_picker.dart';
+import 'package:velocity_x/velocity_x.dart';
 
 class ChatPageArguments {
   final FirebaseChatUser chatUser;
@@ -126,56 +131,64 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with MediaPickerListe
     }
 
     return Scaffold(
+      backgroundColor: AppColor.white,
       appBar: BaseAppBar(
         showTitle: true,
+        centerTitle: false,
         leadingIcon: widget.arguments.isDialog ? false : true,
         // title: _isGroup ? this.widget.arguments.chatUser.userName : _groupName,
         titleWidget: Text(
           _isGroup ? (_groupName ?? '') : (this.widget.arguments.chatUser.userName ?? ''),
-          style: textBold.copyWith(color: AppColor.white),
-        ).addGestureTap(() {
-          if (!_isGroup) return;
-          debugPrint('Navigate to group details');
+          style: GoogleFonts.openSans(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: ColorData.black,
+          ),
+        ).addGestureTap(
+          () {
+            if (!_isGroup) return;
+            debugPrint('Navigate to group details');
 
-          if (kIsWeb && widget.arguments.isDialog)
-            showGeneralDialog(
-              context: context,
-              barrierColor: Colors.black54,
-              barrierDismissible: true,
-              barrierLabel: 'Label',
-              pageBuilder: (_, __, ___) {
-                return Row(
-                  children: [
-                    Spacer(),
-                    SizedBox(
-                      width: context.width * 0.6,
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: NewGroupPage(
-                          participantsList: [],
-                          isGroupDetails: true,
-                          pageType: PageType.EDIT_GROUP,
-                          groupDetails: widget.arguments.recentChat,
+            if (kIsWeb && widget.arguments.isDialog)
+              showGeneralDialog(
+                context: context,
+                barrierColor: Colors.black54,
+                barrierDismissible: true,
+                barrierLabel: 'Label',
+                pageBuilder: (_, __, ___) {
+                  return Row(
+                    children: [
+                      Spacer(),
+                      SizedBox(
+                        width: context.width * 0.6,
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: NewGroupPage(
+                            participantsList: [],
+                            isGroupDetails: true,
+                            pageType: PageType.EDIT_GROUP,
+                            groupDetails: widget.arguments.recentChat,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                );
-              },
-            );
-          else
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => NewGroupPage(
-                  participantsList: [],
-                  isGroupDetails: true,
-                  pageType: PageType.EDIT_GROUP,
-                  groupDetails: widget.arguments.recentChat,
+                    ],
+                  );
+                },
+              );
+            else
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => NewGroupPage(
+                    participantsList: [],
+                    isGroupDetails: true,
+                    pageType: PageType.EDIT_GROUP,
+                    groupDetails: widget.arguments.recentChat,
+                  ),
                 ),
-              ),
-            );
-        }),
+              );
+          },
+        ),
       ),
       body: SafeArea(
         child: Stack(
@@ -273,7 +286,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with MediaPickerListe
                 ? Container(
                     child: Text(
                       messageChat.message ?? '',
-                      style: textRegular14.copyWith(color: AppColor.white),
+                      style: textRegular14.copyWith(color: AppColor.white, fontSize: 16.sm),
                     ),
                     padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
                     width: 200,
@@ -330,14 +343,14 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with MediaPickerListe
                             clipBehavior: Clip.hardEdge,
                           ),
                           onPressed: () {
-                            /*Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => FullPhotoPage(
-                          url: messageChat.content,
-                        ),
-                      ),
-                    );*/
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ImageViewerWidget(
+                                  imageUrl: messageChat.message ?? '',
+                                ),
+                              ),
+                            );
                           },
                           style: ButtonStyle(padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.all(0))),
                         ),
@@ -379,10 +392,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with MediaPickerListe
                               );
                             },
                             errorBuilder: (context, object, stackTrace) {
-                              return Icon(
-                                Icons.account_circle,
-                                size: 35,
-                                color: AppColor.greyColor,
+                              return SvgPicture.asset(
+                                Assets.svgsUserIcon,
+                                height: 35.sm,
+                                width: 35.sm,
                               );
                             },
                             width: 35,
@@ -404,21 +417,22 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with MediaPickerListe
                                 Text(
                                   messageChat.senderName ?? '',
                                   style: textBold.copyWith(
-                                      fontSize: 14,
-                                      color: Color((Random().nextDouble() * 0xFFFFFF).toInt()).withOpacity(1.0)),
+                                    fontSize: 12,
+                                    color: AppColor.primaryColorDark,
+                                  ),
                                 ),
                                 5.h.VBox,
                               ],
                               Text(
                                 messageChat.message ?? '',
-                                style: textRegular14,
+                                style: textRegular14.copyWith(fontSize: 16.sm,fontWeight: FontWeight.w300,color: AppColor.blackColor.withOpacity(0.8)),
                               ),
                             ],
                           ),
                           padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
                           width: 200,
                           decoration: BoxDecoration(
-                            color: AppColor.greyTealColor,
+                            color: AppColor.lightPurple,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           margin: EdgeInsets.only(left: 10),
@@ -454,7 +468,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with MediaPickerListe
                                     },
                                     errorBuilder: (context, object, stackTrace) => Material(
                                       child: Image.asset(
-                                        'images/img_not_available.jpeg',
+                                        Assets.imageImgNotAvailable,
                                         width: 200,
                                         height: 200,
                                         fit: BoxFit.cover,
@@ -472,12 +486,14 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with MediaPickerListe
                                   clipBehavior: Clip.hardEdge,
                                 ),
                                 onPressed: () {
-                                  /*Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => FullPhotoPage(url: messageChat.content),
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ImageViewerWidget(
+                                        imageUrl: messageChat.message ?? '',
                                       ),
-                                    );*/
+                                    ),
+                                  );
                                 },
                                 style: ButtonStyle(padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.all(0))),
                               ),
@@ -526,24 +542,45 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with MediaPickerListe
             child: Container(
               margin: EdgeInsets.symmetric(horizontal: 1),
               child: IconButton(
-                icon: Icon(Icons.image),
-                onPressed: _pickImage,
-                color: AppColor.primaryColor,
+                icon: SvgPicture.asset(Assets.svgsGallery),
+                onPressed: () async {
+                  if (kIsWeb) {
+                    FilePickerResult? result = await FilePicker.platform.pickFiles(
+                      type: FileType.image,
+                    );
+                    if (result != null) {
+                      Uint8List? fileBytes = result.files.first.bytes;
+                      String fileName = result.files.first.name;
+                      String? fileExt = result.files.first.extension;
+                      debugPrint('FILE --> ${result.files.first.bytes}');
+                      if (result.files.first.bytes != null) {
+                        // Upload file
+                        VxToast.show(context, msg: 'Uploading...');
+
+                        _uploadFileBytes(fileBytes, fileName, fileExt);
+                      }
+                    }
+                    // if (result != null) {
+                    //   PlatformFile file = result.files.first;
+                    //   debugPrint('FILE --> ${file.name}');
+                    //   debugPrint('FILE --> ${file.bytes}');
+                    //   if (file.bytes != null) {
+                    //     imageFile = File.fromRawPath(file.bytes!);
+                    //     if (imageFile != null) {
+                    //       ///Call Upload File
+                    //       _uploadFile();
+                    //     }
+                    //   }
+                    // }
+                  } else {
+                    _pickImage();
+                  }
+                },
+                color: AppColor.primaryColorDark,
               ),
             ),
             color: Colors.white,
           ).visiblity(true),
-          Material(
-            child: Container(
-              margin: EdgeInsets.symmetric(horizontal: 1),
-              child: IconButton(
-                icon: Icon(Icons.face),
-                onPressed: null,
-                color: AppColor.primaryColor,
-              ),
-            ),
-            color: Colors.white,
-          ).visiblity(false),
 
           // Edit text
           Flexible(
@@ -569,9 +606,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with MediaPickerListe
             child: Container(
               margin: EdgeInsets.symmetric(horizontal: 8),
               child: IconButton(
-                icon: Icon(Icons.send),
+                icon: SvgPicture.asset(Assets.svgsSend),
                 onPressed: () => onSendMessage(textEditingController.text, SendMessageType.text.typeValue),
-                color: AppColor.primaryColor,
+                color: AppColor.primaryColorDark,
               ),
             ),
             color: Colors.white,
@@ -690,6 +727,21 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with MediaPickerListe
   Future _uploadFile() async {
     String fileName = DateTime.now().millisecondsSinceEpoch.toString();
     UploadTask uploadTask = firebaseChatManager.uploadFile(imageFile!, fileName);
+    try {
+      TaskSnapshot snapshot = await uploadTask;
+      imageUrl = await snapshot.ref.getDownloadURL();
+      showLoading.value = false;
+      setState(() {
+        onSendMessage(imageUrl, SendMessageType.image.typeValue);
+      });
+    } on FirebaseException catch (e) {
+      showLoading.value = false;
+    }
+  }
+
+  Future _uploadFileBytes(Uint8List? fileBytes, String fileName, String? fileExt) async {
+    String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+    UploadTask uploadTask = firebaseChatManager.uploadFileBytes(fileBytes, '$fileName.$fileExt');
     try {
       TaskSnapshot snapshot = await uploadTask;
       imageUrl = await snapshot.ref.getDownloadURL();

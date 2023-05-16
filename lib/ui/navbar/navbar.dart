@@ -67,7 +67,7 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
                     const SizedBox(height: 8),
                     Text(
                       "Message",
-                      style: GoogleFonts.nunito(
+                      style: GoogleFonts.openSans(
                         fontWeight: FontWeight.w700,
                         fontSize: context.height * .016,
                         color: currentTab == 1 ? ColorData.primary : ColorData.grey,
@@ -102,7 +102,7 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
                     const SizedBox(height: 8),
                     Text(
                       "Group",
-                      style: GoogleFonts.nunito(
+                      style: GoogleFonts.openSans(
                         fontSize: context.height * .016,
                         fontWeight: FontWeight.w700,
                         color: currentTab == 2 ? ColorData.primary : ColorData.grey,

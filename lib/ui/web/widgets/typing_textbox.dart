@@ -51,7 +51,7 @@ class _TextTypingBoxState extends State<TextTypingBox> {
                       const SizedBox(width: 16),
                       Text(
                         "Use camera",
-                        style: GoogleFonts.nunito(
+                        style: GoogleFonts.openSans(
                           fontSize: context.height * .022,
                           fontWeight: FontWeight.w600,
                           color: Theme.of(context).primaryColor,
@@ -80,7 +80,7 @@ class _TextTypingBoxState extends State<TextTypingBox> {
                       const SizedBox(width: 16),
                       Text(
                         "Upload from gallery",
-                        style: GoogleFonts.nunito(
+                        style: GoogleFonts.openSans(
                           fontSize: context.height * .022,
                           fontWeight: FontWeight.w600,
                           color: Theme.of(context).primaryColor,
@@ -117,13 +117,13 @@ class _TextTypingBoxState extends State<TextTypingBox> {
                   contentPadding: EdgeInsets.only(right: 40),
                   border: InputBorder.none,
                   hintText: "Message",
-                  hintStyle: GoogleFonts.nunito(
+                  hintStyle: GoogleFonts.openSans(
                     color: ColorData.grey,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                style: GoogleFonts.nunito(
+                style: GoogleFonts.openSans(
                   color: ColorData.black,
                   fontSize: 16,
                   fontWeight: FontWeight.bold,

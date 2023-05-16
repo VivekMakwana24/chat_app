@@ -27,7 +27,7 @@ class ContactList extends StatelessWidget {
             //NAME
             title: Text(
               info[index]['name'].toString(),
-              style: GoogleFonts.nunito(
+              style: GoogleFonts.openSans(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
                 color: ColorData.black,
@@ -41,7 +41,7 @@ class ContactList extends StatelessWidget {
               padding: const EdgeInsets.only(top: 4),
               child: Text(
                 info[index]['message'].toString(),
-                style: GoogleFonts.nunito(
+                style: GoogleFonts.openSans(
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
                   color: ColorData.grey,
@@ -54,7 +54,7 @@ class ContactList extends StatelessWidget {
             //TIME
             trailing: Text(
               info[index]['time'].toString(),
-              style: GoogleFonts.nunito(
+              style: GoogleFonts.openSans(
                 fontSize: 12,
                 color: ColorData.primary,
               ),
