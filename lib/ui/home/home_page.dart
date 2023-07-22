@@ -522,7 +522,7 @@ class _HomePageState extends State<HomePage> {
             backgroundColor: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
               if (states.contains(MaterialState.focused)) return AppColor.lightPurple;
               if (states.contains(MaterialState.hovered)) return AppColor.lightPurple;
-              if (states.contains(MaterialState.pressed)) return AppColor.white;
+              if (states.contains(MaterialState.pressed)) return (_selectedItem!=null) ? AppColor.lightPurple : AppColor.white;
               return Colors.white; // null throus error in flutter 2.2+.
             }),
             shape: MaterialStateProperty.all<OutlinedBorder>(

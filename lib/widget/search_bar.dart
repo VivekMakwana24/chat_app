@@ -6,10 +6,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 //SEARCH BAR
-class SearchBar extends StatelessWidget {
+class SearchBarCustom extends StatelessWidget {
   final String hintText;
 
-  const SearchBar({
+  const SearchBarCustom({
     Key? key,
     required this.hintText,
   }) : super(key: key);

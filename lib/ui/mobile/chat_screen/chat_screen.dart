@@ -19,7 +19,7 @@ class _MobileChatScreenState extends State<MobileChatScreen> {
         children: const [
           Padding(
             padding: EdgeInsets.all(20),
-            child: SearchBar(hintText: "Search..."),
+            child: SearchBarCustom(hintText: "Search..."),
           ),
           Expanded(
             flex: 1,

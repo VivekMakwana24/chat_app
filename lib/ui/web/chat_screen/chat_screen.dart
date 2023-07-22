@@ -128,8 +128,8 @@ class _WebChatScreenState extends State<WebChatScreen> {
                 : 'A',
         isOnline: false,
         //await firebaseChatManager.fetchUserId(emailController.text.trim()),
-        userEmail: 'ray@yopmail.com',
-        password: '111111',
+        userEmail: 'vivek@gocargo.com.au',
+        password: 'password',
         createdAt: generateUTC(DateTime.now().toUtc()),
       );
 

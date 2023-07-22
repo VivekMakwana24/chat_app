@@ -83,7 +83,6 @@ class _BaseAppBarState extends State<BaseAppBar> {
           ),
         ),
       ),
-      brightness: Brightness.light,
       title: !widget.showTitle
           ? SizedBox.shrink()
           : widget.titleWidget ??
