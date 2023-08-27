@@ -7,14 +7,15 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_demo_structure/core/navigation/navigation_service.dart';
+import 'package:flutter_demo_structure/fcm/PushNotificationsManager.dart';
 import 'package:flutter_demo_structure/firebase_options.dart';
-import 'package:flutter_demo_structure/model/user_profile_response.dart';
 import 'package:flutter_demo_structure/util/firebase_chat_manager/firebase_chat_manager.dart';
 import 'package:flutter_demo_structure/util/firebase_chat_manager/models/firebase_chat_user.dart';
 import 'package:flutter_demo_structure/values/export.dart';
 import 'package:flutter_demo_structure/values/string_constants.dart';
 import 'package:flutter_demo_structure/values/theme.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:url_strategy/url_strategy.dart';
@@ -31,24 +32,24 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-
-  if(!kIsWeb){
+  if (!kIsWeb) {
     final appDocumentDir = await getApplicationDocumentsDirectory();
 
     Hive
       ..init(appDocumentDir.path)
       ..registerAdapter(FirebaseChatUserAdapter());
-  }else{
+  } else {
     Hive.registerAdapter(FirebaseChatUserAdapter());
   }
 
   await setupLocator();
   await locator.isReady<AppDB>();
   setPathUrlStrategy();
+
   // usePathUrlStrategy();
 
   //await Firebase.initializeApp();
-  // PushNotificationsManager().init();
+  PushNotificationsManager().init();
 
   // String para1 = Uri.base.queryParameters["para1"];
 
@@ -76,7 +77,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ScreenUtilInit(
       minTextAdapt: true,
-      builder: (_, __) => MaterialApp(
+      useInheritedMediaQuery: true,
+      builder: (_, __) => GetMaterialApp(
         title: StringConstant.appName,
         scaffoldMessengerKey: rootScaffoldMessengerKey,
         theme: appTheme,

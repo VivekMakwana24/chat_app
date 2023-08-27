@@ -7,14 +7,14 @@ final textLight = TextStyle(
   fontFamily: fontFamily,
   decoration: TextDecoration.none,
   fontWeight: FontWeight.w300,
-  fontSize: 16.sp,
+  fontSize: 16.spMin,
   color: Colors.black,
 );
 final textRegular = TextStyle(
   fontFamily: fontFamily,
   decoration: TextDecoration.none,
   fontWeight: FontWeight.w400,
-  fontSize: 16.sp,
+  fontSize: 16.spMin,
   color: Colors.black,
 );
 
@@ -22,7 +22,7 @@ final textRegular14 = TextStyle(
   fontFamily: fontFamily,
   decoration: TextDecoration.none,
   fontWeight: FontWeight.w400,
-  fontSize: 14.sp,
+  fontSize: 14.spMin,
   color: Colors.black,
 );
 
@@ -30,7 +30,7 @@ final textRegular10 = TextStyle(
   fontFamily: fontFamily,
   decoration: TextDecoration.none,
   fontWeight: FontWeight.w400,
-  fontSize: 10.sp,
+  fontSize: 10.spMin,
   color: Colors.black,
 );
 
@@ -38,20 +38,20 @@ final textMedium = TextStyle(
   fontFamily: fontFamily,
   decoration: TextDecoration.none,
   fontWeight: FontWeight.w500,
-  fontSize: 16.sp,
+  fontSize: 16.spMin,
   color: Colors.black,
 );
 final textSemiBold = TextStyle(
   fontFamily: fontFamily,
   decoration: TextDecoration.none,
   fontWeight: FontWeight.w600,
-  fontSize: 16.sp,
+  fontSize: 16.spMin,
   color: Colors.black,
 );
 final textBold = TextStyle(
   fontFamily: fontFamily,
   decoration: TextDecoration.none,
   fontWeight: FontWeight.w700,
-  fontSize: 16.sp,
+  fontSize: 16.spMin,
   color: Colors.black,
 );

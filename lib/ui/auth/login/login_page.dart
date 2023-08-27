@@ -218,7 +218,7 @@ class _LoginPageState extends State<LoginPage> {
     try {
       showLoading.value = true;
       var userModel = FirebaseChatUser(
-        deviceToken: '0',
+        deviceToken: appDB.fcmToken,
         deviceType: kIsWeb
             ? 'w'
             : Platform.isIOS

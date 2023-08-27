@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_demo_structure/core/db/app_db.dart';
 import 'package:flutter_demo_structure/generated/assets.dart';
@@ -17,6 +18,7 @@ import 'package:flutter_demo_structure/util/firebase_chat_manager/models/popup_c
 import 'package:flutter_demo_structure/util/utilities.dart';
 import 'package:flutter_demo_structure/values/colors.dart';
 import 'package:flutter_demo_structure/values/colors_new.dart';
+import 'package:flutter_demo_structure/values/extensions/context_ext.dart';
 import 'package:flutter_demo_structure/values/extensions/widget_ext.dart';
 import 'package:flutter_demo_structure/values/style.dart';
 import 'package:flutter_demo_structure/widget/debouncer.dart';
@@ -73,10 +75,13 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    getPermission();
+    messageListener(context);
+
     firebaseChatManager.updateDataFirestore(
       FirebaseCollection.users.name,
       appDB.currentUserId,
-      {'pushToken': appDB.fcmToken},
+      {'device_token': appDB.fcmToken},
     );
   }
 
@@ -126,7 +131,7 @@ class _HomePageState extends State<HomePage> {
                                         return buildItem(context, _recentChatList[index]);
                                       },
                                       separatorBuilder: (context, index) {
-                                        return 15.sm.verticalSpace;
+                                        return 15.h.verticalSpace;
                                       },
                                     )
                                   : Center(
@@ -480,8 +485,8 @@ class _HomePageState extends State<HomePage> {
                   ),
                   if (itemData.unreadCount > 0) ...[
                     SizedBox(
-                      height: 20.sm,
-                      width: 20.sm,
+                      height: 20.spMin,
+                      width: 20.spMin,
                       child: DecoratedBox(
                         decoration: const BoxDecoration(
                           shape: BoxShape.circle,
@@ -489,7 +494,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                         child: Text(
                           '${itemData.unreadCount}',
-                          style: textMedium.copyWith(fontSize: 10.sp, color: AppColor.white),
+                          style: textMedium.copyWith(fontSize: 10.spMin, color: AppColor.white),
                         ).centered(),
                       ),
                     ),
@@ -522,7 +527,8 @@ class _HomePageState extends State<HomePage> {
             backgroundColor: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
               if (states.contains(MaterialState.focused)) return AppColor.lightPurple;
               if (states.contains(MaterialState.hovered)) return AppColor.lightPurple;
-              if (states.contains(MaterialState.pressed)) return (_selectedItem!=null) ? AppColor.lightPurple : AppColor.white;
+              if (states.contains(MaterialState.pressed))
+                return (_selectedItem != null) ? AppColor.lightPurple : AppColor.white;
               return Colors.white; // null throus error in flutter 2.2+.
             }),
             shape: MaterialStateProperty.all<OutlinedBorder>(
@@ -546,4 +552,92 @@ class _HomePageState extends State<HomePage> {
   }
 
 // endregion
+
+  Future<void> getPermission() async {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+    NotificationSettings settings = await messaging.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+      sound: true,
+    );
+
+    print('User granted permission: ${settings.authorizationStatus}');
+  }
+
+  void messageListener(BuildContext context) {
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print('Got a message whilst in the foreground!');
+      print('Message data: ${message.data}');
+
+      if (message.notification != null) {
+        print('Message also contained a notification: ${message.notification?.body}');
+
+        showDialog(
+          context: context,
+          barrierColor: AppColor.transparent,
+          builder: (BuildContext context) {
+            Future.delayed(Duration(seconds: 2), () {
+              Navigator.of(context).pop(true);
+            });
+            return _showNotification(context, message);
+          },
+        );
+      }
+    });
+  }
+
+  Widget _showNotification(BuildContext context, RemoteMessage message) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Align(
+        alignment: Alignment.topCenter,
+        child: Container(
+          width: context.width - 200,
+          padding: const EdgeInsets.all(16.0),
+          margin: const EdgeInsets.all(10.0),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [BoxShadow(color: Colors.grey[100]!, blurRadius: 10, spreadRadius: 5)],
+          ),
+          child: Row(
+            children: [
+              Image.asset(
+                Assets.imageNotification,
+                height: 40,
+                width: 40,
+              ),
+              10.horizontalSpace,
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(message.notification?.title ?? '', style: textMedium),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(message.notification?.body ?? '', style: textMedium),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ).addGestureTap(() {
+      debugPrint('HEREERE ${message.data['tag']}');
+      if (message.data['tag'] == 'new_chat_message') {
+        _selectedItem = ChatMessage.fromJson(message.data);
+        setState(() {});
+        debugPrint('SELECTEDITEm => ${_selectedItem?.toJson()}');
+      }
+    });
+  }
 }

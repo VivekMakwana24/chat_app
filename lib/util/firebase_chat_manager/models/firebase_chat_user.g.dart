@@ -31,7 +31,7 @@ class FirebaseChatUserAdapter extends TypeAdapter<FirebaseChatUser> {
   @override
   void write(BinaryWriter writer, FirebaseChatUser obj) {
     writer
-      ..writeByte(10)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.userId)
       ..writeByte(1)
@@ -40,8 +40,6 @@ class FirebaseChatUserAdapter extends TypeAdapter<FirebaseChatUser> {
       ..write(obj.deviceType)
       ..writeByte(3)
       ..write(obj.isOnline)
-      ..writeByte(4)
-      ..write(obj.userId)
       ..writeByte(5)
       ..write(obj.userName)
       ..writeByte(6)

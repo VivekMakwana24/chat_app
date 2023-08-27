@@ -23,7 +23,7 @@ setupLocator() async {
 
   locator.registerLazySingleton<UserAuthService>(() => UserAuthService());
   locator.registerLazySingleton<UserAuthRepository>(() => UserAuthRepository());
-  locator.registerSingleton<LoginStore>(LoginStore());
+  // locator.registerSingleton<LoginStore>(LoginStore());
 
   locator.registerSingleton<FirebaseAuth>(FirebaseAuth.instance);
   locator.registerSingleton<FirebaseFirestore>(FirebaseFirestore.instance);

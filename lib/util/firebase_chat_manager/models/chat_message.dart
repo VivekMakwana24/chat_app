@@ -59,6 +59,12 @@ class ChatMessage {
   @JsonKey(name: 'sender_profile')
   String? senderProfile;
 
+  @JsonKey(name: 'title')
+  String? title;
+
+  @JsonKey(name: 'body')
+  String? body;
+
   @JsonKey(name: 'is_admin')
   bool? isAdmin;
 
@@ -66,7 +72,7 @@ class ChatMessage {
   List<String?>? participants;
 
   @JsonKey(name: FirestoreConstants.openChatsIds)
-  List<int?>? openChatIds;
+  List<String?>? openChatIds;
 
   @JsonKey(name: FirestoreConstants.usernamesIsTyping)
   List<String?>? usernamesIsTyping;
@@ -87,7 +93,7 @@ class ChatMessage {
 
   bool isFailed;
   bool isFromComment;
-  bool isSelected=false;
+  bool isSelected = false;
   bool isPlaying = false;
   bool isLoading = false;
 
@@ -177,6 +183,8 @@ class ChatMessage {
     this.isAdmin,
     this.isGroup,
     this.groupName,
+    this.title,
+    this.body,
   });
 
   factory ChatMessage.fromJson(Map<String, dynamic> json) => _$ChatMessageFromJson(json);

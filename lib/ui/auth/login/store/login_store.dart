@@ -8,9 +8,9 @@ import 'package:flutter_demo_structure/core/navigation/navigation_service.dart';
 import 'package:flutter_demo_structure/core/navigation/routes.dart';
 import 'package:mobx/mobx.dart';
 
-part 'login_store.g.dart';
+// part 'login_store.g.dart';
 
-class LoginStore = _LoginStoreBase with _$LoginStore;
+// class LoginStore = _LoginStoreBase with _$LoginStore;
 
 abstract class _LoginStoreBase with Store {
   late SingleResponse loginResponse;
@@ -42,4 +42,4 @@ abstract class _LoginStoreBase with Store {
   }
 }
 
-final authStore = locator<LoginStore>();
+// final authStore = locator<LoginStore>();

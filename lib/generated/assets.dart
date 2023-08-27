@@ -11,6 +11,7 @@ class Assets {
   static const String imageEmail = 'assets/image/email.png';
   static const String imageImgNotAvailable = 'assets/image/img_not_available.jpeg';
   static const String imageMobile = 'assets/image/mobile.png';
+  static const String imageNotification = 'assets/image/notification.png';
   static const String imagePassword = 'assets/image/password.png';
   static const String imageUser = 'assets/image/user.png';
   static const String jsonTypingLoader = 'assets/json/typing_loader.json';

@@ -424,4 +424,13 @@ class FirebaseChatManager {
     UploadTask uploadTask = reference.putData(image!, SettableMetadata(contentType: 'image/jpeg'));
     return uploadTask;
   }
+
+  Future<void> updateDeviceToken(String? docId) async{
+    var collection = FirebaseFirestore.instance.collection(FirebaseCollection.users.name);
+    collection
+        .doc(docId)
+        .update({'device_token' : appDB.fcmToken}) // <-- Updated data
+        .then((_) => debugPrint('Success'))
+        .catchError((error) => debugPrint('Failed: $error'));
+  }
 }
