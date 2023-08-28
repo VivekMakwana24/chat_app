@@ -114,11 +114,11 @@ class CustomOtpViewState extends State<CustomOtpView> {
             FilteringTextInputFormatter.digitsOnly,
           ],
           maxLength: 1,
-          style: textBold.copyWith(fontSize: 45.sp, color: AppColor.primaryColor),
+          style: textBold.copyWith(fontSize: 45.spMin, color: AppColor.primaryColor),
           focusNode: _focusNodes[i],
           obscureText: widget.isTextObscure,
           decoration: InputDecoration(
-            hintStyle: textBold.copyWith(fontSize: 45.sp, color: Color(0xffCBCDD1)),
+            hintStyle: textBold.copyWith(fontSize: 45.spMin, color: Color(0xffCBCDD1)),
             counterText: "",
             hintText: "•",
             contentPadding: EdgeInsets.zero,

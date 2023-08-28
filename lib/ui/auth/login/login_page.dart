@@ -121,7 +121,7 @@ class _LoginPageState extends State<LoginPage> {
           StringConstant.welcomeBack.toUpperCase(),
           style: textBold.copyWith(
             color: AppColor.primaryColor,
-            fontSize: 28.sp,
+            fontSize: 28.spMin,
           ),
         ),
       ],

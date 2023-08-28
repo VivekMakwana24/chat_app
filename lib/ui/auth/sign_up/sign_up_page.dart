@@ -115,7 +115,7 @@ class _SignUpPageState extends State<SignUpPage> {
           StringConstant.signUp.toUpperCase(),
           style: textBold.copyWith(
             color: AppColor.primaryColor,
-            fontSize: 28.sp,
+            fontSize: 28.spMin,
           ),
         ),
       ],

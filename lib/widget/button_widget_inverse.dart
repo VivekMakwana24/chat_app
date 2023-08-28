@@ -27,7 +27,7 @@ class AppButtonInverse extends StatelessWidget {
         onPressed: callback,
         child: Text(
           label,
-          style: textBold.copyWith(color: AppColor.white, fontSize: 16.sp),
+          style: textBold.copyWith(color: AppColor.white, fontSize: 16.spMin),
         ),
         color: buttonColor ? AppColor.primaryColor : AppColor.primaryColor,
         shape: RoundedRectangleBorder(

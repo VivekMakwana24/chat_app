@@ -51,7 +51,7 @@ class CustomAlertDialog extends StatelessWidget {
               child: Text(
                 this.subTitle,
                 textAlign: TextAlign.center,
-                style: textMedium.copyWith(fontSize: 20.sp),
+                style: textMedium.copyWith(fontSize: 20.spMin),
               ),
             ),
             Padding(

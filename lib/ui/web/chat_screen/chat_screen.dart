@@ -57,9 +57,6 @@ class _WebChatScreenState extends State<WebChatScreen> {
                             selectedScreen = screen;
                             setState(() {});
                           },
-                          callback: (ChatMessage) {
-
-                          },
                         ),
                         //DEVIDER
                         Container(

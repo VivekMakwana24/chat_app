@@ -126,7 +126,7 @@ class AppTextField extends StatelessWidget {
             floatingLabelBehavior: FloatingLabelBehavior.always,
             hintStyle: textMedium.copyWith(
               color: AppColor.santasGray,
-              fontSize: 15.sp,
+              fontSize: 15.spMin,
             ),
             errorStyle: textMedium.copyWith(color: AppColor.redColor),
             errorMaxLines: 2,

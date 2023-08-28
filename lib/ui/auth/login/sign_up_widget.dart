@@ -33,7 +33,7 @@ class SignUpWidget extends StatelessWidget {
             fromLogin ? StringConstant.dontHaveAccount : StringConstant.alreadyHaveAccount,
             style: textMedium.copyWith(
               color: AppColor.brownColor,
-              fontSize: 16.sp,
+              fontSize: 16.spMin,
             ),
           ),
           4.0.VBox,

@@ -88,7 +88,7 @@ class _BaseAppBarState extends State<BaseAppBar> {
           : widget.titleWidget ??
               Text(
                 widget.title!,
-                style: textBold.copyWith(fontSize: 19.sp, color: widget.titleWidgetColor),
+                style: textBold.copyWith(fontSize: 19.spMin, color: widget.titleWidgetColor),
               ),
       backgroundColor: widget.backgroundColor != null ? widget.backgroundColor : AppColor.white,
       elevation: widget.elevations,
@@ -149,7 +149,7 @@ class OverLapsWidget extends StatelessWidget {
                   child: Center(
                     child: Text(
                       '1',
-                      style: TextStyle(fontSize: 5.sp),
+                      style: TextStyle(fontSize: 5.spMin),
                     ),
                   ),
                 ),
