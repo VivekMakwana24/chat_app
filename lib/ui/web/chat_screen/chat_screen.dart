@@ -29,12 +29,12 @@ class WebChatScreen extends StatefulWidget {
 class _WebChatScreenState extends State<WebChatScreen> {
   SelectedScreen selectedScreen = SelectedScreen.OneToOne;
 
-  ValueNotifier<bool> _showLoading = ValueNotifier<bool>(true);
+  ValueNotifier<bool> _showLoading = ValueNotifier<bool>(false);
 
   @override
   void initState() {
     super.initState();
-    loginAndNavigateToHome();
+    // loginAndNavigateToHome();
   }
 
   @override

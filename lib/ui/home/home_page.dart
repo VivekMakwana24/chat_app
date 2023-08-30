@@ -44,7 +44,6 @@ class _HomePageState extends State<HomePage> {
 
   // region Class members
   ValueNotifier<bool> showLoading = ValueNotifier<bool>(false);
-  ValueNotifier<bool> _isDataUpdated = ValueNotifier<bool>(false);
   final ScrollController listScrollController = ScrollController();
   StreamController<bool> btnClearController = StreamController<bool>();
   TextEditingController searchBarTec = TextEditingController();
@@ -53,8 +52,6 @@ class _HomePageState extends State<HomePage> {
   final List<ChatMessage> _recentChatList = [];
 
   int _limit = 20;
-  int _limitIncrement = 20;
-  String _textSearch = "";
 
   ChatMessage? _selectedItem;
 
@@ -76,7 +73,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     getPermission();
-    messageListener(context);
+
 
     firebaseChatManager.updateDataFirestore(
       FirebaseCollection.users.name,
@@ -294,12 +291,10 @@ class _HomePageState extends State<HomePage> {
                   if (value.isNotEmpty) {
                     btnClearController.add(true);
                     setState(() {
-                      _textSearch = value;
                     });
                   } else {
                     btnClearController.add(false);
                     setState(() {
-                      _textSearch = "";
                     });
                   }
                 });
@@ -323,7 +318,6 @@ class _HomePageState extends State<HomePage> {
                                 searchBarTec.clear();
                                 btnClearController.add(false);
                                 setState(() {
-                                  _textSearch = "";
                                 });
                               },
                               child: Icon(Icons.clear_rounded, color: AppColor.greyColor, size: 20))
@@ -567,77 +561,5 @@ class _HomePageState extends State<HomePage> {
     );
 
     print('User granted permission: ${settings.authorizationStatus}');
-  }
-
-  void messageListener(BuildContext context) {
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print('Got a message whilst in the foreground!');
-      print('Message data: ${message.data}');
-
-      if (message.notification != null) {
-        print('Message also contained a notification: ${message.notification?.body}');
-
-        showDialog(
-          context: context,
-          barrierColor: AppColor.transparent,
-          builder: (BuildContext context) {
-            Future.delayed(Duration(seconds: 2), () {
-              Navigator.of(context).pop(true);
-            });
-            return _showNotification(context, message);
-          },
-        );
-      }
-    });
-  }
-
-  Widget _showNotification(BuildContext context, RemoteMessage message) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Align(
-        alignment: Alignment.topCenter,
-        child: Container(
-          width: context.width - 200,
-          padding: const EdgeInsets.all(16.0),
-          margin: const EdgeInsets.all(10.0),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [BoxShadow(color: Colors.grey[100]!, blurRadius: 10, spreadRadius: 5)],
-          ),
-          child: Row(
-            children: [
-              Image.asset(
-                Assets.imageNotification,
-                height: 40,
-                width: 40,
-              ),
-              10.horizontalSpace,
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(message.notification?.title ?? '', style: textMedium),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Text(message.notification?.body ?? '', style: textMedium),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    ).addGestureTap(() {
-      debugPrint('HEREERE ${message.data['tag']}');
-      if (message.data['tag'] == 'new_chat_message') {
-        _selectedItem = ChatMessage.fromJson(message.data);
-        setState(() {});
-        debugPrint('SELECTEDITEm => ${_selectedItem?.toJson()}');
-      }
-    });
   }
 }

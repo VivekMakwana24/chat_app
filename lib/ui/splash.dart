@@ -7,11 +7,9 @@ import 'package:flutter_demo_structure/core/navigation/routes.dart';
 import 'package:flutter_demo_structure/generated/assets.dart';
 import 'package:flutter_demo_structure/ui/navbar/navbar.dart';
 import 'package:flutter_demo_structure/ui/web/chat_screen/chat_screen.dart';
-import 'package:flutter_demo_structure/values/colors_new.dart';
 import 'package:flutter_demo_structure/values/export.dart';
 import 'package:flutter_demo_structure/widget/responsive_layout.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class Splash extends StatefulWidget {
@@ -28,41 +26,29 @@ class _SplashState extends State<Splash> {
 
   Future<void> initSetting() async {
     // bool isAuthenticated = await AuthService.authenticateUser();
-    if (true) {
-      Timer(Duration(seconds: 2), () {
-        if (appDB.isLogin) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const ResponsiveLayout(
-                webScreenLayout: WebChatScreen(),
-                tabletScreenLayout: MyBottomNavigationBar(),
-                mobileScreenLayout: MyBottomNavigationBar(),
-              ),
-            ),
-          );
-        } else {
-          // navigator.pushReplacementNamed(RouteName.loginPage);
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const ResponsiveLayout(
-                webScreenLayout: WebChatScreen(),
-                tabletScreenLayout: MyBottomNavigationBar(),
-                mobileScreenLayout: MyBottomNavigationBar(),
-              ),
-            ),
-          );
-        }
-      });
+    if (appDB.isLogin) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ResponsiveLayout(
+            webScreenLayout: WebChatScreen(),
+            tabletScreenLayout: MyBottomNavigationBar(),
+            mobileScreenLayout: MyBottomNavigationBar(),
+          ),
+        ),
+      );
     } else {
-      Timer(Duration(seconds: 2), () {
-        if (!appDB.isLogin)
-          navigator.pushReplacementNamed(RouteName.lineChart);
-        else {
-          navigator.pushReplacementNamed(RouteName.homePage);
-        }
-      });
+      // navigator.pushReplacementNamed(RouteName.loginPage);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ResponsiveLayout(
+            webScreenLayout: WebChatScreen(),
+            tabletScreenLayout: MyBottomNavigationBar(),
+            mobileScreenLayout: MyBottomNavigationBar(),
+          ),
+        ),
+      );
     }
   }
 

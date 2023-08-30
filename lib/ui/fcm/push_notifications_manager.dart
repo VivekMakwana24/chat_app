@@ -76,10 +76,17 @@ class PushNotificationsManager {
     firebaseMessaging.getToken().then((String? token) async {
       appDB.fcmToken = token ?? '';
       // appDB.fcmToken = token!;
-      debugPrint("Push Messaging token: ${appDB.fcmToken}");
+      debugPrint("Push Messaging token: ${token}");
+      debugPrint("Push Messaging fcmtoken: ${appDB.fcmToken}");
+      debugPrint("AppDB${appDB.currentUserId}");
 
       if (appDB.currentUserId.isNotEmpty) {
-        firebaseChatManager.updateDeviceToken(appDB.currentUserId);
+        Future.delayed(
+          const Duration(seconds: 5),
+          () {
+            firebaseChatManager.updateDeviceToken(appDB.currentUserId);
+          },
+        );
       }
     });
 

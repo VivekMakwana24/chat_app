@@ -9,11 +9,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_demo_structure/core/navigation/navigation_service.dart';
 import 'package:flutter_demo_structure/fcm/PushNotificationsManager.dart';
 import 'package:flutter_demo_structure/firebase_options.dart';
+import 'package:flutter_demo_structure/ui/navbar/navbar.dart';
+import 'package:flutter_demo_structure/ui/web/chat_screen/chat_screen.dart';
 import 'package:flutter_demo_structure/util/firebase_chat_manager/firebase_chat_manager.dart';
 import 'package:flutter_demo_structure/util/firebase_chat_manager/models/firebase_chat_user.dart';
 import 'package:flutter_demo_structure/values/export.dart';
 import 'package:flutter_demo_structure/values/string_constants.dart';
 import 'package:flutter_demo_structure/values/theme.dart';
+import 'package:flutter_demo_structure/widget/responsive_layout.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -87,7 +90,11 @@ class MyApp extends StatelessWidget {
         routes: Routes.route(),
         onGenerateRoute: Routes.onGenerateRoute,
         onUnknownRoute: Routes.onUnknownRoute,
-        initialRoute: RouteName.root,
+        home: ResponsiveLayout(
+          webScreenLayout: WebChatScreen(),
+          tabletScreenLayout: WebChatScreen(),
+          mobileScreenLayout: MyBottomNavigationBar(),
+        ),
       ),
     );
   }

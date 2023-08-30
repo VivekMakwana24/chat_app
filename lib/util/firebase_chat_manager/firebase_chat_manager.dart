@@ -425,11 +425,11 @@ class FirebaseChatManager {
     return uploadTask;
   }
 
-  Future<void> updateDeviceToken(String? docId) async{
+  Future<void> updateDeviceToken(String? docId,[String? token]) async{
     var collection = FirebaseFirestore.instance.collection(FirebaseCollection.users.name);
     collection
         .doc(docId)
-        .update({'device_token' : appDB.fcmToken}) // <-- Updated data
+        .update({'device_token' : token ?? appDB.fcmToken}) // <-- Updated data
         .then((_) => debugPrint('Success'))
         .catchError((error) => debugPrint('Failed: $error'));
   }

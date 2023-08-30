@@ -6,7 +6,11 @@ class NotificationController extends GetxController {
 
   List<ChatMessage>? get getNotificationList => _getNotificationList.value;
 
+  RxInt notificationCount = 0.obs;
+
+  Rx<ChatMessage>? selectedItem = ChatMessage().obs;
+
   void setNotificationData(ChatMessage notificationData) {
-    _getNotificationList.add(notificationData);
+    _getNotificationList.insert(0, notificationData);
   }
 }

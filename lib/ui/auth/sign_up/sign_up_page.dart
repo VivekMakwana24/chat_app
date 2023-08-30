@@ -189,7 +189,7 @@ class _SignUpPageState extends State<SignUpPage> {
             16.0.VBox,
             AppButtonInverse(
               StringConstant.signUp.toUpperCase(),
-                  () {
+              () {
                 if (_formKey.currentState!.validate()) {
                   signUpAndNavigateToHome();
                 }
@@ -216,8 +216,8 @@ class _SignUpPageState extends State<SignUpPage> {
         deviceType: kIsWeb
             ? 'w'
             : Platform.isIOS
-            ? 'i'
-            : 'A',
+                ? 'i'
+                : 'A',
         isOnline: false,
         //await firebaseChatManager.fetchUserId(emailController.text.trim()),
         userEmail: emailController.text.trim(),
@@ -235,7 +235,7 @@ class _SignUpPageState extends State<SignUpPage> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => const ResponsiveLayout(
+            builder: (context) => ResponsiveLayout(
               webScreenLayout: WebChatScreen(),
               tabletScreenLayout: MyBottomNavigationBar(),
               mobileScreenLayout: MyBottomNavigationBar(),
