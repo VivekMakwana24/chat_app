@@ -88,13 +88,14 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         navigatorKey: NavigationService.navigatorKey,
         routes: Routes.route(),
+        initialRoute: RouteName.root,
         onGenerateRoute: Routes.onGenerateRoute,
         onUnknownRoute: Routes.onUnknownRoute,
-        home: ResponsiveLayout(
+        /*home: ResponsiveLayout(
           webScreenLayout: WebChatScreen(),
           tabletScreenLayout: WebChatScreen(),
           mobileScreenLayout: MyBottomNavigationBar(),
-        ),
+        ),*/
       ),
     );
   }

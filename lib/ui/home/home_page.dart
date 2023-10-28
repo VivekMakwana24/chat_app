@@ -18,18 +18,22 @@ import 'package:flutter_demo_structure/util/firebase_chat_manager/models/popup_c
 import 'package:flutter_demo_structure/util/utilities.dart';
 import 'package:flutter_demo_structure/values/colors.dart';
 import 'package:flutter_demo_structure/values/colors_new.dart';
-import 'package:flutter_demo_structure/values/extensions/context_ext.dart';
+import 'package:flutter_demo_structure/values/constants.dart';
 import 'package:flutter_demo_structure/values/extensions/widget_ext.dart';
 import 'package:flutter_demo_structure/values/style.dart';
+import 'package:flutter_demo_structure/widget/button_widget.dart';
 import 'package:flutter_demo_structure/widget/debouncer.dart';
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  final bool fetchOnlyGroups;
+
+  const HomePage({this.fetchOnlyGroups = false, Key? key}) : super(key: key);
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -74,7 +78,6 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     getPermission();
 
-
     firebaseChatManager.updateDataFirestore(
       FirebaseCollection.users.name,
       appDB.currentUserId,
@@ -106,18 +109,68 @@ class _HomePageState extends State<HomePage> {
                         padding: EdgeInsets.all(20),
                         child: buildSearchBar(),
                       ),
+                      10.h.verticalSpace,
+
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: SizedBox(
+                          width: 100,
+                          child: AppButton(
+                            'Create Group',
+                            () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => UserListPage(
+                                    isForGroup: true,
+                                    pageType: PageType.NEW_GROUP,
+                                  ),
+                                ),
+                              );
+                            },
+                            height: 30,
+                            radius: 6,
+                          ),
+                        ),
+                      ).visiblity(
+                        widget.fetchOnlyGroups,
+                      ),
 
                       // buildSearchBar(),
                       10.h.verticalSpace,
                       Flexible(
                         child: StreamBuilder<QuerySnapshot>(
-                          stream: firebaseChatManager.getRecentChatStream(_limit, searchBarTec.text.trim()),
+                          stream: firebaseChatManager.getRecentChatStream(
+                              _limit, searchBarTec.text.trim(), widget.fetchOnlyGroups),
                           builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
                             if (snapshot.hasData) {
                               _recentChatList.clear();
 
                               _recentChatList.addAll(
                                   (snapshot.data?.docs.map((e) => ChatMessage.toDocumentToClass(e)).toList() ?? []));
+
+                              if (chatID.isNotEmpty) {
+                                var itemData = _recentChatList.firstWhereOrNull((element) => element.chatId == chatID);
+                                chatID = '';
+                                if (itemData != null) {
+                                  if (_selectedItem != null) {
+                                    _selectedItem?.isSelected = false;
+                                    _selectedItem = null;
+                                  }
+                                  itemData.isSelected = true;
+                                  _selectedItem = itemData;
+
+                                  debugPrint('SelectedITem = ${_selectedItem?.chatId}');
+                                  debugPrint('SelectedITem = ${_selectedItem?.isSelected}');
+                                  Future.delayed(
+                                    Duration(milliseconds: 1500),
+                                    () {
+                                      debugPrint('Set State Called --> SelectedITem = ${_selectedItem?.isSelected}');
+                                      setState(() {});
+                                    },
+                                  );
+                                }
+                              }
 
                               return (_recentChatList.isNotEmpty)
                                   ? ListView.separated(
@@ -239,13 +292,14 @@ class _HomePageState extends State<HomePage> {
           backgroundColor: AppColor.primaryColor,
           onPressed: () {
             Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => UserListPage(
-                    isForGroup: false,
-                    pageType: PageType.USERS,
-                  ),
-                ));
+              context,
+              MaterialPageRoute(
+                builder: (context) => UserListPage(
+                  isForGroup: false,
+                  pageType: PageType.USERS,
+                ),
+              ),
+            );
           },
         ),
       ],
@@ -290,12 +344,10 @@ class _HomePageState extends State<HomePage> {
                 searchDebouncer.run(() {
                   if (value.isNotEmpty) {
                     btnClearController.add(true);
-                    setState(() {
-                    });
+                    setState(() {});
                   } else {
                     btnClearController.add(false);
-                    setState(() {
-                    });
+                    setState(() {});
                   }
                 });
               },
@@ -317,8 +369,7 @@ class _HomePageState extends State<HomePage> {
                               onTap: () {
                                 searchBarTec.clear();
                                 btnClearController.add(false);
-                                setState(() {
-                                });
+                                setState(() {});
                               },
                               child: Icon(Icons.clear_rounded, color: AppColor.greyColor, size: 20))
                           : SizedBox.shrink();

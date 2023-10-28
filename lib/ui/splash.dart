@@ -1,9 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_demo_structure/core/db/app_db.dart';
-import 'package:flutter_demo_structure/core/navigation/navigation_service.dart';
-import 'package:flutter_demo_structure/core/navigation/routes.dart';
 import 'package:flutter_demo_structure/generated/assets.dart';
 import 'package:flutter_demo_structure/ui/navbar/navbar.dart';
 import 'package:flutter_demo_structure/ui/web/chat_screen/chat_screen.dart';
@@ -24,32 +21,19 @@ class _SplashState extends State<Splash> {
     super.initState();
   }
 
+
   Future<void> initSetting() async {
     // bool isAuthenticated = await AuthService.authenticateUser();
-    if (appDB.isLogin) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ResponsiveLayout(
-            webScreenLayout: WebChatScreen(),
-            tabletScreenLayout: MyBottomNavigationBar(),
-            mobileScreenLayout: MyBottomNavigationBar(),
-          ),
+    /*Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ResponsiveLayout(
+          webScreenLayout: WebChatScreen(),
+          tabletScreenLayout: MyBottomNavigationBar(),
+          mobileScreenLayout: MyBottomNavigationBar(),
         ),
-      );
-    } else {
-      // navigator.pushReplacementNamed(RouteName.loginPage);
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ResponsiveLayout(
-            webScreenLayout: WebChatScreen(),
-            tabletScreenLayout: MyBottomNavigationBar(),
-            mobileScreenLayout: MyBottomNavigationBar(),
-          ),
-        ),
-      );
-    }
+      ),
+    );*/
   }
 
   @override

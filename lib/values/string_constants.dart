@@ -1,5 +1,5 @@
 class StringConstant {
-  static const String appName = 'Demo Structure';
+  static const String appName = 'GoCargo Chat';
   static const String ok = "Ok";
   static const String cancel = "Cancel";
   static const String yes = "Yes";

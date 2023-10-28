@@ -106,7 +106,7 @@ class _MessagePageMobileState extends State<MessagePageMobile> {
                   10.h.verticalSpace,
                   Flexible(
                     child: StreamBuilder<QuerySnapshot>(
-                      stream: firebaseChatManager.getRecentChatStream(_limit, searchBarTec.text.trim()),
+                      stream: firebaseChatManager.getRecentChatStream(_limit, searchBarTec.text.trim(), false),
                       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
                         if (snapshot.hasData) {
                           _recentChatList.clear();

@@ -21,6 +21,7 @@ class FirestoreConstants {
   static const unreadCountList = 'unread_count_list';
   static const receiver_name = 'receiver_name';
   static const group_name = 'group_name';
+  static const isGroup = 'is_group';
 
   static getUnreadCountKey(String? userId) {
     return userId.toString() + '_unreadCount';

@@ -1,7 +1,7 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -14,17 +14,20 @@ import 'package:flutter_demo_structure/util/date_time_helper.dart';
 import 'package:flutter_demo_structure/util/firebase_chat_manager/models/chat_message.dart';
 import 'package:flutter_demo_structure/util/firebase_chat_manager/models/firebase_chat_user.dart';
 import 'package:flutter_demo_structure/values/colors.dart';
+import 'package:flutter_demo_structure/values/constants.dart';
 import 'package:flutter_demo_structure/values/style.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 class ResponsiveLayout extends StatefulWidget {
+  final String? queryParam;
   final Widget webScreenLayout;
   final Widget tabletScreenLayout;
   final Widget mobileScreenLayout;
 
   ResponsiveLayout({
     super.key,
+    this.queryParam,
     required this.webScreenLayout,
     required this.tabletScreenLayout,
     required this.mobileScreenLayout,
@@ -43,6 +46,27 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
     getPermission();
 
     loginAndNavigateToHome();
+    /*if (!appDB.isLogin) {
+    } else {
+      debugPrint('<====USER ALREADY LOGGEDIN===>');
+      Map<String, dynamic>? loginMap;
+      debugPrint('widget.queryParam ${widget.queryParam}');
+      debugPrint('widget.queryParam?.isNotEmpty ${widget.queryParam?.isNotEmpty}');
+      if (widget.queryParam != null) {
+        var decoded = utf8.decode(
+          base64Decode(
+            base64.normalize(widget.queryParam ??
+                'ewogICAgInVzZXJfZW1haWwiOiJ2aXZla0B5b3BtYWlsLmNvbSIsCiAgICAiZ3JvdXBfaWQiOiIiCn0='),
+          ),
+        );
+        decoded = decoded.replaceAll("\n", '');
+        debugPrint('===> USER decoded  $decoded');
+        loginMap = jsonDecode(decoded.toString());
+        chatID = loginMap?['chat_id'] ?? '';
+        debugPrint('===> chatID $chatID');
+      }
+      debugPrint('Already Logged In as ${appDB.user?.userEmail}');
+    }*/
 
     messageListener(context);
   }
@@ -72,10 +96,28 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
 
   Future<void> loginAndNavigateToHome() async {
     try {
-      // Map<String, dynamic> map = jsonDecode(utf8.decode(base64Decode(base64.normalize(
-      //     widget.path ?? 'ewogICAgInVzZXJfZW1haWwiOiJ2aXZla0B5b3BtYWlsLmNvbSIsCiAgICAiZ3JvdXBfaWQiOiIiCn0='))));
+      Map<String, dynamic>? loginMap;
+      debugPrint('widget.queryParam ${widget.queryParam}');
+      debugPrint('widget.queryParam?.isNotEmpty ${widget.queryParam?.isNotEmpty}');
+      if (widget.queryParam != null) {
+        var decoded = utf8.decode(
+          base64Decode(
+            base64.normalize(widget.queryParam ??
+                'ewogICAgInVzZXJfZW1haWwiOiJ2aXZla0B5b3BtYWlsLmNvbSIsCiAgICAiZ3JvdXBfaWQiOiIiCn0='),
+          ),
+        );
+        decoded = decoded.replaceAll("\n", '');
+        debugPrint('===> USER decoded  $decoded');
+        loginMap = jsonDecode(decoded.toString());
+        debugPrint('===> USER EMAIL ${loginMap?['user_email']}');
+        chatID = loginMap?['chat_id'] ?? '';
+        debugPrint('===> chatID $chatID');
+      }
 
-      // debugPrint('===> USER EMAIL ' + map['user_email']);
+      if (appDB.user?.userEmail?.toLowerCase() == loginMap?['user_email'].toString()) {
+        return;
+      }
+
       var userModel = FirebaseChatUser(
         deviceToken: '0',
         deviceType: kIsWeb
@@ -85,8 +127,8 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
                 : 'A',
         isOnline: false,
         //await firebaseChatManager.fetchUserId(emailController.text.trim()),
-        userEmail: 'james@yopmail.com',
-        password: '111111',
+        userEmail: loginMap != null ? loginMap['user_email'] : 'james@yopmail.com',
+        password: loginMap != null ? loginMap['password'] : '111111',
         createdAt: generateUTC(DateTime.now().toUtc()),
       );
 
@@ -104,10 +146,10 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
     } on Exception catch (e) {
       // showLoading.value = false;
 
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      /*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Email or password is invalid! Please try again.'),
         duration: const Duration(seconds: 2),
-      ));
+      ));*/
       debugPrint('Error In Firebase $e');
     }
   }

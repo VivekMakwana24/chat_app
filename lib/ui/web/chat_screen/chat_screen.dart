@@ -27,7 +27,7 @@ class WebChatScreen extends StatefulWidget {
 }
 
 class _WebChatScreenState extends State<WebChatScreen> {
-  SelectedScreen selectedScreen = SelectedScreen.OneToOne;
+  SelectedScreen selectedScreen = SelectedScreen.RecentChat;
 
   ValueNotifier<bool> _showLoading = ValueNotifier<bool>(false);
 
@@ -72,16 +72,22 @@ class _WebChatScreenState extends State<WebChatScreen> {
 
                         //WEB PROFILE
                         Expanded(
-                          child: selectedScreen == SelectedScreen.OneToOne
+                          child: selectedScreen == SelectedScreen.RecentChat
                               ? appDB.user != null
-                                  ? HomePage()
-                                  : CircularProgressIndicator.adaptive()
-                              : appDB.user != null
-                                  ? UserListPage(
-                                      isForGroup: false,
-                                      pageType: PageType.USERS,
+                                  ? HomePage(
+                                      fetchOnlyGroups: false,
                                     )
-                                  : CircularProgressIndicator.adaptive(),
+                                  : CircularProgressIndicator.adaptive()
+                              : selectedScreen == SelectedScreen.Groups
+                                  ? HomePage(
+                                      fetchOnlyGroups: true,
+                                    )
+                                  : appDB.user != null
+                                      ? UserListPage(
+                                          isForGroup: false,
+                                          pageType: PageType.USERS,
+                                        )
+                                      : CircularProgressIndicator.adaptive(),
                         ),
 
                         /* //DEVIDER

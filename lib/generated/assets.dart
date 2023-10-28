@@ -9,6 +9,7 @@ class Assets {
   static const String imageBack = 'assets/image/back.png';
   static const String imageCheckedBox = 'assets/image/checked_box.png';
   static const String imageEmail = 'assets/image/email.png';
+  static const String imageIcUsersingle = 'assets/image/ic_usersingle.png';
   static const String imageImgNotAvailable = 'assets/image/img_not_available.jpeg';
   static const String imageMobile = 'assets/image/mobile.png';
   static const String imageNotification = 'assets/image/notification.png';
@@ -24,6 +25,7 @@ class Assets {
   static const String svgsGroupIcon = 'assets/svgs/group-icon.svg';
   static const String svgsGroups = 'assets/svgs/groups.svg';
   static const String svgsIcClose = 'assets/svgs/ic_close.svg';
+  static const String svgsIcUser1 = 'assets/svgs/ic_user1.svg';
   static const String svgsLogo = 'assets/svgs/logo.svg';
   static const String svgsLogout = 'assets/svgs/logout.svg';
   static const String svgsMessage = 'assets/svgs/message.svg';

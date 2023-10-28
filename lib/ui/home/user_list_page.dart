@@ -241,7 +241,7 @@ class _UserListPageState extends State<UserListPage> {
           margin: EdgeInsets.only(top: 10),
           child: SizedBox(
             height: 100,
-            child: ListView.builder(
+            child: ListView.separated(
               itemCount: participants.length,
               scrollDirection: Axis.horizontal,
               itemBuilder: (context, index) {
@@ -250,6 +250,9 @@ class _UserListPageState extends State<UserListPage> {
                   padding: EdgeInsets.only(left: index == 0 ? 16 : 0),
                   child: _buildParticipantsItem(userChat),
                 );
+              },
+              separatorBuilder: (BuildContext context, int index) {
+                return 10.horizontalSpace;
               },
             ),
           ).visiblity(participants.isNotEmpty),
@@ -291,27 +294,27 @@ class _UserListPageState extends State<UserListPage> {
                         errorBuilder: (context, object, stackTrace) {
                           return SvgPicture.asset(
                             Assets.svgsUserIcon,
-                            height: 30.sm,
-                            width: 30.sm,
+                            height: 50.r,
+                            width: 50.r,
                           );
                         },
                       )
                     : SvgPicture.asset(
                         Assets.svgsUserIcon,
-                        height: 30.sm,
-                        width: 30.sm,
+                        height: 50.r,
+                        width: 50.r,
                       ),
                 borderRadius: BorderRadius.all(Radius.circular(25)),
                 clipBehavior: Clip.hardEdge,
               ),
               Positioned(
-                right: 0,
-                bottom: 0,
+                right: 10,
+                bottom: 10,
                 child: Container(
                   decoration: BoxDecoration(color: AppColor.primaryColor, shape: BoxShape.circle),
                   child: Icon(
                     Icons.close_rounded,
-                    size: 20,
+                    size: 15,
                     color: AppColor.greyColor,
                   ),
                 ).addGestureTap(() {
@@ -375,14 +378,14 @@ class _UserListPageState extends State<UserListPage> {
                     builder: (context, snapshot) {
                       return snapshot.data == true
                           ? GestureDetector(
-                          onTap: () {
-                            searchBarTec.clear();
-                            btnClearController.add(false);
-                            setState(() {
-                              _textSearch = "";
-                            });
-                          },
-                          child: Icon(Icons.clear_rounded, color: AppColor.greyColor, size: 20))
+                              onTap: () {
+                                searchBarTec.clear();
+                                btnClearController.add(false);
+                                setState(() {
+                                  _textSearch = "";
+                                });
+                              },
+                              child: Icon(Icons.clear_rounded, color: AppColor.greyColor, size: 20))
                           : SizedBox.shrink();
                     }),
                 enabledBorder: OutlineInputBorder(
@@ -575,7 +578,7 @@ class _UserListPageState extends State<UserListPage> {
               _participantsList.notifyListeners();
             },
             style: ButtonStyle(
-              padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.symmetric(vertical: 16,horizontal: 16)),
+              padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.symmetric(vertical: 16, horizontal: 16)),
               backgroundColor: MaterialStateProperty.all<Color>(AppColor.white),
               shape: MaterialStateProperty.all<OutlinedBorder>(
                 RoundedRectangleBorder(

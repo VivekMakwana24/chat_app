@@ -203,26 +203,59 @@ class FirebaseChatManager {
   /*
   * Fetch Recent Chat Stream
   * */
-  Stream<QuerySnapshot> getRecentChatStream(int limit, String textSearch) {
+  Stream<QuerySnapshot> getRecentChatStream(int limit, String textSearch, bool fetchOnlyGroups) {
     debugPrint('#### getRecentChatStream ######');
     debugPrint('## GetRecentChatStream = ${FirebaseCollection.recent_chat.name} ${appDB.user?.userId}');
+    debugPrint('## fetchOnlyGroups = $fetchOnlyGroups');
     debugPrint('##########');
     if (textSearch.isNotEmpty) {
-      return firebaseFirestore
-          .collection(FirebaseCollection.recent_chat.name)
-          .where(FirestoreConstants.participants, arrayContains: appDB.user?.userId)
-          .where(FirestoreConstants.receiver_name, isEqualTo: textSearch)
-          .where(FirestoreConstants.group_name, isEqualTo: textSearch)
-          .orderBy(FirestoreConstants.createdAt, descending: true)
-          .limit(limit)
-          .snapshots();
+      if (fetchOnlyGroups) {
+        return firebaseFirestore
+            .collection(FirebaseCollection.recent_chat.name)
+            .where(FirestoreConstants.participants, arrayContains: appDB.user?.userId)
+            .where(FirestoreConstants.receiver_name, isEqualTo: textSearch)
+            .where(FirestoreConstants.group_name, isEqualTo: textSearch)
+            .where(FirestoreConstants.isGroup, isEqualTo: true)
+            .orderBy(FirestoreConstants.createdAt, descending: true)
+            .limit(limit)
+            .snapshots();
+      } else {
+        return firebaseFirestore
+            .collection(FirebaseCollection.recent_chat.name)
+            .where(FirestoreConstants.participants, arrayContains: appDB.user?.userId)
+            .where(FirestoreConstants.receiver_name, isEqualTo: textSearch)
+            .where(FirestoreConstants.group_name, isEqualTo: textSearch)
+            .orderBy(FirestoreConstants.createdAt, descending: true)
+            .limit(limit)
+            .snapshots();
+      }
     } else {
-      return firebaseFirestore
-          .collection(FirebaseCollection.recent_chat.name)
-          .where(FirestoreConstants.participants, arrayContains: appDB.user?.userId)
-          .orderBy(FirestoreConstants.createdAt, descending: true)
-          .limit(limit)
-          .snapshots();
+      if (fetchOnlyGroups) {
+        debugPrint('EERRRRR [===> ');
+        debugPrint('${firebaseFirestore
+            .collection(FirebaseCollection.recent_chat.name)
+            .where(FirestoreConstants.participants, arrayContains: appDB.user?.userId)
+            .where(FirestoreConstants.isGroup, isEqualTo: true)
+            .where(FirestoreConstants.isGroup, isNotEqualTo: null) // Add this line to filter out null values
+            .orderBy(FirestoreConstants.createdAt, descending: true) // Order the results by createdAt
+            .limit(limit)
+            .snapshots().length.then((value) => debugPrint('VALUE ==$value'))}');
+        return firebaseFirestore
+            .collection(FirebaseCollection.recent_chat.name)
+            .where(FirestoreConstants.participants, arrayContains: appDB.user?.userId)
+            .where(FirestoreConstants.isGroup, isEqualTo: true)
+            .where(FirestoreConstants.isGroup, isNotEqualTo: null) // Add this line to filter out null values
+            // .orderBy(FirestoreConstants.createdAt, descending: false) // Order the results by createdAt
+            .limit(limit)
+            .snapshots();
+      } else {
+        return firebaseFirestore
+            .collection(FirebaseCollection.recent_chat.name)
+            .where(FirestoreConstants.participants, arrayContains: appDB.user?.userId)
+            .orderBy(FirestoreConstants.createdAt, descending: true)
+            .limit(limit)
+            .snapshots();
+      }
     }
   }
 
@@ -425,11 +458,11 @@ class FirebaseChatManager {
     return uploadTask;
   }
 
-  Future<void> updateDeviceToken(String? docId,[String? token]) async{
+  Future<void> updateDeviceToken(String? docId, [String? token]) async {
     var collection = FirebaseFirestore.instance.collection(FirebaseCollection.users.name);
     collection
         .doc(docId)
-        .update({'device_token' : token ?? appDB.fcmToken}) // <-- Updated data
+        .update({'device_token': token ?? appDB.fcmToken}) // <-- Updated data
         .then((_) => debugPrint('Success'))
         .catchError((error) => debugPrint('Failed: $error'));
   }

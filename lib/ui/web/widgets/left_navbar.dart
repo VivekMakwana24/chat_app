@@ -5,15 +5,13 @@ import 'package:flutter_demo_structure/main.dart';
 import 'package:flutter_demo_structure/ui/auth/login/login_page.dart';
 import 'package:flutter_demo_structure/ui/home/controller/notification_controller.dart';
 import 'package:flutter_demo_structure/ui/web/widgets/notification_icon.dart';
-import 'package:flutter_demo_structure/util/firebase_chat_manager/models/chat_message.dart';
 import 'package:flutter_demo_structure/values/colors_new.dart';
 import 'package:flutter_demo_structure/values/export.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:velocity_x/velocity_x.dart';
 
-enum SelectedScreen { OneToOne, Groups }
+enum SelectedScreen { RecentChat, users, Groups }
 
 class LeftNavBar extends StatefulWidget {
   SelectedScreen selectedScreen;
@@ -60,13 +58,13 @@ class _LeftNavBarState extends State<LeftNavBar> {
               InkWell(
                 hoverColor: Colors.transparent,
                 onTap: () {
-                  if (widget.selectedScreen == SelectedScreen.OneToOne) return;
-                  widget.selectedScreen = SelectedScreen.OneToOne;
+                  if (widget.selectedScreen == SelectedScreen.RecentChat) return;
+                  widget.selectedScreen = SelectedScreen.RecentChat;
                   widget.onScreenChange(widget.selectedScreen);
                   setState(() {});
                 },
                 child: SvgPicture.asset(
-                  color: widget.selectedScreen == SelectedScreen.OneToOne ? ColorData.primary : ColorData.grey,
+                  color: widget.selectedScreen == SelectedScreen.users ? ColorData.primary : ColorData.grey,
                   Assets.svgsChat,
                   height: 30,
                 ),
@@ -86,6 +84,23 @@ class _LeftNavBarState extends State<LeftNavBar> {
                 child: SvgPicture.asset(
                   color: widget.selectedScreen == SelectedScreen.Groups ? ColorData.primary : ColorData.grey,
                   Assets.svgsUsers,
+                  height: 30,
+                ),
+              ), //User ICON
+              40.heightBox,
+
+              InkWell(
+                hoverColor: Colors.transparent,
+                onTap: () {
+                  if (widget.selectedScreen == SelectedScreen.users) return;
+
+                  widget.selectedScreen = SelectedScreen.users;
+                  widget.onScreenChange(widget.selectedScreen);
+                  setState(() {});
+                },
+                child: Image.asset(
+                  color: widget.selectedScreen == SelectedScreen.users ? ColorData.primary : ColorData.grey,
+                  Assets.imageIcUsersingle,
                   height: 30,
                 ),
               ),

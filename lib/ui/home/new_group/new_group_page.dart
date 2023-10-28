@@ -4,19 +4,17 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_demo_structure/core/db/app_db.dart';
+import 'package:flutter_demo_structure/core/navigation/routes.dart';
 import 'package:flutter_demo_structure/generated/assets.dart';
 import 'package:flutter_demo_structure/main.dart';
-import 'package:flutter_demo_structure/ui/home/home_page.dart';
 import 'package:flutter_demo_structure/ui/home/user_list_page.dart';
-import 'package:flutter_demo_structure/ui/navbar/navbar.dart';
-import 'package:flutter_demo_structure/ui/web/chat_screen/chat_screen.dart';
+import 'package:flutter_demo_structure/ui/web_page.dart';
 import 'package:flutter_demo_structure/util/date_time_helper.dart';
 import 'package:flutter_demo_structure/util/firebase_chat_manager/constants/firebase_collection_enum.dart';
 import 'package:flutter_demo_structure/util/firebase_chat_manager/models/chat_message.dart';
 import 'package:flutter_demo_structure/util/firebase_chat_manager/models/firebase_chat_user.dart';
 import 'package:flutter_demo_structure/util/utilities.dart';
 import 'package:flutter_demo_structure/values/colors.dart';
-import 'package:flutter_demo_structure/values/extensions/context_ext.dart';
 import 'package:flutter_demo_structure/values/style.dart';
 import 'package:flutter_demo_structure/widget/base_app_bar.dart';
 import 'package:flutter_demo_structure/widget/loading.dart';
@@ -84,8 +82,8 @@ class _NewGroupPageState extends State<NewGroupPage> {
           child: Column(
             children: [
               20.verticalSpace,
-              buildGroupImageView(),
-              20.verticalSpace,
+              // buildGroupImageView(),
+              // 20.verticalSpace,
               AppTextField(
                 controller: _groupNameController,
                 label: 'Type your group subject here..',
@@ -294,12 +292,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
         .set(sendMessageRequest.toJson());
 
     _showLoading.value = false;
-
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
-      builder: (context) {
-        return (kIsWeb && context.width >= 1024) ? WebChatScreen() : MyBottomNavigationBar();
-      },
-    ), (route) => false);
+    Navigator.pushNamedAndRemoveUntil(context, RouteName.webPage, (route) => false);
   }
 
   Future<void> _fetchUserDetails() async {
