@@ -4,23 +4,23 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_demo_structure/core/db/app_db.dart';
-import 'package:flutter_demo_structure/generated/assets.dart';
-import 'package:flutter_demo_structure/main.dart';
-import 'package:flutter_demo_structure/ui/home/chat_detail/chat_details.dart';
-import 'package:flutter_demo_structure/ui/home/new_group/new_group_page.dart';
-import 'package:flutter_demo_structure/util/firebase_chat_manager/constants/firebase_collection_enum.dart';
-import 'package:flutter_demo_structure/util/firebase_chat_manager/models/chat_message.dart';
-import 'package:flutter_demo_structure/util/firebase_chat_manager/models/firebase_chat_user.dart';
-import 'package:flutter_demo_structure/util/firebase_chat_manager/models/popup_choices.dart';
-import 'package:flutter_demo_structure/util/utilities.dart';
-import 'package:flutter_demo_structure/values/colors.dart';
-import 'package:flutter_demo_structure/values/colors_new.dart';
-import 'package:flutter_demo_structure/values/extensions/context_ext.dart';
-import 'package:flutter_demo_structure/values/extensions/widget_ext.dart';
-import 'package:flutter_demo_structure/widget/app_utils.dart';
-import 'package:flutter_demo_structure/widget/base_app_bar.dart';
-import 'package:flutter_demo_structure/widget/debouncer.dart';
+import 'package:gotms_chat/core/db/app_db.dart';
+import 'package:gotms_chat/generated/assets.dart';
+import 'package:gotms_chat/main.dart';
+import 'package:gotms_chat/ui/home/chat_detail/chat_details.dart';
+import 'package:gotms_chat/ui/home/new_group/new_group_page.dart';
+import 'package:gotms_chat/util/firebase_chat_manager/constants/firebase_collection_enum.dart';
+import 'package:gotms_chat/util/firebase_chat_manager/models/chat_message.dart';
+import 'package:gotms_chat/util/firebase_chat_manager/models/firebase_chat_user.dart';
+import 'package:gotms_chat/util/firebase_chat_manager/models/popup_choices.dart';
+import 'package:gotms_chat/util/utilities.dart';
+import 'package:gotms_chat/values/colors.dart';
+import 'package:gotms_chat/values/colors_new.dart';
+import 'package:gotms_chat/values/extensions/context_ext.dart';
+import 'package:gotms_chat/values/extensions/widget_ext.dart';
+import 'package:gotms_chat/widget/app_utils.dart';
+import 'package:gotms_chat/widget/base_app_bar.dart';
+import 'package:gotms_chat/widget/debouncer.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -94,7 +94,7 @@ class _UserListPageState extends State<UserListPage> {
         backgroundColor: AppColor.white,
         appBar: BaseAppBar(
           showTitle: true,
-          leadingIcon: context.width >= 1024 ? false : true,
+          leadingIcon: (context.width >= 1024 || widget.pageType == PageType.USERS) ? false : true,
           title: widget.pageType == PageType.NEW_GROUP
               ? 'New Group'
               : (widget.pageType == PageType.USERS)
@@ -118,7 +118,7 @@ class _UserListPageState extends State<UserListPage> {
                       debugPrint('HasDaTA ${snapshot.hasData}');
 
                       if (snapshot.hasData) {
-                        debugPrint('HasDaTA ${(snapshot.data?.docs.length ?? 0) > 0}');
+                        debugPrint('snapshot.hasData ---> ${(snapshot.data?.docs.length ?? 0) > 0}');
                         if ((snapshot.data?.docs.length ?? 0) > 0) {
                           return ListView.builder(
                             padding: EdgeInsets.all(10),

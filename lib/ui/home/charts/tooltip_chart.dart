@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_demo_structure/ui/home/charts/graph_data.dart';
-import 'package:flutter_demo_structure/util/date_time_helper.dart';
+import 'package:gotms_chat/ui/home/charts/graph_data.dart';
+import 'package:gotms_chat/util/date_time_helper.dart';
 
 class ChartTooltip extends StatelessWidget {
   GraphDataDetails data;

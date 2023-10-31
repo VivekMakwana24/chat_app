@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_demo_structure/core/db/app_db.dart';
-import 'package:flutter_demo_structure/core/navigation/navigation_service.dart';
-import 'package:flutter_demo_structure/core/navigation/routes.dart';
+import 'package:gotms_chat/core/db/app_db.dart';
+import 'package:gotms_chat/core/navigation/navigation_service.dart';
+import 'package:gotms_chat/core/navigation/routes.dart';
 
 import 'app_exceptions.dart';
 

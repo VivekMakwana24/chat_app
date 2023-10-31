@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_demo_structure/ui/web/widgets/chat_list.dart';
-import 'package:flutter_demo_structure/ui/web/widgets/profile_appbar.dart';
-import 'package:flutter_demo_structure/ui/web/widgets/typing_textbox.dart';
-import 'package:flutter_demo_structure/values/colors_new.dart';
+import 'package:gotms_chat/ui/web/widgets/chat_list.dart';
+import 'package:gotms_chat/ui/web/widgets/profile_appbar.dart';
+import 'package:gotms_chat/ui/web/widgets/typing_textbox.dart';
+import 'package:gotms_chat/values/colors_new.dart';
 
 class MessageScreen extends StatefulWidget {
   const MessageScreen({super.key});

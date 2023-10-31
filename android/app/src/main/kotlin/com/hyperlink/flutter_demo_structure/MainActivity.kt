@@ -1,4 +1,4 @@
-package com.hyperlink.flutter_demo_structure
+package com.hyperlink.gotms_chat
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine

@@ -3,26 +3,26 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_demo_structure/core/db/app_db.dart';
-import 'package:flutter_demo_structure/generated/assets.dart';
-import 'package:flutter_demo_structure/main.dart';
-import 'package:flutter_demo_structure/ui/home/chat_detail/chat_details.dart';
-import 'package:flutter_demo_structure/ui/home/new_group/new_group_page.dart';
-import 'package:flutter_demo_structure/ui/home/user_list_page.dart';
-import 'package:flutter_demo_structure/ui/web/widgets/contactlist_appbar.dart';
-import 'package:flutter_demo_structure/util/date_time_helper.dart';
-import 'package:flutter_demo_structure/util/firebase_chat_manager/constants/firebase_collection_enum.dart';
-import 'package:flutter_demo_structure/util/firebase_chat_manager/models/chat_message.dart';
-import 'package:flutter_demo_structure/util/firebase_chat_manager/models/firebase_chat_user.dart';
-import 'package:flutter_demo_structure/util/firebase_chat_manager/models/popup_choices.dart';
-import 'package:flutter_demo_structure/util/utilities.dart';
-import 'package:flutter_demo_structure/values/colors.dart';
-import 'package:flutter_demo_structure/values/colors_new.dart';
-import 'package:flutter_demo_structure/values/constants.dart';
-import 'package:flutter_demo_structure/values/extensions/widget_ext.dart';
-import 'package:flutter_demo_structure/values/style.dart';
-import 'package:flutter_demo_structure/widget/button_widget.dart';
-import 'package:flutter_demo_structure/widget/debouncer.dart';
+import 'package:gotms_chat/core/db/app_db.dart';
+import 'package:gotms_chat/generated/assets.dart';
+import 'package:gotms_chat/main.dart';
+import 'package:gotms_chat/ui/home/chat_detail/chat_details.dart';
+import 'package:gotms_chat/ui/home/new_group/new_group_page.dart';
+import 'package:gotms_chat/ui/home/user_list_page.dart';
+import 'package:gotms_chat/ui/web/widgets/contactlist_appbar.dart';
+import 'package:gotms_chat/util/date_time_helper.dart';
+import 'package:gotms_chat/util/firebase_chat_manager/constants/firebase_collection_enum.dart';
+import 'package:gotms_chat/util/firebase_chat_manager/models/chat_message.dart';
+import 'package:gotms_chat/util/firebase_chat_manager/models/firebase_chat_user.dart';
+import 'package:gotms_chat/util/firebase_chat_manager/models/popup_choices.dart';
+import 'package:gotms_chat/util/utilities.dart';
+import 'package:gotms_chat/values/colors.dart';
+import 'package:gotms_chat/values/colors_new.dart';
+import 'package:gotms_chat/values/constants.dart';
+import 'package:gotms_chat/values/extensions/widget_ext.dart';
+import 'package:gotms_chat/values/style.dart';
+import 'package:gotms_chat/widget/button_widget.dart';
+import 'package:gotms_chat/widget/debouncer.dart';
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -149,6 +149,7 @@ class _HomePageState extends State<HomePage> {
                               _recentChatList.addAll(
                                   (snapshot.data?.docs.map((e) => ChatMessage.toDocumentToClass(e)).toList() ?? []));
 
+                              ///Open specific chat if ChatID is available.
                               if (chatID.isNotEmpty) {
                                 var itemData = _recentChatList.firstWhereOrNull((element) => element.chatId == chatID);
                                 chatID = '';
@@ -455,17 +456,17 @@ class _HomePageState extends State<HomePage> {
           child: Row(
             children: <Widget>[
               Material(
-                child: !(itemData.getChatIcon.isEmptyOrNull ?? true)
+                child: !(itemData.getChatIcon.isEmptyOrNull)
                     ? Image.network(
                         itemData.getChatIcon ?? '',
                         fit: BoxFit.cover,
-                        width: 50,
-                        height: 50,
+                        width: 50.r,
+                        height: 50.r,
                         loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
                           if (loadingProgress == null) return child;
                           return Container(
-                            width: 50,
-                            height: 50,
+                            width: 50.r,
+                            height: 50.r,
                             child: Center(
                               child: CircularProgressIndicator(
                                 color: AppColor.primaryColor,
@@ -479,15 +480,15 @@ class _HomePageState extends State<HomePage> {
                         errorBuilder: (context, object, stackTrace) {
                           return SvgPicture.asset(
                             (itemData.isGroup ?? false) ? Assets.svgsGroupIcon : Assets.svgsUserIcon,
-                            height: 40.sm,
-                            width: 40.sm,
+                            height: 40.spMin,
+                            width: 40.spMin,
                           );
                         },
                       )
                     : SvgPicture.asset(
                         (itemData.isGroup ?? false) ? Assets.svgsGroupIcon : Assets.svgsUserIcon,
-                        height: 40.sm,
-                        width: 40.sm,
+                        height: 40.spMin,
+                        width: 40.spMin,
                       ),
                 borderRadius: BorderRadius.all(Radius.circular(25)),
                 clipBehavior: Clip.hardEdge,
@@ -501,7 +502,7 @@ class _HomePageState extends State<HomePage> {
                         child: Text(
                           (itemData.isGroup ?? false) ? '${itemData.groupName}' : '${itemData.getName}',
                           maxLines: 1,
-                          style: TextStyle(color: AppColor.primaryColor),
+                          style: TextStyle(color: AppColor.primaryColor,fontSize: 14.spMin),
                         ),
                         alignment: Alignment.centerLeft,
                         margin: EdgeInsets.fromLTRB(0, 0, 0, 5),
@@ -517,7 +518,7 @@ class _HomePageState extends State<HomePage> {
                       )
                     ],
                   ),
-                  margin: EdgeInsets.only(left: 20),
+                  margin: EdgeInsets.only(left: 10),
                 ),
               ),
               Column(
@@ -527,6 +528,7 @@ class _HomePageState extends State<HomePage> {
                     itemData.createdAt?.convertToAgo(text: 'ago') ??
                         (itemData.createdAt?.convertToAgoWithTimeStamp(text: 'ago') ?? ''),
                     style: textRegular10.copyWith(color: AppColor.greyColor),
+                    overflow: TextOverflow.ellipsis,
                   ),
                   if (itemData.unreadCount > 0) ...[
                     SizedBox(
@@ -546,7 +548,7 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ],
               ).wrapPadding(
-                padding: EdgeInsets.only(right: 10.w),
+                padding: EdgeInsets.only(right: 5),
               ),
             ],
           ),

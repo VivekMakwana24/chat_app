@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_demo_structure/values/colors.dart';
-import 'package:flutter_demo_structure/values/export.dart';
+import 'package:gotms_chat/values/colors.dart';
+import 'package:gotms_chat/values/export.dart';
 
 class AppImage extends StatefulWidget {
   String? url;

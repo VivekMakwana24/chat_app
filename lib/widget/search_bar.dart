@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_demo_structure/generated/assets.dart';
-import 'package:flutter_demo_structure/values/colors_new.dart';
-import 'package:flutter_demo_structure/values/export.dart';
+import 'package:gotms_chat/generated/assets.dart';
+import 'package:gotms_chat/values/colors_new.dart';
+import 'package:gotms_chat/values/export.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 

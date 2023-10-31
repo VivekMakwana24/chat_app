@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_demo_structure/values/export.dart';
+import 'package:gotms_chat/values/export.dart';
 
 class MyBullet extends StatelessWidget {
   final double padding;

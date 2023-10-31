@@ -1,7 +1,7 @@
 import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_demo_structure/core/navigation/navigation_service.dart';
-import 'package:flutter_demo_structure/values/export.dart';
+import 'package:gotms_chat/core/navigation/navigation_service.dart';
+import 'package:gotms_chat/values/export.dart';
 
 enum MessageType { INFO, ERROR, WARNING }
 

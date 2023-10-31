@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_demo_structure/ui/common/contact_list/contact_list.dart';
-import 'package:flutter_demo_structure/widget/base_app_bar.dart';
-import 'package:flutter_demo_structure/widget/search_bar.dart';
+import 'package:gotms_chat/ui/common/contact_list/contact_list.dart';
+import 'package:gotms_chat/widget/base_app_bar.dart';
+import 'package:gotms_chat/widget/search_bar.dart';
 
 class MobileChatScreen extends StatefulWidget {
   const MobileChatScreen({super.key});

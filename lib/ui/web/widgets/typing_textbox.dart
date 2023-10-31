@@ -1,15 +1,13 @@
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_demo_structure/generated/assets.dart';
-import 'package:flutter_demo_structure/values/colors_new.dart';
-import 'package:flutter_demo_structure/values/extensions/context_ext.dart';
+import 'package:gotms_chat/generated/assets.dart';
+import 'package:gotms_chat/values/colors_new.dart';
+import 'package:gotms_chat/values/extensions/context_ext.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:images_picker/images_picker.dart';
 
 class TextTypingBox extends StatefulWidget {
   const TextTypingBox({super.key});

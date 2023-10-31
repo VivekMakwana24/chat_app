@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_demo_structure/util/firebase_chat_manager/models/chat_message.dart';
-import 'package:flutter_demo_structure/values/export.dart';
+import 'package:gotms_chat/util/firebase_chat_manager/models/chat_message.dart';
+import 'package:gotms_chat/values/export.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:velocity_x/velocity_x.dart';
 

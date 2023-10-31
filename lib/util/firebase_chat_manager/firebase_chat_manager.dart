@@ -5,17 +5,17 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_demo_structure/core/db/app_db.dart';
-import 'package:flutter_demo_structure/core/di/api/req_params.dart';
-import 'package:flutter_demo_structure/core/navigation/navigation_service.dart';
-import 'package:flutter_demo_structure/core/navigation/routes.dart';
-import 'package:flutter_demo_structure/main.dart';
-import 'package:flutter_demo_structure/util/date_time_helper.dart';
-import 'package:flutter_demo_structure/util/firebase_chat_manager/constants/firebase_collection_enum.dart';
-import 'package:flutter_demo_structure/util/firebase_chat_manager/constants/firestore_constants.dart';
-import 'package:flutter_demo_structure/util/firebase_chat_manager/models/chat_message.dart';
-import 'package:flutter_demo_structure/util/firebase_chat_manager/models/firebase_chat_user.dart';
-import 'package:flutter_demo_structure/util/firebase_chat_manager/models/message_chat.dart';
+import 'package:gotms_chat/core/db/app_db.dart';
+import 'package:gotms_chat/core/di/api/req_params.dart';
+import 'package:gotms_chat/core/navigation/navigation_service.dart';
+import 'package:gotms_chat/core/navigation/routes.dart';
+import 'package:gotms_chat/main.dart';
+import 'package:gotms_chat/util/date_time_helper.dart';
+import 'package:gotms_chat/util/firebase_chat_manager/constants/firebase_collection_enum.dart';
+import 'package:gotms_chat/util/firebase_chat_manager/constants/firestore_constants.dart';
+import 'package:gotms_chat/util/firebase_chat_manager/models/chat_message.dart';
+import 'package:gotms_chat/util/firebase_chat_manager/models/firebase_chat_user.dart';
+import 'package:gotms_chat/util/firebase_chat_manager/models/message_chat.dart';
 
 class FirebaseChatManager {
   /// Logout User
@@ -119,15 +119,16 @@ class FirebaseChatManager {
   * */
   Stream<QuerySnapshot> getStreamFireStore(String pathCollection, int limit, String? textSearch,
       [List<String>? participantsList]) {
-    debugPrint('### - getStreamFireStore ${textSearch}');
-    debugPrint('### - participantsList ${participantsList}');
-
+    debugPrint('### - getStreamFireStore $textSearch');
+    debugPrint('### - participantsList $participantsList');
+    debugPrint('### - _textSearch $textSearch');
     if (textSearch?.isNotEmpty ?? false) {
       return firebaseFirestore
           .collection(pathCollection)
           .limit(limit)
-          .where(FirestoreConstants.user_name, isEqualTo: textSearch)
           .where(FirestoreConstants.participants, whereNotIn: participantsList)
+          .where(FirestoreConstants.user_name, isEqualTo: textSearch)
+          .orderBy(FirestoreConstants.createdAt) // Replace 'fieldName' with the field you want to order by
           .snapshots();
     } else {
       return firebaseFirestore.collection(pathCollection).limit(limit).snapshots();
@@ -150,6 +151,24 @@ class FirebaseChatManager {
       return Future.value(messageChat);
     }
     return Future.error('');
+  }
+
+  Future<void>? deleteDocument(String chatId) async {
+    debugPrint('### - deleteDocument $chatId');
+    final QuerySnapshot result = await firebaseFirestore
+        .collection(FirebaseCollection.recent_chat.name)
+        .where(FirestoreConstants.chatId, isEqualTo: chatId)
+        .limit(1)
+        .get();
+
+    debugPrint('### - deleteDocument QuerySnapshot ${result.size}');
+
+    final List<DocumentSnapshot> documents = result.docs;
+    await firebaseFirestore.runTransaction((Transaction myTransaction) async {
+      myTransaction.delete(documents[0].reference);
+    });
+
+    debugPrint('### - deleteDocument Success');
   }
 
   Future<void> updateDataFirestore(String collectionPath, String docPath, Map<String, dynamic> dataNeedUpdate) {
@@ -207,17 +226,24 @@ class FirebaseChatManager {
     debugPrint('#### getRecentChatStream ######');
     debugPrint('## GetRecentChatStream = ${FirebaseCollection.recent_chat.name} ${appDB.user?.userId}');
     debugPrint('## fetchOnlyGroups = $fetchOnlyGroups');
+    debugPrint('## textSearch = $textSearch');
+    debugPrint('## fetchOnlyGroups = ${firebaseFirestore
+        .collection(FirebaseCollection.recent_chat.name)
+        .where(FirestoreConstants.participants, arrayContains: appDB.user?.userId)
+        .where(FirestoreConstants.receiver_name, isEqualTo: textSearch)
+        .where(FirestoreConstants.group_name, isEqualTo: textSearch)
+        .orderBy(FirestoreConstants.createdAt, descending: true)
+        .snapshots().length}');
     debugPrint('##########');
     if (textSearch.isNotEmpty) {
       if (fetchOnlyGroups) {
         return firebaseFirestore
             .collection(FirebaseCollection.recent_chat.name)
             .where(FirestoreConstants.participants, arrayContains: appDB.user?.userId)
-            .where(FirestoreConstants.receiver_name, isEqualTo: textSearch)
             .where(FirestoreConstants.group_name, isEqualTo: textSearch)
             .where(FirestoreConstants.isGroup, isEqualTo: true)
             .orderBy(FirestoreConstants.createdAt, descending: true)
-            .limit(limit)
+            // .limit(limit)
             .snapshots();
       } else {
         return firebaseFirestore
@@ -232,14 +258,10 @@ class FirebaseChatManager {
     } else {
       if (fetchOnlyGroups) {
         debugPrint('EERRRRR [===> ');
-        debugPrint('${firebaseFirestore
-            .collection(FirebaseCollection.recent_chat.name)
-            .where(FirestoreConstants.participants, arrayContains: appDB.user?.userId)
-            .where(FirestoreConstants.isGroup, isEqualTo: true)
-            .where(FirestoreConstants.isGroup, isNotEqualTo: null) // Add this line to filter out null values
-            .orderBy(FirestoreConstants.createdAt, descending: true) // Order the results by createdAt
-            .limit(limit)
-            .snapshots().length.then((value) => debugPrint('VALUE ==$value'))}');
+        debugPrint(
+            '${firebaseFirestore.collection(FirebaseCollection.recent_chat.name).where(FirestoreConstants.participants, arrayContains: appDB.user?.userId).where(FirestoreConstants.isGroup, isEqualTo: true).where(FirestoreConstants.isGroup, isNotEqualTo: null) // Add this line to filter out null values
+                .orderBy(FirestoreConstants.createdAt, descending: true) // Order the results by createdAt
+                .limit(limit).snapshots().length.then((value) => debugPrint('VALUE ==$value'))}');
         return firebaseFirestore
             .collection(FirebaseCollection.recent_chat.name)
             .where(FirestoreConstants.participants, arrayContains: appDB.user?.userId)

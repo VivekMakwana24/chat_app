@@ -2,8 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_demo_structure/core/db/app_db.dart';
-import 'package:flutter_demo_structure/core/di/api/EncText.dart';
+import 'package:gotms_chat/core/db/app_db.dart';
 
 class CustomInterceptors extends Interceptor {
   @override
@@ -24,14 +23,14 @@ class CustomInterceptors extends Interceptor {
 
     debugPrint("Headers: ${jsonEncode(options.headers)}");
 
-    options.data = enc.encrypt(jsonEncode(options.data));
+    // options.data = enc.encrypt(jsonEncode(options.data));
     return handler.next(options);
   }
 
   @override
   Future onResponse(Response response, ResponseInterceptorHandler handler) async {
     debugPrint('RESPONSE[${response.statusCode}] => PATH: ${response.realUri}');
-    response.data = enc.decrypt(response.data);
+    // response.data = enc.decrypt(response.data);
     debugPrint('RESPONSE[${response.statusCode}] => PATH: ${response.data}');
     return handler.next(response);
   }

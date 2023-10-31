@@ -1,4 +1,4 @@
-import 'package:flutter_demo_structure/core/db/app_db.dart';
+import 'package:gotms_chat/core/db/app_db.dart';
 
 class FirestoreConstants {
   static const user_name = "user_name";
@@ -17,6 +17,7 @@ class FirestoreConstants {
   static const chatId = "chat_id";
   static const openChatsIds = 'open_chats_ids';
   static const participants = 'participants';
+  static const participantsNotification = 'participants_notification';
   static const usernamesIsTyping = 'usernames_is_typing';
   static const unreadCountList = 'unread_count_list';
   static const receiver_name = 'receiver_name';

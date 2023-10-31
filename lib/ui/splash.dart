@@ -1,11 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_demo_structure/generated/assets.dart';
-import 'package:flutter_demo_structure/ui/navbar/navbar.dart';
-import 'package:flutter_demo_structure/ui/web/chat_screen/chat_screen.dart';
-import 'package:flutter_demo_structure/values/export.dart';
-import 'package:flutter_demo_structure/widget/responsive_layout.dart';
+import 'package:gotms_chat/generated/assets.dart';
+import 'package:gotms_chat/ui/navbar/navbar.dart';
+import 'package:gotms_chat/ui/web/chat_screen/chat_screen.dart';
+import 'package:gotms_chat/values/export.dart';
+import 'package:gotms_chat/widget/responsive_layout.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:velocity_x/velocity_x.dart';
 

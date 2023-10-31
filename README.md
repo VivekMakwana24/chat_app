@@ -1,4 +1,4 @@
-**A Demo Structure Flutter project.**
+**A Chat App Flutter project.**
 
 ```bash
 ├───android                             <-- Android related code

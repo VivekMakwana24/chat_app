@@ -3,11 +3,11 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:dio_http_cache/dio_http_cache.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_demo_structure/core/di/api/api_end_points.dart';
-import 'package:flutter_demo_structure/core/di/api/interceptor/custom_interceptors.dart';
-import 'package:flutter_demo_structure/core/di/api/interceptor/internet_interceptor.dart';
-import 'package:flutter_demo_structure/core/navigation/navigation_service.dart';
-import 'package:flutter_demo_structure/core/navigation/routes.dart';
+import 'package:gotms_chat/core/di/api/api_end_points.dart';
+import 'package:gotms_chat/core/di/api/interceptor/custom_interceptors.dart';
+import 'package:gotms_chat/core/di/api/interceptor/internet_interceptor.dart';
+import 'package:gotms_chat/core/navigation/navigation_service.dart';
+import 'package:gotms_chat/core/navigation/routes.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
 import 'app_exceptions.dart';

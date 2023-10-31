@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_demo_structure/ui/navbar/navbar.dart';
-import 'package:flutter_demo_structure/ui/web/chat_screen/chat_screen.dart';
-import 'package:flutter_demo_structure/widget/responsive_layout.dart';
+import 'package:gotms_chat/ui/navbar/navbar.dart';
+import 'package:gotms_chat/ui/web/chat_screen/chat_screen.dart';
+import 'package:gotms_chat/widget/responsive_layout.dart';
 
 class WebPage extends StatefulWidget {
   final String? queryParam;

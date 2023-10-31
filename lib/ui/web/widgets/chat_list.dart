@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_demo_structure/model/info.dart';
-import 'package:flutter_demo_structure/ui/web/widgets/my_chat_bubble.dart';
-import 'package:flutter_demo_structure/ui/web/widgets/sender_chat_bubble.dart';
+import 'package:gotms_chat/model/info.dart';
+import 'package:gotms_chat/ui/web/widgets/my_chat_bubble.dart';
+import 'package:gotms_chat/ui/web/widgets/sender_chat_bubble.dart';
 
 class ChatList extends StatefulWidget {
   const ChatList({super.key});

@@ -1,4 +1,4 @@
-import 'package:flutter_demo_structure/util/firebase_chat_manager/models/chat_message.dart';
+import 'package:gotms_chat/util/firebase_chat_manager/models/chat_message.dart';
 import 'package:get/get.dart';
 
 class NotificationController extends GetxController {

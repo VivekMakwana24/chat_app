@@ -1,6 +1,6 @@
 {
-    "name": "flutter_demo_structure",
-    "short_name": "flutter_demo_structure",
+    "name": "gotms_chat",
+    "short_name": "gotms_chat",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

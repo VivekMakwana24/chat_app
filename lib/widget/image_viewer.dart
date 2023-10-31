@@ -1,8 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_demo_structure/generated/assets.dart';
-import 'package:flutter_demo_structure/values/colors.dart';
-import 'package:flutter_demo_structure/values/extensions/export.dart';
+import 'package:gotms_chat/generated/assets.dart';
+import 'package:gotms_chat/values/colors.dart';
+import 'package:gotms_chat/values/extensions/export.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class ImageViewerWidget extends StatelessWidget {

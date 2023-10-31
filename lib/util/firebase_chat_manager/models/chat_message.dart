@@ -1,10 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_demo_structure/core/db/app_db.dart';
-import 'package:flutter_demo_structure/util/date_time_enum.dart';
-import 'package:flutter_demo_structure/util/date_time_helper.dart';
-import 'package:flutter_demo_structure/util/firebase_chat_manager/constants/firestore_constants.dart';
+import 'package:gotms_chat/core/db/app_db.dart';
+import 'package:gotms_chat/util/date_time_enum.dart';
+import 'package:gotms_chat/util/date_time_helper.dart';
+import 'package:gotms_chat/util/firebase_chat_manager/constants/firestore_constants.dart';
 import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:velocity_x/velocity_x.dart';
@@ -67,6 +67,9 @@ class ChatMessage {
 
   @JsonKey(name: 'is_admin')
   bool? isAdmin;
+
+  @JsonKey(name: 'system_generated')
+  bool? systemGenerated;
 
   @JsonKey(name: FirestoreConstants.participants)
   List<String?>? participants;
@@ -185,6 +188,7 @@ class ChatMessage {
     this.groupName,
     this.title,
     this.body,
+    this.systemGenerated = false,
   });
 
   factory ChatMessage.fromJson(Map<String, dynamic> json) => _$ChatMessageFromJson(json);

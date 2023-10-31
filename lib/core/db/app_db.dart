@@ -1,6 +1,6 @@
-import 'package:flutter_demo_structure/model/user_profile_response.dart';
-import 'package:flutter_demo_structure/util/firebase_chat_manager/models/firebase_chat_user.dart';
-import 'package:flutter_demo_structure/util/firebase_chat_manager/models/firebase_chat_user.dart';
+import 'package:gotms_chat/model/user_profile_response.dart';
+import 'package:gotms_chat/util/firebase_chat_manager/models/firebase_chat_user.dart';
+import 'package:gotms_chat/util/firebase_chat_manager/models/firebase_chat_user.dart';
 import 'package:hive/hive.dart';
 
 import '../locator.dart';

@@ -5,19 +5,19 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_demo_structure/core/db/app_db.dart';
-import 'package:flutter_demo_structure/generated/assets.dart';
-import 'package:flutter_demo_structure/main.dart';
-import 'package:flutter_demo_structure/ui/home/controller/notification_controller.dart';
-import 'package:flutter_demo_structure/ui/web/widgets/notification_icon.dart';
-import 'package:flutter_demo_structure/util/date_time_helper.dart';
-import 'package:flutter_demo_structure/util/firebase_chat_manager/models/chat_message.dart';
-import 'package:flutter_demo_structure/util/firebase_chat_manager/models/firebase_chat_user.dart';
-import 'package:flutter_demo_structure/values/colors.dart';
-import 'package:flutter_demo_structure/values/constants.dart';
-import 'package:flutter_demo_structure/values/style.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:gotms_chat/core/db/app_db.dart';
+import 'package:gotms_chat/generated/assets.dart';
+import 'package:gotms_chat/main.dart';
+import 'package:gotms_chat/ui/home/controller/notification_controller.dart';
+import 'package:gotms_chat/ui/web/widgets/notification_icon.dart';
+import 'package:gotms_chat/util/date_time_helper.dart';
+import 'package:gotms_chat/util/firebase_chat_manager/models/chat_message.dart';
+import 'package:gotms_chat/util/firebase_chat_manager/models/firebase_chat_user.dart';
+import 'package:gotms_chat/values/colors.dart';
+import 'package:gotms_chat/values/constants.dart';
+import 'package:gotms_chat/values/style.dart';
 
 class ResponsiveLayout extends StatefulWidget {
   final String? queryParam;
@@ -114,8 +114,18 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
         debugPrint('===> chatID $chatID');
       }
 
-      if (appDB.user?.userEmail?.toLowerCase() == loginMap?['user_email'].toString()) {
-        return;
+      debugPrint(
+          'CHECk DATA ==> as current email ${appDB.user?.userEmail} is equal to ${loginMap?['user_email'].toString().toLowerCase()}');
+
+      if (appDB.isLogin) {
+        if (appDB.user?.userEmail?.toLowerCase() != 'james@yopmail.com' &&
+            appDB.user?.userEmail?.toLowerCase() == loginMap?['user_email'].toString().toLowerCase()) {
+          debugPrint(
+              'RETURNING DATA ==> as current email ${appDB.user?.userEmail} is equal to ${loginMap?['user_email'].toString().toLowerCase()}');
+          return;
+        } else {
+          debugPrint('MOVING FORWARD WITH LOGIN');
+        }
       }
 
       var userModel = FirebaseChatUser(

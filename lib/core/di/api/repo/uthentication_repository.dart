@@ -1,7 +1,7 @@
-import 'package:flutter_demo_structure/core/di/api/api_end_points.dart';
-import 'package:flutter_demo_structure/core/di/api/http_client.dart';
-import 'package:flutter_demo_structure/core/di/api/response/api_base/api_base.dart';
-import 'package:flutter_demo_structure/model/user_profile_response.dart';
+import 'package:gotms_chat/core/di/api/api_end_points.dart';
+import 'package:gotms_chat/core/di/api/http_client.dart';
+import 'package:gotms_chat/core/di/api/response/api_base/api_base.dart';
+import 'package:gotms_chat/model/user_profile_response.dart';
 
 import '../../../locator.dart';
 

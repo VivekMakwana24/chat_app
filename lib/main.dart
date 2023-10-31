@@ -6,17 +6,17 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_demo_structure/core/navigation/navigation_service.dart';
-import 'package:flutter_demo_structure/fcm/PushNotificationsManager.dart';
-import 'package:flutter_demo_structure/firebase_options.dart';
-import 'package:flutter_demo_structure/ui/navbar/navbar.dart';
-import 'package:flutter_demo_structure/ui/web/chat_screen/chat_screen.dart';
-import 'package:flutter_demo_structure/util/firebase_chat_manager/firebase_chat_manager.dart';
-import 'package:flutter_demo_structure/util/firebase_chat_manager/models/firebase_chat_user.dart';
-import 'package:flutter_demo_structure/values/export.dart';
-import 'package:flutter_demo_structure/values/string_constants.dart';
-import 'package:flutter_demo_structure/values/theme.dart';
-import 'package:flutter_demo_structure/widget/responsive_layout.dart';
+import 'package:gotms_chat/core/navigation/navigation_service.dart';
+import 'package:gotms_chat/fcm/PushNotificationsManager.dart';
+import 'package:gotms_chat/firebase_options.dart';
+import 'package:gotms_chat/ui/navbar/navbar.dart';
+import 'package:gotms_chat/ui/web/chat_screen/chat_screen.dart';
+import 'package:gotms_chat/util/firebase_chat_manager/firebase_chat_manager.dart';
+import 'package:gotms_chat/util/firebase_chat_manager/models/firebase_chat_user.dart';
+import 'package:gotms_chat/values/export.dart';
+import 'package:gotms_chat/values/string_constants.dart';
+import 'package:gotms_chat/values/theme.dart';
+import 'package:gotms_chat/widget/responsive_layout.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -75,7 +75,6 @@ Future<void> main() async {
 
 class MyApp extends StatelessWidget {
   static GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
-
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(

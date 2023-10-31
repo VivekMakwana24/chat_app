@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_demo_structure/core/db/app_db.dart';
-import 'package:flutter_demo_structure/core/di/api/app_exceptions.dart';
-import 'package:flutter_demo_structure/core/di/api/repo/uthentication_repository.dart';
-import 'package:flutter_demo_structure/core/di/api/response/api_base/api_base.dart';
-import 'package:flutter_demo_structure/core/locator.dart';
-import 'package:flutter_demo_structure/core/navigation/navigation_service.dart';
-import 'package:flutter_demo_structure/core/navigation/routes.dart';
+import 'package:gotms_chat/core/db/app_db.dart';
+import 'package:gotms_chat/core/di/api/app_exceptions.dart';
+import 'package:gotms_chat/core/di/api/repo/uthentication_repository.dart';
+import 'package:gotms_chat/core/di/api/response/api_base/api_base.dart';
+import 'package:gotms_chat/core/locator.dart';
+import 'package:gotms_chat/core/navigation/navigation_service.dart';
+import 'package:gotms_chat/core/navigation/routes.dart';
 import 'package:mobx/mobx.dart';
 
 // part 'login_store.g.dart';

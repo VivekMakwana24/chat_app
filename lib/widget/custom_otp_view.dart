@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_demo_structure/values/export.dart';
+import 'package:gotms_chat/values/export.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CustomOtpView extends StatefulWidget {

@@ -1,8 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_demo_structure/values/export.dart';
-import 'package:flutter_demo_structure/values/string_constants.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gotms_chat/values/export.dart';
+import 'package:gotms_chat/values/string_constants.dart';
 
 class CustomAlertDialog extends StatelessWidget {
   final String title;
@@ -63,7 +62,7 @@ class CustomAlertDialog extends StatelessWidget {
                   InkWell(
                     onTap: () {
                       Navigator.of(context).pop();
-                      onTapCancelCallback!();
+                      if (onTapCancelCallback != null) onTapCancelCallback!();
                     },
                     child: LayoutBuilder(builder: (context, snapshot) {
                       return Container(

@@ -1,11 +1,12 @@
+/*
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_demo_structure/ui/home/charts/graph_data.dart';
-import 'package:flutter_demo_structure/ui/home/charts/tooltip_chart.dart';
-import 'package:flutter_demo_structure/ui/home/line_chart_page.dart';
-import 'package:flutter_demo_structure/util/date_time_helper.dart';
-import 'package:flutter_demo_structure/values/export.dart';
+import 'package:gotms_chat/ui/home/charts/graph_data.dart';
+import 'package:gotms_chat/ui/home/charts/tooltip_chart.dart';
+import 'package:gotms_chat/ui/home/line_chart_page.dart';
+import 'package:gotms_chat/util/date_time_helper.dart';
+import 'package:gotms_chat/values/export.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 class LineChartSummaryPage extends StatefulWidget {
@@ -152,3 +153,4 @@ class _LineChartSummaryPageState extends State<LineChartSummaryPage> {
     );
   }
 }
+*/

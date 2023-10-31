@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_demo_structure/values/export.dart';
-import 'package:flutter_demo_structure/values/string_constants.dart';
-import 'package:flutter_demo_structure/widget/media_picker.dart';
+import 'package:gotms_chat/values/export.dart';
+import 'package:gotms_chat/values/string_constants.dart';
+import 'package:gotms_chat/widget/media_picker.dart';
 import 'package:images_picker/images_picker.dart';
 
 class MediaPickerDialog extends StatelessWidget {

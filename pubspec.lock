@@ -49,14 +49,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.4.2"
-  asn1lib:
-    dependency: transitive
-    description:
-      name: asn1lib
-      sha256: "21afe4333076c02877d14f4a89df111e658a6d466cbfc802eb705eb91bd5adfd"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.5.0"
   async:
     dependency: transitive
     description:
@@ -273,16 +265,8 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.1"
-  country_pickers:
-    dependency: "direct main"
-    description:
-      name: country_pickers
-      sha256: a71df4a061b25f07b202a881c43a057edc842a30b3410d511382103c68afebc2
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.0"
   crypto:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: crypto
       sha256: ff625774173754681d66daaf4a448684fb04b78f902da9cb3d308c19cc5e8bab
@@ -345,22 +329,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.3.0"
-  encrypt:
-    dependency: "direct main"
-    description:
-      name: encrypt
-      sha256: "4fd4e4fdc21b9d7d4141823e1e6515cd94e7b8d84749504c232999fba25d9bbb"
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.0.1"
-  equatable:
-    dependency: transitive
-    description:
-      name: equatable
-      sha256: c2b87cb7756efdf69892005af546c56c0b5037f54d2a88269b4f347a505e3ca2
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.5"
   fake_async:
     dependency: transitive
     description:
@@ -497,14 +465,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.0"
-  fl_chart:
-    dependency: "direct main"
-    description:
-      name: fl_chart
-      sha256: "749b3342ea3e95cbf61a0fec31a62606e837377b8b6d0caa7367a7ef80f38b7d"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.55.2"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -745,7 +705,7 @@ packages:
     source: hosted
     version: "1.2.11"
   intl:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: intl
       sha256: "910f85bce16fb5c6f614e117efa303e85a1731bb0081edf3604a2ae6e9a3cc91"
@@ -1141,22 +1101,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.0"
-  syncfusion_flutter_charts:
-    dependency: "direct main"
-    description:
-      name: syncfusion_flutter_charts
-      sha256: "0222ac9d8cb6c671f014effe9bd5c0aef35eadb16471355345ba87cc0ac007b3"
-      url: "https://pub.dev"
-    source: hosted
-    version: "20.4.54"
-  syncfusion_flutter_core:
-    dependency: transitive
-    description:
-      name: syncfusion_flutter_core
-      sha256: "3979f0b1c5a97422cadae52d476c21fa3e0fb671ef51de6cae1d646d8b99fe1f"
-      url: "https://pub.dev"
-    source: hosted
-    version: "20.4.54"
   synchronized:
     dependency: transitive
     description:

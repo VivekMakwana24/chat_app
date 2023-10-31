@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_demo_structure/ui/home/text_message_item_view.dart';
-import 'package:flutter_demo_structure/util/firebase_chat_manager/models/chat_message.dart';
+import 'package:gotms_chat/ui/home/text_message_item_view.dart';
+import 'package:gotms_chat/util/firebase_chat_manager/models/chat_message.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class DirectMessageItemView extends StatefulWidget {

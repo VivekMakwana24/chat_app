@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_demo_structure/ui/auth/login/login_page.dart';
-import 'package:flutter_demo_structure/ui/auth/sign_up/sign_up_page.dart';
-import 'package:flutter_demo_structure/ui/home/line_chart_summary.dart';
-import 'package:flutter_demo_structure/ui/web_page.dart';
-import 'package:flutter_demo_structure/widget/web_widget.dart';
+import 'package:gotms_chat/ui/auth/login/login_page.dart';
+import 'package:gotms_chat/ui/auth/sign_up/sign_up_page.dart';
+import 'package:gotms_chat/ui/home/line_chart_summary.dart';
+import 'package:gotms_chat/ui/web_page.dart';
+import 'package:gotms_chat/widget/web_widget.dart';
 
 abstract class RouteName {
   static const String root = "/";
@@ -53,9 +53,6 @@ class Routes {
 
       case RouteName.signUpPage:
         page = SignUpPage();
-        break;
-      case RouteName.lineChart:
-        page = LineChartSummaryPage();
         break;
 
       /*case RouteName.homePage:

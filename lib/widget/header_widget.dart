@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
-import 'package:flutter_demo_structure/res.dart';
-import 'package:flutter_demo_structure/values/extensions/export.dart';
+import 'package:gotms_chat/res.dart';
+import 'package:gotms_chat/values/extensions/export.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class AppBarWidget extends StatefulWidget {

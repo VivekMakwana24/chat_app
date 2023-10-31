@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_demo_structure/ui/home/controller/notification_controller.dart';
-import 'package:flutter_demo_structure/util/firebase_chat_manager/models/chat_message.dart';
-import 'package:flutter_demo_structure/values/colors_new.dart';
-import 'package:flutter_demo_structure/values/extensions/export.dart';
-import 'package:flutter_demo_structure/values/style.dart';
+import 'package:gotms_chat/ui/home/controller/notification_controller.dart';
+import 'package:gotms_chat/util/firebase_chat_manager/models/chat_message.dart';
+import 'package:gotms_chat/values/colors_new.dart';
+import 'package:gotms_chat/values/extensions/export.dart';
+import 'package:gotms_chat/values/style.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 
-import 'package:flutter_demo_structure/generated/assets.dart';
+import 'package:gotms_chat/generated/assets.dart';
 
 class NotificationIcon extends StatelessWidget {
   NotificationIcon({super.key});

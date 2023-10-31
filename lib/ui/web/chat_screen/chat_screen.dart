@@ -3,16 +3,16 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_demo_structure/core/db/app_db.dart';
-import 'package:flutter_demo_structure/main.dart';
-import 'package:flutter_demo_structure/ui/home/home_page.dart';
-import 'package:flutter_demo_structure/ui/home/new_group/new_group_page.dart';
-import 'package:flutter_demo_structure/ui/home/user_list_page.dart';
-import 'package:flutter_demo_structure/ui/web/widgets/left_navbar.dart';
-import 'package:flutter_demo_structure/util/date_time_helper.dart';
-import 'package:flutter_demo_structure/util/firebase_chat_manager/models/firebase_chat_user.dart';
-import 'package:flutter_demo_structure/values/colors_new.dart';
-import 'package:flutter_demo_structure/values/export.dart';
+import 'package:gotms_chat/core/db/app_db.dart';
+import 'package:gotms_chat/main.dart';
+import 'package:gotms_chat/ui/home/home_page.dart';
+import 'package:gotms_chat/ui/home/new_group/new_group_page.dart';
+import 'package:gotms_chat/ui/home/user_list_page.dart';
+import 'package:gotms_chat/ui/web/widgets/left_navbar.dart';
+import 'package:gotms_chat/util/date_time_helper.dart';
+import 'package:gotms_chat/util/firebase_chat_manager/models/firebase_chat_user.dart';
+import 'package:gotms_chat/values/colors_new.dart';
+import 'package:gotms_chat/values/export.dart';
 
 class WebChatScreen extends StatefulWidget {
   final String? path;
