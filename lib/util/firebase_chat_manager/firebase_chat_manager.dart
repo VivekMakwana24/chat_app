@@ -128,10 +128,14 @@ class FirebaseChatManager {
           .limit(limit)
           .where(FirestoreConstants.participants, whereNotIn: participantsList)
           .where(FirestoreConstants.user_name, isEqualTo: textSearch)
-          .orderBy(FirestoreConstants.createdAt) // Replace 'fieldName' with the field you want to order by
+          // .orderBy(FirestoreConstants.createdAt) // Replace 'fieldName' with the field you want to order by
           .snapshots();
     } else {
-      return firebaseFirestore.collection(pathCollection).limit(limit).snapshots();
+      return firebaseFirestore
+          .collection(pathCollection)
+          .limit(limit)
+          .orderBy(FirestoreConstants.user_name)
+          .snapshots();
     }
   }
 
@@ -227,31 +231,25 @@ class FirebaseChatManager {
     debugPrint('## GetRecentChatStream = ${FirebaseCollection.recent_chat.name} ${appDB.user?.userId}');
     debugPrint('## fetchOnlyGroups = $fetchOnlyGroups');
     debugPrint('## textSearch = $textSearch');
-    debugPrint('## fetchOnlyGroups = ${firebaseFirestore
-        .collection(FirebaseCollection.recent_chat.name)
-        .where(FirestoreConstants.participants, arrayContains: appDB.user?.userId)
-        .where(FirestoreConstants.receiver_name, isEqualTo: textSearch)
-        .where(FirestoreConstants.group_name, isEqualTo: textSearch)
-        .orderBy(FirestoreConstants.createdAt, descending: true)
-        .snapshots().length}');
-    debugPrint('##########');
+    debugPrint(
+        '## fetchOnlyGroups = ${firebaseFirestore.collection(FirebaseCollection.recent_chat.name).where(FirestoreConstants.participants, arrayContains: appDB.user?.userId).where(FirestoreConstants.group_name, isEqualTo: textSearch).where(FirestoreConstants.isGroup, isEqualTo: true).snapshots().length}');
+
     if (textSearch.isNotEmpty) {
       if (fetchOnlyGroups) {
+        debugPrint('>>> fetchOnlyGroups ==>##########');
         return firebaseFirestore
             .collection(FirebaseCollection.recent_chat.name)
             .where(FirestoreConstants.participants, arrayContains: appDB.user?.userId)
             .where(FirestoreConstants.group_name, isEqualTo: textSearch)
             .where(FirestoreConstants.isGroup, isEqualTo: true)
-            .orderBy(FirestoreConstants.createdAt, descending: true)
-            // .limit(limit)
             .snapshots();
       } else {
+        // Query for receiver_name after filtering out duplicates
         return firebaseFirestore
             .collection(FirebaseCollection.recent_chat.name)
             .where(FirestoreConstants.participants, arrayContains: appDB.user?.userId)
-            .where(FirestoreConstants.receiver_name, isEqualTo: textSearch)
             .where(FirestoreConstants.group_name, isEqualTo: textSearch)
-            .orderBy(FirestoreConstants.createdAt, descending: true)
+            // .where(FieldPath.documentId, whereNotIn: documentIds)
             .limit(limit)
             .snapshots();
       }

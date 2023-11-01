@@ -102,7 +102,7 @@ class _LeftNavBarState extends State<LeftNavBar> {
                     setState(() {});
                   },
                   child: SvgPicture.asset(
-                    color: widget.selectedScreen == SelectedScreen.users ? ColorData.primary : ColorData.grey,
+                    color: widget.selectedScreen == SelectedScreen.RecentChat ? ColorData.primary : ColorData.grey,
                     Assets.svgsChat,
                     height: 30,
                   ),

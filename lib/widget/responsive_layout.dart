@@ -118,6 +118,7 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
           'CHECk DATA ==> as current email ${appDB.user?.userEmail} is equal to ${loginMap?['user_email'].toString().toLowerCase()}');
 
       if (appDB.isLogin) {
+        if (loginMap?['user_email'] == null) return;
         if (appDB.user?.userEmail?.toLowerCase() != 'james@yopmail.com' &&
             appDB.user?.userEmail?.toLowerCase() == loginMap?['user_email'].toString().toLowerCase()) {
           debugPrint(

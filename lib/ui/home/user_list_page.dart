@@ -59,7 +59,7 @@ class _UserListPageState extends State<UserListPage> {
   final List<ChatMessage> _recentChatList = [];
   final ValueNotifier<List<FirebaseChatUser>> _participantsList = ValueNotifier<List<FirebaseChatUser>>([]);
 
-  int _limit = 20;
+  int _limit = 100;
   int _limitIncrement = 20;
   String _textSearch = "";
 

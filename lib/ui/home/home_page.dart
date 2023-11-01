@@ -3,6 +3,11 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:gotms_chat/core/db/app_db.dart';
 import 'package:gotms_chat/generated/assets.dart';
 import 'package:gotms_chat/main.dart';
@@ -10,6 +15,7 @@ import 'package:gotms_chat/ui/home/chat_detail/chat_details.dart';
 import 'package:gotms_chat/ui/home/new_group/new_group_page.dart';
 import 'package:gotms_chat/ui/home/user_list_page.dart';
 import 'package:gotms_chat/ui/web/widgets/contactlist_appbar.dart';
+import 'package:gotms_chat/ui/web/widgets/left_navbar.dart';
 import 'package:gotms_chat/util/date_time_helper.dart';
 import 'package:gotms_chat/util/firebase_chat_manager/constants/firebase_collection_enum.dart';
 import 'package:gotms_chat/util/firebase_chat_manager/models/chat_message.dart';
@@ -21,19 +27,18 @@ import 'package:gotms_chat/values/colors_new.dart';
 import 'package:gotms_chat/values/constants.dart';
 import 'package:gotms_chat/values/extensions/widget_ext.dart';
 import 'package:gotms_chat/values/style.dart';
-import 'package:gotms_chat/widget/button_widget.dart';
 import 'package:gotms_chat/widget/debouncer.dart';
-import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class HomePage extends StatefulWidget {
   final bool fetchOnlyGroups;
+  final SelectedScreen selectedScreen;
 
-  const HomePage({this.fetchOnlyGroups = false, Key? key}) : super(key: key);
+  const HomePage({
+    this.fetchOnlyGroups = false,
+    this.selectedScreen = SelectedScreen.RecentChat,
+    Key? key,
+  }) : super(key: key);
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -55,7 +60,7 @@ class _HomePageState extends State<HomePage> {
 
   final List<ChatMessage> _recentChatList = [];
 
-  int _limit = 20;
+  int _limit = 100;
 
   ChatMessage? _selectedItem;
 
@@ -87,6 +92,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('selectedScreen ${widget.selectedScreen}');
+
     return SafeArea(
       child: Scaffold(
         floatingActionButtonLocation: FloatingActionButtonLocation.centerTop,
@@ -102,7 +109,9 @@ class _HomePageState extends State<HomePage> {
                   child: Column(
                     children: [
                       //WEB PROFILE
-                      ContactlistAppBar(),
+                      ContactlistAppBar(
+                        selectedScreen: widget.selectedScreen,
+                      ),
 
                       //SEARCH
                       Padding(
@@ -111,33 +120,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                       10.h.verticalSpace,
 
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: SizedBox(
-                          width: 100,
-                          child: AppButton(
-                            'Create Group',
-                            () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => UserListPage(
-                                    isForGroup: true,
-                                    pageType: PageType.NEW_GROUP,
-                                  ),
-                                ),
-                              );
-                            },
-                            height: 30,
-                            radius: 6,
-                          ),
-                        ),
-                      ).visiblity(
-                        widget.fetchOnlyGroups,
-                      ),
-
                       // buildSearchBar(),
-                      10.h.verticalSpace,
                       Flexible(
                         child: StreamBuilder<QuerySnapshot>(
                           stream: firebaseChatManager.getRecentChatStream(
@@ -502,7 +485,7 @@ class _HomePageState extends State<HomePage> {
                         child: Text(
                           (itemData.isGroup ?? false) ? '${itemData.groupName}' : '${itemData.getName}',
                           maxLines: 1,
-                          style: TextStyle(color: AppColor.primaryColor,fontSize: 14.spMin),
+                          style: TextStyle(color: AppColor.primaryColor, fontSize: 14.spMin),
                         ),
                         alignment: Alignment.centerLeft,
                         margin: EdgeInsets.fromLTRB(0, 0, 0, 5),

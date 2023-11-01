@@ -81,6 +81,7 @@ class _WebChatScreenState extends State<WebChatScreen> {
                               : selectedScreen == SelectedScreen.Groups
                                   ? HomePage(
                                       fetchOnlyGroups: true,
+                                      selectedScreen: selectedScreen,
                                     )
                                   : appDB.user != null
                                       ? UserListPage(
