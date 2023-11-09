@@ -25,13 +25,15 @@ class FirebaseChatUserAdapter extends TypeAdapter<FirebaseChatUser> {
       userEmail: fields[7] as String?,
       createdAt: fields[9] as String?,
       userId: fields[0] as String?,
+      transportCompany: fields[10] as String?,
+      isDriver: fields[11] as bool?,
     )..chattingWith = fields[8] as String?;
   }
 
   @override
   void write(BinaryWriter writer, FirebaseChatUser obj) {
     writer
-      ..writeByte(9)
+      ..writeByte(11)
       ..writeByte(0)
       ..write(obj.userId)
       ..writeByte(1)
@@ -49,7 +51,11 @@ class FirebaseChatUserAdapter extends TypeAdapter<FirebaseChatUser> {
       ..writeByte(8)
       ..write(obj.chattingWith)
       ..writeByte(9)
-      ..write(obj.createdAt);
+      ..write(obj.createdAt)
+      ..writeByte(10)
+      ..write(obj.transportCompany)
+      ..writeByte(11)
+      ..write(obj.isDriver);
   }
 
   @override

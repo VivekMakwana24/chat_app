@@ -68,8 +68,11 @@ class ChatMessage {
   @JsonKey(name: 'is_admin')
   bool? isAdmin;
 
-  @JsonKey(name: 'system_generated')
+  @JsonKey(name: 'system_generated', defaultValue: false)
   bool? systemGenerated;
+
+  @JsonKey(name: 'system_group_name')
+  String? systemGroupName;
 
   @JsonKey(name: FirestoreConstants.participants)
   List<String?>? participants;
@@ -189,6 +192,7 @@ class ChatMessage {
     this.title,
     this.body,
     this.systemGenerated = false,
+    this.systemGroupName,
   });
 
   factory ChatMessage.fromJson(Map<String, dynamic> json) => _$ChatMessageFromJson(json);
@@ -196,6 +200,12 @@ class ChatMessage {
   Map<String, dynamic> toJson() => _$ChatMessageToJson(this);
 
   factory ChatMessage.toDocumentToClass(e) {
-    return e.data() == null ? ChatMessage() : ChatMessage.fromJson(jsonDecode(jsonEncode(e.data())));
+    return e.data() == null
+        ? ChatMessage()
+        : ChatMessage.fromJson(
+            jsonDecode(
+              jsonEncode(e.data()),
+            ),
+          );
   }
 }

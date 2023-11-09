@@ -1,9 +1,12 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:algolia/algolia.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:gotms_chat/core/db/app_db.dart';
 import 'package:gotms_chat/generated/assets.dart';
 import 'package:gotms_chat/main.dart';
@@ -21,9 +24,7 @@ import 'package:gotms_chat/values/extensions/widget_ext.dart';
 import 'package:gotms_chat/widget/app_utils.dart';
 import 'package:gotms_chat/widget/base_app_bar.dart';
 import 'package:gotms_chat/widget/debouncer.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:gotms_chat/widget/responsive_layout.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class UserListPage extends StatefulWidget {
@@ -52,13 +53,13 @@ class _UserListPageState extends State<UserListPage> {
   // region Class members
   ValueNotifier<bool> showLoading = ValueNotifier<bool>(false);
   final ScrollController listScrollController = ScrollController();
-  StreamController<bool> btnClearController = StreamController<bool>();
+  StreamController<bool> btnClearController = StreamController<bool>.broadcast();
   TextEditingController searchBarTec = TextEditingController();
   Debouncer searchDebouncer = Debouncer(milliseconds: 300);
 
   final List<ChatMessage> _recentChatList = [];
   final ValueNotifier<List<FirebaseChatUser>> _participantsList = ValueNotifier<List<FirebaseChatUser>>([]);
-
+  bool isPopped = false;
   int _limit = 100;
   int _limitIncrement = 20;
   String _textSearch = "";
@@ -80,80 +81,84 @@ class _UserListPageState extends State<UserListPage> {
   @override
   void initState() {
     super.initState();
-    /* firebaseChatManager.updateDataFirestore(
-      FirebaseCollection.users.name,
-      appDB.user?.userId.toString(),
-      {'pushToken': appDB.fcmToken},
-    );*/
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    debugPrint('didChangeDependencies USER LIST PAGE');
+    firebaseChatManager.getStreamFireStore(FirebaseCollection.users.name, _limit, _textSearch, widget.participantsList);
   }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: AppColor.white,
-        appBar: BaseAppBar(
-          showTitle: true,
-          leadingIcon: (context.width >= 1024 || widget.pageType == PageType.USERS) ? false : true,
-          title: widget.pageType == PageType.NEW_GROUP
-              ? 'New Group'
-              : (widget.pageType == PageType.USERS)
-                  ? 'Users'
-                  : 'Add Participants',
-          action: [],
-        ),
-        floatingActionButton: (widget.pageType != PageType.USERS) ? buildFloatingAction(context) : null,
-        body: Stack(
-          children: <Widget>[
-            // List
-            Column(
-              children: [
-                if (widget.pageType != PageType.USERS) buildParticipantsList(),
-                buildSearchBar(),
-                Expanded(
-                  child: StreamBuilder<QuerySnapshot>(
-                    stream: firebaseChatManager.getStreamFireStore(
-                        FirebaseCollection.users.name, _limit, _textSearch, widget.participantsList),
-                    builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                      debugPrint('HasDaTA ${snapshot.hasData}');
+    return ResponsiveLayout(
+      webScreenLayout: SafeArea(
+        child: Scaffold(
+          backgroundColor: AppColor.white,
+          appBar: BaseAppBar(
+            showTitle: true,
+            leadingIcon: (context.width >= 1024 || widget.pageType == PageType.USERS) ? false : true,
+            title: widget.pageType == PageType.NEW_GROUP
+                ? 'New Group'
+                : (widget.pageType == PageType.USERS)
+                    ? 'Users'
+                    : 'Add Participants',
+            action: [],
+          ),
+          floatingActionButton: (widget.pageType != PageType.USERS) ? buildFloatingAction(context) : null,
+          body: Stack(
+            children: <Widget>[
+              // List
+              Column(
+                children: [
+                  if (widget.pageType != PageType.USERS) buildParticipantsList(),
+                  buildSearchBar(),
+                  Expanded(
+                    child: StreamBuilder<AlgoliaQuerySnapshot>(
+                      stream: algoliaService.algoliaStream,
+                      builder: (BuildContext context, AsyncSnapshot<AlgoliaQuerySnapshot> snapshot) {
+                        debugPrint('HasDaTA ${snapshot.hasData}');
 
-                      if (snapshot.hasData) {
-                        debugPrint('snapshot.hasData ---> ${(snapshot.data?.docs.length ?? 0) > 0}');
-                        if ((snapshot.data?.docs.length ?? 0) > 0) {
-                          return ListView.builder(
-                            padding: EdgeInsets.all(10),
-                            itemBuilder: (context, index) => buildItem(context, snapshot.data?.docs[index]),
-                            itemCount: snapshot.data?.docs.length,
-                            controller: listScrollController,
-                          );
+                        if (snapshot.hasData) {
+                          debugPrint('snapshot.hasData ---> ${(snapshot.data?.length ?? 0) > 0}');
+                          if ((snapshot.data?.hits.length ?? 0) > 0) {
+                            return ListView.builder(
+                              padding: EdgeInsets.all(10),
+                              itemBuilder: (context, index) => buildItem(context, snapshot.data?.hits?[index]),
+                              itemCount: snapshot.data?.hits.length,
+                              controller: listScrollController,
+                            );
+                          } else {
+                            return Center(
+                              child: Text("No users"),
+                            );
+                          }
                         } else {
                           return Center(
-                            child: Text("No users"),
+                            child: CircularProgressIndicator(
+                              color: AppColor.primaryColor,
+                            ),
                           );
                         }
-                      } else {
-                        return Center(
-                          child: CircularProgressIndicator(
-                            color: AppColor.primaryColor,
-                          ),
-                        );
-                      }
-                    },
+                      },
+                    ),
                   ),
-                ),
-              ],
-            ),
-
-            // Loading
-            Positioned(
-              child: ValueListenableBuilder(
-                valueListenable: showLoading,
-                builder: (BuildContext context, bool isLoading, Widget? child) {
-                  return isLoading ? CircularProgressIndicator.adaptive() : SizedBox.shrink();
-                },
+                ],
               ),
-            )
-          ],
+
+              // Loading
+              Positioned(
+                child: ValueListenableBuilder(
+                  valueListenable: showLoading,
+                  builder: (BuildContext context, bool isLoading, Widget? child) {
+                    return isLoading ? CircularProgressIndicator.adaptive() : SizedBox.shrink();
+                  },
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -196,22 +201,33 @@ class _UserListPageState extends State<UserListPage> {
                 barrierDismissible: true,
                 barrierLabel: 'Label',
                 pageBuilder: (_, __, ___) {
-                  return Row(
-                    children: [
-                      Spacer(),
-                      SizedBox(
-                        width: context.width * 0.4,
-                        child: Align(
-                          alignment: Alignment.centerRight,
-                          child: NewGroupPage(
-                            participantsList: _participantsList.value,
-                            isGroupDetails: false,
-                            pageType: PageType.NEW_GROUP,
+                  return LayoutBuilder(builder: (context, constraints) {
+                    debugPrint('constraints $constraints');
+                    Future.delayed(Duration(milliseconds: 300), () {
+                      debugPrint('POPPING $constraints');
+                      if ((constraints.maxWidth) < 580 && !isPopped) {
+                        debugPrint('POPPING mounted $constraints');
+                        isPopped = true;
+                        Navigator.pop(context);
+                      }
+                    });
+                    return Row(
+                      children: [
+                        Spacer(),
+                        SizedBox(
+                          width: context.width * 0.4,
+                          child: Align(
+                            alignment: Alignment.centerRight,
+                            child: NewGroupPage(
+                              participantsList: _participantsList.value,
+                              isGroupDetails: false,
+                              pageType: PageType.NEW_GROUP,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  );
+                      ],
+                    );
+                  });
                 },
               );
             else
@@ -355,15 +371,14 @@ class _UserListPageState extends State<UserListPage> {
                 searchDebouncer.run(() {
                   if (value.isNotEmpty) {
                     btnClearController.add(true);
-                    setState(() {
-                      _textSearch = value;
-                    });
+                    _textSearch = value;
                   } else {
                     btnClearController.add(false);
-                    setState(() {
-                      _textSearch = "";
-                    });
+                    _textSearch = "";
                   }
+                  firebaseChatManager.getStreamFireStore(
+                      FirebaseCollection.users.name, _limit, _textSearch, widget.participantsList);
+                  if (mounted) setState(() {});
                 });
               },
               decoration: InputDecoration(
@@ -412,22 +427,6 @@ class _UserListPageState extends State<UserListPage> {
               ),
             ),
           ),
-          /*StreamBuilder<bool>(
-              stream: btnClearController.stream,
-              builder: (context, snapshot) {
-                return snapshot.data == true
-                    ? GestureDetector(
-                        onTap: () {
-                          searchBarTec.clear();
-                          btnClearController.add(false);
-                          setState(() {
-                            _textSearch = "";
-                          });
-                        },
-                        child: Icon(Icons.clear_rounded, color: AppColor.greyColor, size: 20),
-                      )
-                    : SizedBox.shrink();
-              }),*/
         ],
       ),
       padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
@@ -469,9 +468,9 @@ class _UserListPageState extends State<UserListPage> {
     } else {}
   }
 
-  Widget buildItem(BuildContext context, DocumentSnapshot? document) {
+  Widget buildItem(BuildContext context, AlgoliaObjectSnapshot? document) {
     if (document != null) {
-      FirebaseChatUser userChat = FirebaseChatUser.fromDocument(document);
+      FirebaseChatUser userChat = FirebaseChatUser.fromAlogiaDocument(document);
       debugPrint('USERS ==> ${userChat.userId} ${userChat.userName}');
       debugPrint('MyuseriD ==> ${appDB.user?.userId}');
 
@@ -563,7 +562,11 @@ class _UserListPageState extends State<UserListPage> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => ChatDetailsPage(
-                      arguments: ChatPageArguments(chatUser: userChat, isGroup: false, isDialog: false),
+                      arguments: ChatPageArguments(
+                        chatUser: userChat,
+                        isGroup: false,
+                        isDialog: false,
+                      ),
                     ),
                   ),
                 );

@@ -35,6 +35,7 @@ ChatMessage _$ChatMessageFromJson(Map<String, dynamic> json) => ChatMessage(
       title: json['title'] as String?,
       body: json['body'] as String?,
       systemGenerated: json['system_generated'] as bool? ?? false,
+      systemGroupName: json['system_group_name'] as String?,
     );
 
 Map<String, dynamic> _$ChatMessageToJson(ChatMessage instance) =>
@@ -54,6 +55,7 @@ Map<String, dynamic> _$ChatMessageToJson(ChatMessage instance) =>
       'body': instance.body,
       'is_admin': instance.isAdmin,
       'system_generated': instance.systemGenerated,
+      'system_group_name': instance.systemGroupName,
       'participants': instance.participants,
       'open_chats_ids': instance.openChatIds,
       'usernames_is_typing': instance.usernamesIsTyping,

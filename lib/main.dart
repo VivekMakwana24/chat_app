@@ -1,24 +1,23 @@
 import 'dart:async';
 
+import 'package:algolia/algolia.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:gotms_chat/core/navigation/navigation_service.dart';
 import 'package:gotms_chat/fcm/PushNotificationsManager.dart';
 import 'package:gotms_chat/firebase_options.dart';
-import 'package:gotms_chat/ui/navbar/navbar.dart';
-import 'package:gotms_chat/ui/web/chat_screen/chat_screen.dart';
+import 'package:gotms_chat/util/firebase_chat_manager/algolia_coverter.dart';
 import 'package:gotms_chat/util/firebase_chat_manager/firebase_chat_manager.dart';
 import 'package:gotms_chat/util/firebase_chat_manager/models/firebase_chat_user.dart';
 import 'package:gotms_chat/values/export.dart';
 import 'package:gotms_chat/values/string_constants.dart';
 import 'package:gotms_chat/values/theme.dart';
-import 'package:gotms_chat/widget/responsive_layout.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:url_strategy/url_strategy.dart';
@@ -26,7 +25,6 @@ import 'package:url_strategy/url_strategy.dart';
 import 'core/db/app_db.dart';
 import 'core/locator.dart';
 import 'core/navigation/routes.dart';
-import 'package:flutter_web_plugins/url_strategy.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -75,6 +73,7 @@ Future<void> main() async {
 
 class MyApp extends StatelessWidget {
   static GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
@@ -117,3 +116,6 @@ final firebaseFirestore = locator<FirebaseFirestore>();
 final firebaseChatManager = locator<FirebaseChatManager>();
 
 final firebaseStorage = locator<FirebaseStorage>();
+
+final algolia = locator<Algolia>();
+final algoliaService = locator<AlgoliaService>();

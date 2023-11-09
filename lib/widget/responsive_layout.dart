@@ -13,24 +13,26 @@ import 'package:gotms_chat/main.dart';
 import 'package:gotms_chat/ui/home/controller/notification_controller.dart';
 import 'package:gotms_chat/ui/web/widgets/notification_icon.dart';
 import 'package:gotms_chat/util/date_time_helper.dart';
+import 'package:gotms_chat/util/firebase_chat_manager/constants/firebase_collection_enum.dart';
 import 'package:gotms_chat/util/firebase_chat_manager/models/chat_message.dart';
 import 'package:gotms_chat/util/firebase_chat_manager/models/firebase_chat_user.dart';
 import 'package:gotms_chat/values/colors.dart';
 import 'package:gotms_chat/values/constants.dart';
 import 'package:gotms_chat/values/style.dart';
+import 'package:velocity_x/velocity_x.dart';
 
 class ResponsiveLayout extends StatefulWidget {
   final String? queryParam;
   final Widget webScreenLayout;
-  final Widget tabletScreenLayout;
-  final Widget mobileScreenLayout;
+  final Widget? tabletScreenLayout;
+  final Widget? mobileScreenLayout;
 
   ResponsiveLayout({
     super.key,
     this.queryParam,
     required this.webScreenLayout,
-    required this.tabletScreenLayout,
-    required this.mobileScreenLayout,
+    this.tabletScreenLayout,
+    this.mobileScreenLayout,
   });
 
   @override
@@ -77,11 +79,6 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
       builder: (context, constraints) {
         if (constraints.maxWidth >= 800) {
           return widget.webScreenLayout;
-        } else if (constraints.maxWidth <= 200) {
-          return Scaffold(
-            backgroundColor: Colors.white,
-            body: NotificationIcon(),
-          );
         } else if (constraints.maxWidth < 580) {
           return Scaffold(
             backgroundColor: Colors.white,
@@ -123,6 +120,8 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
             appDB.user?.userEmail?.toLowerCase() == loginMap?['user_email'].toString().toLowerCase()) {
           debugPrint(
               'RETURNING DATA ==> as current email ${appDB.user?.userEmail} is equal to ${loginMap?['user_email'].toString().toLowerCase()}');
+
+          appDB.user = (await firebaseChatManager.getUserDetails(appDB.user?.userId ?? ''))!;
           return;
         } else {
           debugPrint('MOVING FORWARD WITH LOGIN');
@@ -149,6 +148,18 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
         appDB.isLogin = true;
 
         appDB.user = (await firebaseChatManager.getUserDetails(userModel.userId.toString()))!;
+
+        if (appDB.user?.userName.isEmptyOrNull ?? false) {
+          debugPrint(
+              'USERNAME not found so inserting username : ${appDB.user?.userEmail?.substring(0, appDB.user?.userEmail?.indexOf('@')).replaceAll("@", '')}');
+          firebaseChatManager.updateDataFirestore(
+            FirebaseCollection.users.name,
+            appDB.currentUserId,
+            {
+              'user_name': appDB.user?.userEmail?.substring(0, appDB.user?.userEmail?.indexOf('@')).replaceAll("@", ''),
+            },
+          );
+        }
 
         debugPrint('LOGGED IN USER ${appDB.user?.toJson()}');
 

@@ -64,6 +64,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
   @override
   void initState() {
     super.initState();
+
     if (widget.pageType != PageType.NEW_GROUP) {
       _groupNameController.text = widget.groupDetails?.groupName ?? '';
     }
@@ -73,6 +74,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
   Widget build(BuildContext context) {
     debugPrint('widget.participantsList ${widget.participantsList}');
     debugPrint('widget.groupDetails?.systemGenerated ${widget.groupDetails?.systemGenerated}');
+    widget.groupDetails?.systemGenerated ??= false;
     if (widget.participantsList.isEmpty) _fetchUserDetails();
     return Scaffold(
       appBar: BaseAppBar(
@@ -81,7 +83,9 @@ class _NewGroupPageState extends State<NewGroupPage> {
         title: widget.pageType == PageType.NEW_GROUP ? 'New Group' : 'Edit group',
         action: [],
       ),
-      floatingActionButton: buildFloatingAction(context),
+      floatingActionButton: buildFloatingAction(context).visiblity(
+        !(widget.groupDetails?.systemGenerated ?? false) || widget.pageType == PageType.NEW_GROUP,
+      ),
       body: ValueListenableBuilder(
         valueListenable: _showLoading,
         builder: (BuildContext context, bool value, Widget? child) {
@@ -170,7 +174,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
                   color: ColorData.red,
                 ),
               ).visiblity(
-                !(widget.groupDetails?.systemGenerated ?? true),
+                !(widget.groupDetails?.systemGenerated ?? false) && widget.pageType == PageType.EDIT_GROUP,
               ),
 
               20.verticalSpace,
@@ -310,7 +314,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
                     margin: EdgeInsets.only(left: 20),
                   ),
                 ),
-                if (userChat.userId != appDB.user?.userId)
+                if (userChat.userId != appDB.user?.userId && !(widget.groupDetails?.systemGenerated ?? true))
                   Icon(
                     Icons.close,
                     color: Colors.red,

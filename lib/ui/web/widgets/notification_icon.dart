@@ -14,6 +14,7 @@ class NotificationIcon extends StatelessWidget {
   NotificationIcon({super.key});
 
   var _controller = Get.put(NotificationController());
+  bool isPopped = false;
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +29,20 @@ class NotificationIcon extends StatelessWidget {
           showDialog(
             context: context,
             builder: (context) {
-              return _notificationDialog();
+              return LayoutBuilder(
+                builder: (context,constraints) {
+                  debugPrint('constraints $constraints');
+                  Future.delayed(Duration(milliseconds: 300), () {
+                    debugPrint('POPPING $constraints');
+                    if ((constraints.maxWidth) < 580 && !isPopped) {
+                      debugPrint('POPPING mounted $constraints');
+                      isPopped = true;
+                      Navigator.pop(context);
+                    }
+                  });
+                  return _notificationDialog();
+                }
+              );
             },
           );
         },

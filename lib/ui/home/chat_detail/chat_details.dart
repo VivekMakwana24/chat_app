@@ -5,6 +5,9 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:gotms_chat/core/db/app_db.dart';
 import 'package:gotms_chat/core/navigation/routes.dart';
 import 'package:gotms_chat/generated/assets.dart';
@@ -20,9 +23,6 @@ import 'package:gotms_chat/values/export.dart';
 import 'package:gotms_chat/widget/base_app_bar.dart';
 import 'package:gotms_chat/widget/image_picker_dialog.dart';
 import 'package:gotms_chat/widget/image_viewer.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:images_picker/images_picker.dart';
 import 'package:velocity_x/velocity_x.dart';
 
@@ -72,6 +72,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with MediaPickerListe
   ValueNotifier<bool> showLoading = ValueNotifier<bool>(false);
   bool isShowSticker = false;
   String imageUrl = "";
+  bool isPopped = false;
 
   final TextEditingController textEditingController = TextEditingController();
   final ScrollController listScrollController = ScrollController();
@@ -131,31 +132,41 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with MediaPickerListe
       _chatId = FirestoreConstants.getChatId(widget.arguments.chatUser.userId);
     }
 
-    return Scaffold(
-      backgroundColor: AppColor.white,
-      appBar: _buildAppBar(context),
-      body: SafeArea(
-        child: Stack(
-          children: <Widget>[
-            Column(
-              children: <Widget>[
-                // List of messages
-                buildListMessage(),
+    return LayoutBuilder(builder: (context, constraints) {
+      Future.delayed(Duration(milliseconds: 300), () {
+        debugPrint('POPPING $constraints');
+        if (!widget.arguments.isDialog && (constraints.maxWidth) < 580 && !isPopped) {
+          debugPrint('POPPING mounted $constraints');
+          isPopped = true;
+          Navigator.pop(context);
+        }
+      });
+      return Scaffold(
+        backgroundColor: AppColor.white,
+        appBar: _buildAppBar(context),
+        body: SafeArea(
+          child: Stack(
+            children: <Widget>[
+              Column(
+                children: <Widget>[
+                  // List of messages
+                  buildListMessage(),
 
-                // Sticker
-                // isShowSticker ? buildSticker() : SizedBox.shrink(),
+                  // Sticker
+                  // isShowSticker ? buildSticker() : SizedBox.shrink(),
 
-                // Input content
-                buildInput(),
-              ],
-            ),
+                  // Input content
+                  buildInput(),
+                ],
+              ),
 
-            // Loading
-            buildLoading()
-          ],
+              // Loading
+              buildLoading()
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 
   // endregion
@@ -194,51 +205,62 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with MediaPickerListe
           ],
         ],
       ).addGestureTap(
-            () {
+        () {
           if (!_isGroup) return;
           debugPrint('Navigate to group details');
 
           if (kIsWeb && widget.arguments.isDialog)
-            showGeneralDialog(
+            showDialog(
               context: context,
               barrierColor: Colors.black54,
               barrierDismissible: true,
               barrierLabel: 'Label',
-              pageBuilder: (_, __, ___) {
-                return Row(
-                  children: [
-                    Spacer(),
-                    SizedBox(
-                      width: context.width * 0.6,
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: NewGroupPage(
-                          participantsList: [],
-                          isGroupDetails: true,
-                          pageType: PageType.EDIT_GROUP,
-                          groupDetails: widget.arguments.recentChat,
-                          onPopped: () {
-                            debugPrint('POPPED');
-                            Navigator.pushNamedAndRemoveUntil(context, RouteName.webPage, (route) => false);
-                          },
+              builder: (BuildContext context) {
+                debugPrint('isPOPPED => $isPopped');
+                return LayoutBuilder(builder: (context, constraints) {
+                  debugPrint('constraints $constraints');
+                  Future.delayed(Duration(milliseconds: 300), () {
+                    debugPrint('POPPING $constraints');
+                    if ((constraints.maxWidth) < 580 && !isPopped) {
+                      debugPrint('POPPING mounted $constraints');
+                      isPopped = true;
+                      Navigator.pop(context);
+                    }
+                  });
+                  return Align(
+                    alignment: Alignment.centerRight,
+                    child: Row(
+                      children: [
+                        Spacer(),
+                        SizedBox(
+                          width: (1.sw ?? 1) * 0.6,
+                          child: NewGroupPage(
+                            participantsList: [],
+                            isGroupDetails: true,
+                            pageType: PageType.EDIT_GROUP,
+                            groupDetails: widget.arguments.recentChat,
+                            onPopped: () {
+                              debugPrint('POPPED');
+                              Navigator.pushNamedAndRemoveUntil(context, RouteName.webPage, (route) => false);
+                            },
+                          ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
-                );
+                  );
+                });
               },
             );
           else
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) =>
-                    NewGroupPage(
-                      participantsList: [],
-                      isGroupDetails: true,
-                      pageType: PageType.EDIT_GROUP,
-                      groupDetails: widget.arguments.recentChat,
-                    ),
+                builder: (context) => NewGroupPage(
+                  participantsList: [],
+                  isGroupDetails: true,
+                  pageType: PageType.EDIT_GROUP,
+                  groupDetails: widget.arguments.recentChat,
+                ),
               ),
             );
         },
@@ -261,38 +283,38 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with MediaPickerListe
     return Flexible(
       child: _chatId.isNotEmpty
           ? StreamBuilder<QuerySnapshot>(
-        stream: firebaseChatManager.getChatStream(_chatId, _limit),
-        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (snapshot.hasData) {
-            listMessage = snapshot.data!.docs;
-            //Remove unread count
-            firebaseChatManager.removeUnreadCount(_chatId);
+              stream: firebaseChatManager.getChatStream(_chatId, _limit),
+              builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (snapshot.hasData) {
+                  listMessage = snapshot.data!.docs;
+                  //Remove unread count
+                  firebaseChatManager.removeUnreadCount(_chatId);
 
-            if (listMessage.length > 0) {
-              return ListView.builder(
-                padding: EdgeInsets.all(10),
-                itemBuilder: (context, index) => buildItem(index, snapshot.data?.docs[index]),
-                itemCount: snapshot.data?.docs.length,
-                reverse: true,
-                controller: listScrollController,
-              );
-            } else {
-              return Center(child: Text("No message here yet..."));
-            }
-          } else {
-            return Center(
+                  if (listMessage.length > 0) {
+                    return ListView.builder(
+                      padding: EdgeInsets.all(10),
+                      itemBuilder: (context, index) => buildItem(index, snapshot.data?.docs[index]),
+                      itemCount: snapshot.data?.docs.length,
+                      reverse: true,
+                      controller: listScrollController,
+                    );
+                  } else {
+                    return Center(child: Text("No message here yet..."));
+                  }
+                } else {
+                  return Center(
+                    child: CircularProgressIndicator(
+                      color: AppColor.primaryColor,
+                    ),
+                  );
+                }
+              },
+            )
+          : Center(
               child: CircularProgressIndicator(
                 color: AppColor.primaryColor,
               ),
-            );
-          }
-        },
-      )
-          : Center(
-        child: CircularProgressIndicator(
-          color: AppColor.primaryColor,
-        ),
-      ),
+            ),
     );
   }
 
@@ -305,91 +327,90 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with MediaPickerListe
         return Row(
           children: <Widget>[
             messageChat.messageType == SendMessageType.text.typeValue
-            // Text
+                // Text
                 ? Container(
-              child: Text(
-                messageChat.message ?? '',
-                style: textRegular14.copyWith(color: AppColor.white, fontSize: 16.sm),
-              ),
-              padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
-              width: 200,
-              decoration: BoxDecoration(color: AppColor.primaryColor, borderRadius: BorderRadius.circular(8)),
-              margin: EdgeInsets.only(bottom: !messageChat.isLeftSide ? 20 : 10, right: 10),
-            )
+                    child: Text(
+                      messageChat.message ?? '',
+                      style: textRegular14.copyWith(color: AppColor.white, fontSize: 16.sm),
+                    ),
+                    padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
+                    width: 200,
+                    decoration: BoxDecoration(color: AppColor.primaryColor, borderRadius: BorderRadius.circular(8)),
+                    margin: EdgeInsets.only(bottom: !messageChat.isLeftSide ? 20 : 10, right: 10),
+                  )
                 : messageChat.messageType == SendMessageType.image.typeValue
-            // Image
-                ? Container(
-              child: OutlinedButton(
-                child: Material(
-                  child: Image.network(
-                    messageChat.message ?? '',
-                    loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Container(
-                        decoration: BoxDecoration(
-                          color: AppColor.greyTealColor,
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(8),
+                    // Image
+                    ? Container(
+                        child: OutlinedButton(
+                          child: Material(
+                            child: Image.network(
+                              messageChat.message ?? '',
+                              loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    color: AppColor.greyTealColor,
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(8),
+                                    ),
+                                  ),
+                                  width: 200,
+                                  height: 200,
+                                  child: Center(
+                                    child: CircularProgressIndicator(
+                                      color: AppColor.primaryColor,
+                                      value: loadingProgress.expectedTotalBytes != null
+                                          ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                          : null,
+                                    ),
+                                  ),
+                                );
+                              },
+                              errorBuilder: (context, object, stackTrace) {
+                                return Material(
+                                  child: Image.asset(
+                                    Assets.imageImgNotAvailable,
+                                    width: 200,
+                                    height: 200,
+                                    fit: BoxFit.cover,
+                                  ),
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(8),
+                                  ),
+                                  clipBehavior: Clip.hardEdge,
+                                );
+                              },
+                              width: 200,
+                              height: 200,
+                              fit: BoxFit.cover,
+                            ),
+                            borderRadius: BorderRadius.all(Radius.circular(8)),
+                            clipBehavior: Clip.hardEdge,
                           ),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ImageViewerWidget(
+                                  imageUrl: messageChat.message ?? '',
+                                ),
+                              ),
+                            );
+                          },
+                          style: ButtonStyle(padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.all(0))),
                         ),
-                        width: 200,
-                        height: 200,
-                        child: Center(
-                          child: CircularProgressIndicator(
-                            color: AppColor.primaryColor,
-                            value: loadingProgress.expectedTotalBytes != null
-                                ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                                : null,
-                          ),
-                        ),
-                      );
-                    },
-                    errorBuilder: (context, object, stackTrace) {
-                      return Material(
+                        margin: EdgeInsets.only(bottom: !messageChat.isLeftSide ? 20 : 10, right: 10),
+                      )
+                    // Sticker
+                    : Container(
                         child: Image.asset(
-                          Assets.imageImgNotAvailable,
-                          width: 200,
-                          height: 200,
+                          'images/${messageChat.message}.gif',
+                          width: 100,
+                          height: 100,
                           fit: BoxFit.cover,
                         ),
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(8),
-                        ),
-                        clipBehavior: Clip.hardEdge,
-                      );
-                    },
-                    width: 200,
-                    height: 200,
-                    fit: BoxFit.cover,
-                  ),
-                  borderRadius: BorderRadius.all(Radius.circular(8)),
-                  clipBehavior: Clip.hardEdge,
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          ImageViewerWidget(
-                            imageUrl: messageChat.message ?? '',
-                          ),
-                    ),
-                  );
-                },
-                style: ButtonStyle(padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.all(0))),
-              ),
-              margin: EdgeInsets.only(bottom: !messageChat.isLeftSide ? 20 : 10, right: 10),
-            )
-            // Sticker
-                : Container(
-              child: Image.asset(
-                'images/${messageChat.message}.gif',
-                width: 100,
-                height: 100,
-                fit: BoxFit.cover,
-              ),
-              margin: EdgeInsets.only(bottom: !messageChat.isLeftSide ? 20 : 10, right: 10),
-            ),
+                        margin: EdgeInsets.only(bottom: !messageChat.isLeftSide ? 20 : 10, right: 10),
+                      ),
           ],
           mainAxisAlignment: MainAxisAlignment.end,
         );
@@ -402,141 +423,139 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with MediaPickerListe
                 children: <Widget>[
                   messageChat.isLeftSide
                       ? Material(
-                    child: Image.network(
-                      _isGroup ? messageChat.getChatIcon ?? '' : widget.arguments.chatUser.userImage ?? '',
-                      loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return Center(
-                          child: CircularProgressIndicator(
-                            color: AppColor.primaryColor,
-                            value: loadingProgress.expectedTotalBytes != null
-                                ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                                : null,
+                          child: Image.network(
+                            _isGroup ? messageChat.getChatIcon ?? '' : widget.arguments.chatUser.userImage ?? '',
+                            loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Center(
+                                child: CircularProgressIndicator(
+                                  color: AppColor.primaryColor,
+                                  value: loadingProgress.expectedTotalBytes != null
+                                      ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                      : null,
+                                ),
+                              );
+                            },
+                            errorBuilder: (context, object, stackTrace) {
+                              return SvgPicture.asset(
+                                Assets.svgsUserIcon,
+                                height: 35.sm,
+                                width: 35.sm,
+                              );
+                            },
+                            width: 35,
+                            height: 35,
+                            fit: BoxFit.cover,
                           ),
-                        );
-                      },
-                      errorBuilder: (context, object, stackTrace) {
-                        return SvgPicture.asset(
-                          Assets.svgsUserIcon,
-                          height: 35.sm,
-                          width: 35.sm,
-                        );
-                      },
-                      width: 35,
-                      height: 35,
-                      fit: BoxFit.cover,
-                    ),
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(18),
-                    ),
-                    clipBehavior: Clip.hardEdge,
-                  )
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(18),
+                          ),
+                          clipBehavior: Clip.hardEdge,
+                        )
                       : Container(width: 35),
                   messageChat.messageType == SendMessageType.text.typeValue
                       ? Container(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (_isGroup) ...[
-                          Text(
-                            messageChat.senderName ?? '',
-                            style: textBold.copyWith(
-                              fontSize: 12,
-                              color: AppColor.primaryColorDark,
-                            ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (_isGroup) ...[
+                                Text(
+                                  messageChat.senderName ?? '',
+                                  style: textBold.copyWith(
+                                    fontSize: 12,
+                                    color: AppColor.primaryColorDark,
+                                  ),
+                                ),
+                                5.h.VBox,
+                              ],
+                              Text(
+                                messageChat.message ?? '',
+                                style: textRegular14.copyWith(
+                                    fontSize: 16.sm,
+                                    fontWeight: FontWeight.w300,
+                                    color: AppColor.blackColor.withOpacity(0.8)),
+                              ),
+                            ],
                           ),
-                          5.h.VBox,
-                        ],
-                        Text(
-                          messageChat.message ?? '',
-                          style: textRegular14.copyWith(
-                              fontSize: 16.sm,
-                              fontWeight: FontWeight.w300,
-                              color: AppColor.blackColor.withOpacity(0.8)),
-                        ),
-                      ],
-                    ),
-                    padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
-                    width: 200,
-                    decoration: BoxDecoration(
-                      color: AppColor.lightPurple,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    margin: EdgeInsets.only(left: 10),
-                  )
-                      : messageChat.messageType == SendMessageType.image.typeValue
-                      ? Container(
-                    child: TextButton(
-                      child: Material(
-                        child: Image.network(
-                          messageChat.message ?? '',
-                          loadingBuilder:
-                              (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return Container(
-                              decoration: BoxDecoration(
-                                color: AppColor.greyTealColor,
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(8),
-                                ),
-                              ),
-                              width: 200,
-                              height: 200,
-                              child: Center(
-                                child: CircularProgressIndicator(
-                                  color: AppColor.greyTealColor,
-                                  value: loadingProgress.expectedTotalBytes != null
-                                      ? loadingProgress.cumulativeBytesLoaded /
-                                      loadingProgress.expectedTotalBytes!
-                                      : null,
-                                ),
-                              ),
-                            );
-                          },
-                          errorBuilder: (context, object, stackTrace) =>
-                              Material(
-                                child: Image.asset(
-                                  Assets.imageImgNotAvailable,
-                                  width: 200,
-                                  height: 200,
-                                  fit: BoxFit.cover,
-                                ),
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(8),
-                                ),
-                                clipBehavior: Clip.hardEdge,
-                              ),
+                          padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
                           width: 200,
-                          height: 200,
-                          fit: BoxFit.cover,
-                        ),
-                        borderRadius: BorderRadius.all(Radius.circular(8)),
-                        clipBehavior: Clip.hardEdge,
-                      ),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                ImageViewerWidget(
-                                  imageUrl: messageChat.message ?? '',
-                                ),
+                          decoration: BoxDecoration(
+                            color: AppColor.lightPurple,
+                            borderRadius: BorderRadius.circular(8),
                           ),
-                        );
-                      },
-                      style: ButtonStyle(padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.all(0))),
-                    ),
-                    margin: EdgeInsets.only(left: 10),
-                  )
-                      : Container(
-                    child: Image.asset(
-                      'images/${messageChat.message}.gif',
-                      width: 100,
-                      height: 100,
-                      fit: BoxFit.cover,
-                    ),
-                    margin: EdgeInsets.only(bottom: !messageChat.isLeftSide ? 20 : 10, right: 10),
-                  ),
+                          margin: EdgeInsets.only(left: 10),
+                        )
+                      : messageChat.messageType == SendMessageType.image.typeValue
+                          ? Container(
+                              child: TextButton(
+                                child: Material(
+                                  child: Image.network(
+                                    messageChat.message ?? '',
+                                    loadingBuilder:
+                                        (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                                      if (loadingProgress == null) return child;
+                                      return Container(
+                                        decoration: BoxDecoration(
+                                          color: AppColor.greyTealColor,
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(8),
+                                          ),
+                                        ),
+                                        width: 200,
+                                        height: 200,
+                                        child: Center(
+                                          child: CircularProgressIndicator(
+                                            color: AppColor.greyTealColor,
+                                            value: loadingProgress.expectedTotalBytes != null
+                                                ? loadingProgress.cumulativeBytesLoaded /
+                                                    loadingProgress.expectedTotalBytes!
+                                                : null,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    errorBuilder: (context, object, stackTrace) => Material(
+                                      child: Image.asset(
+                                        Assets.imageImgNotAvailable,
+                                        width: 200,
+                                        height: 200,
+                                        fit: BoxFit.cover,
+                                      ),
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(8),
+                                      ),
+                                      clipBehavior: Clip.hardEdge,
+                                    ),
+                                    width: 200,
+                                    height: 200,
+                                    fit: BoxFit.cover,
+                                  ),
+                                  borderRadius: BorderRadius.all(Radius.circular(8)),
+                                  clipBehavior: Clip.hardEdge,
+                                ),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ImageViewerWidget(
+                                        imageUrl: messageChat.message ?? '',
+                                      ),
+                                    ),
+                                  );
+                                },
+                                style: ButtonStyle(padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.all(0))),
+                              ),
+                              margin: EdgeInsets.only(left: 10),
+                            )
+                          : Container(
+                              child: Image.asset(
+                                'images/${messageChat.message}.gif',
+                                width: 100,
+                                height: 100,
+                                fit: BoxFit.cover,
+                              ),
+                              margin: EdgeInsets.only(bottom: !messageChat.isLeftSide ? 20 : 10, right: 10),
+                            ),
                 ],
               ),
 
@@ -654,9 +673,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with MediaPickerListe
   }
 
   void onSendMessage(String content, String type) {
-    if (content
-        .trim()
-        .isNotEmpty) {
+    if (content.trim().isNotEmpty) {
       textEditingController.clear();
       if (_isGroup) {
         ChatMessage sendMessageRequest = ChatMessage(
@@ -756,10 +773,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with MediaPickerListe
   }
 
   Future _uploadFile() async {
-    String fileName = DateTime
-        .now()
-        .millisecondsSinceEpoch
-        .toString();
+    String fileName = DateTime.now().millisecondsSinceEpoch.toString();
     UploadTask uploadTask = firebaseChatManager.uploadFile(imageFile!, fileName);
     try {
       TaskSnapshot snapshot = await uploadTask;
@@ -774,10 +788,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with MediaPickerListe
   }
 
   Future _uploadFileBytes(Uint8List? fileBytes, String fileName, String? fileExt) async {
-    String fileName = DateTime
-        .now()
-        .millisecondsSinceEpoch
-        .toString();
+    String fileName = DateTime.now().millisecondsSinceEpoch.toString();
     UploadTask uploadTask = firebaseChatManager.uploadFileBytes(fileBytes, '$fileName.$fileExt');
     try {
       TaskSnapshot snapshot = await uploadTask;

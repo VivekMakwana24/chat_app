@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:algolia/algolia.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -15,7 +16,6 @@ import 'package:gotms_chat/util/firebase_chat_manager/constants/firebase_collect
 import 'package:gotms_chat/util/firebase_chat_manager/constants/firestore_constants.dart';
 import 'package:gotms_chat/util/firebase_chat_manager/models/chat_message.dart';
 import 'package:gotms_chat/util/firebase_chat_manager/models/firebase_chat_user.dart';
-import 'package:gotms_chat/util/firebase_chat_manager/models/message_chat.dart';
 
 class FirebaseChatManager {
   /// Logout User
@@ -23,30 +23,6 @@ class FirebaseChatManager {
     await FirebaseAuth.instance.signOut();
     navigator.pushNamedAndRemoveUntil(RouteName.loginPage);
   }
-
-  /*Future<int?> fetchUserId(String email) async {
-    final QuerySnapshot result = await FirebaseFirestore.instance
-        .collection(FirebaseCollection.users.name)
-        .orderBy('createdAt', descending: true)
-        .limitToLast(1)
-        .get();
-
-    final List<DocumentSnapshot> documents = result.docs;
-
-    if (documents.isEmpty) {
-      debugPrint('ItS EMPTY');
-      return 1;
-    } else {
-      debugPrint('==> Not empty ==> ${documents.last.data()}');
-      FirebaseChatUser user = FirebaseChatUser.fromDocument(documents.last);
-
-      if (user.userEmail == email)
-        return Future.value((user.userId ?? 0));
-      else
-        return Future.value((user.userId ?? 0) + 1);
-      // return Future.value(documents.last.data())
-    }
-  }*/
 
   /*
   * Firebase Login
@@ -83,7 +59,7 @@ class FirebaseChatManager {
     } on Exception catch (e) {
       debugPrint('Firebase No User Found $e');
 
-      throw Exception('$e');
+      // throw Exception('$e');
 
       ///SignUp the user into firebase
       return firebaseUserSignup(user);
@@ -117,26 +93,24 @@ class FirebaseChatManager {
   /*
   * Get User Listing
   * */
-  Stream<QuerySnapshot> getStreamFireStore(String pathCollection, int limit, String? textSearch,
-      [List<String>? participantsList]) {
+  Future<AlgoliaQuerySnapshot> getStreamFireStore(String pathCollection, int limit, String? textSearch,
+      [List<String>? participantsList]) async {
     debugPrint('### - getStreamFireStore $textSearch');
     debugPrint('### - participantsList $participantsList');
     debugPrint('### - _textSearch $textSearch');
-    if (textSearch?.isNotEmpty ?? false) {
-      return firebaseFirestore
-          .collection(pathCollection)
-          .limit(limit)
-          .where(FirestoreConstants.participants, whereNotIn: participantsList)
-          .where(FirestoreConstants.user_name, isEqualTo: textSearch)
-          // .orderBy(FirestoreConstants.createdAt) // Replace 'fieldName' with the field you want to order by
-          .snapshots();
-    } else {
-      return firebaseFirestore
-          .collection(pathCollection)
-          .limit(limit)
-          .orderBy(FirestoreConstants.user_name)
-          .snapshots();
-    }
+    // if (textSearch?.isNotEmpty ?? false) {
+    var filterExpression = "transport_company:${appDB.user?.transportCompany}";
+    debugPrint('### - filterExpression $filterExpression');
+
+    AlgoliaQuery query = algolia.instance.index(pathCollection).query(textSearch ?? '');
+
+    query = query.facetFilter(filterExpression);
+
+    AlgoliaQuerySnapshot snapshot = await query.getObjects();
+
+    algoliaService.updateAlgoliaSnapshot(snapshot);
+
+    return snapshot;
   }
 
   Future<FirebaseChatUser>? getUserDetails(String userId) async {
@@ -184,7 +158,7 @@ class FirebaseChatManager {
     return firebaseFirestore.collection(collectionPath).doc(docPath).update(dataNeedUpdate);
   }
 
-  /*
+/*
   * Fetch Chat Stream
   * */
   Stream<QuerySnapshot> getChatStream(String chatId, int limit) {
@@ -200,7 +174,7 @@ class FirebaseChatManager {
         .snapshots();
   }
 
-  /*
+/*
   * Fetch Chat Stream
   * */
   Stream<List<FirebaseChatUser>> getUsers(List<String?> participantsList) {
@@ -223,7 +197,7 @@ class FirebaseChatManager {
         .toList());
   }
 
-  /*
+/*
   * Fetch Recent Chat Stream
   * */
   Stream<QuerySnapshot> getRecentChatStream(int limit, String textSearch, bool fetchOnlyGroups) {
@@ -255,17 +229,11 @@ class FirebaseChatManager {
       }
     } else {
       if (fetchOnlyGroups) {
-        debugPrint('EERRRRR [===> ');
-        debugPrint(
-            '${firebaseFirestore.collection(FirebaseCollection.recent_chat.name).where(FirestoreConstants.participants, arrayContains: appDB.user?.userId).where(FirestoreConstants.isGroup, isEqualTo: true).where(FirestoreConstants.isGroup, isNotEqualTo: null) // Add this line to filter out null values
-                .orderBy(FirestoreConstants.createdAt, descending: true) // Order the results by createdAt
-                .limit(limit).snapshots().length.then((value) => debugPrint('VALUE ==$value'))}');
         return firebaseFirestore
             .collection(FirebaseCollection.recent_chat.name)
             .where(FirestoreConstants.participants, arrayContains: appDB.user?.userId)
             .where(FirestoreConstants.isGroup, isEqualTo: true)
             .where(FirestoreConstants.isGroup, isNotEqualTo: null) // Add this line to filter out null values
-            // .orderBy(FirestoreConstants.createdAt, descending: false) // Order the results by createdAt
             .limit(limit)
             .snapshots();
       } else {
@@ -277,40 +245,6 @@ class FirebaseChatManager {
             .snapshots();
       }
     }
-  }
-
-  /*
-  * Send Chat Message
-  * */
-  void sendMessageOld(String content, int type, String groupChatId, String currentUserId, String peerId) {
-    debugPrint('#### sendMessage ######');
-    debugPrint('## content = $content');
-    debugPrint('## type = $type');
-    debugPrint('## currentUserId = $currentUserId');
-    debugPrint('## peerId = $peerId');
-    debugPrint('##########');
-    DocumentReference documentReference = firebaseFirestore
-        .collection(FirebaseCollection.chat.name)
-        .doc(groupChatId)
-        .collection(groupChatId)
-        .doc(DateTime.now().millisecondsSinceEpoch.toString());
-
-    MessageChat messageChat = MessageChat(
-      idFrom: currentUserId,
-      idTo: peerId,
-      timestamp: DateTime.now().millisecondsSinceEpoch.toString(),
-      content: content,
-      type: type,
-    );
-
-    FirebaseFirestore.instance.runTransaction(
-      (transaction) async {
-        transaction.set(
-          documentReference,
-          messageChat.toJson(),
-        );
-      },
-    );
   }
 
   Future<void> sendMessage(
@@ -436,7 +370,7 @@ class FirebaseChatManager {
         .snapshots();
   }
 
-  /*
+/*
   * Firebase Update User Details
   * */
   void removeUnreadCount(String chatId) {

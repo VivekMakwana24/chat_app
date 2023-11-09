@@ -58,7 +58,8 @@ class _HomePageState extends State<HomePage> {
   TextEditingController searchBarTec = TextEditingController();
   Debouncer searchDebouncer = Debouncer(milliseconds: 300);
 
-  final List<ChatMessage> _recentChatList = [];
+  ValueNotifier<List<ChatMessage>> _recentChatList = ValueNotifier([]);
+  ValueNotifier<List<ChatMessage>> _filteredChatList = ValueNotifier([]);
 
   int _limit = 100;
 
@@ -127,14 +128,20 @@ class _HomePageState extends State<HomePage> {
                               _limit, searchBarTec.text.trim(), widget.fetchOnlyGroups),
                           builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
                             if (snapshot.hasData) {
-                              _recentChatList.clear();
+                              _recentChatList.value.clear();
+                              _recentChatList.value.addAll(
+                                (snapshot.data?.docs.map((e) => ChatMessage.toDocumentToClass(e)).toList() ?? []),
+                              );
 
-                              _recentChatList.addAll(
-                                  (snapshot.data?.docs.map((e) => ChatMessage.toDocumentToClass(e)).toList() ?? []));
+                              _filteredChatList.value.clear();
+                              _filteredChatList.value.addAll(
+                                (snapshot.data?.docs.map((e) => ChatMessage.toDocumentToClass(e)).toList() ?? []),
+                              );
 
                               ///Open specific chat if ChatID is available.
                               if (chatID.isNotEmpty) {
-                                var itemData = _recentChatList.firstWhereOrNull((element) => element.chatId == chatID);
+                                var itemData =
+                                    _filteredChatList.value.firstWhereOrNull((element) => element.chatId == chatID);
                                 chatID = '';
                                 if (itemData != null) {
                                   if (_selectedItem != null) {
@@ -156,16 +163,21 @@ class _HomePageState extends State<HomePage> {
                                 }
                               }
 
-                              return (_recentChatList.isNotEmpty)
-                                  ? ListView.separated(
-                                      itemCount: _recentChatList.length,
-                                      shrinkWrap: true,
-                                      // physics: const NeverScrollableScrollPhysics(),
-                                      itemBuilder: (context, index) {
-                                        return buildItem(context, _recentChatList[index]);
-                                      },
-                                      separatorBuilder: (context, index) {
-                                        return 15.h.verticalSpace;
+                              return (_filteredChatList.value.isNotEmpty)
+                                  ? ValueListenableBuilder(
+                                      valueListenable: _filteredChatList,
+                                      builder: (BuildContext context, List<ChatMessage> value, Widget? child) {
+                                        return ListView.separated(
+                                          itemCount: _filteredChatList.value.length,
+                                          shrinkWrap: true,
+                                          // physics: const NeverScrollableScrollPhysics(),
+                                          itemBuilder: (context, index) {
+                                            return buildItem(context, _filteredChatList.value[index]);
+                                          },
+                                          separatorBuilder: (context, index) {
+                                            return 15.h.verticalSpace;
+                                          },
+                                        );
                                       },
                                     )
                                   : Center(
@@ -324,15 +336,20 @@ class _HomePageState extends State<HomePage> {
               cursorColor: ColorData.black,
               keyboardType: TextInputType.text,
               controller: searchBarTec,
-              onChanged: (value) {
+              onChanged: (searchValue) {
                 searchDebouncer.run(() {
-                  if (value.isNotEmpty) {
+                  if (searchValue.isNotEmpty) {
                     btnClearController.add(true);
-                    setState(() {});
                   } else {
                     btnClearController.add(false);
-                    setState(() {});
                   }
+
+                  _filteredChatList.value = _recentChatList.value
+                      .where((element) =>
+                          (element.receiverName?.toLowerCase().contains(searchValue.toLowerCase()) ?? false) ||
+                          (element.groupName?.toLowerCase().contains(searchValue.toLowerCase()) ?? false))
+                      .toList();
+                  _filteredChatList.notifyListeners();
                 });
               },
               decoration: InputDecoration(

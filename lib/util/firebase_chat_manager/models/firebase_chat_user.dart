@@ -1,3 +1,4 @@
+import 'package:algolia/algolia.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -15,6 +16,8 @@ class FirebaseChatUser {
     this.createdAt,
     this.userId,
     this.password,
+    this.transportCompany,
+    this.isDriver = false,
   });
 
   FirebaseChatUser.fromJson(dynamic json) {
@@ -27,6 +30,8 @@ class FirebaseChatUser {
     userId = json['user_id'];
     chattingWith = json['chatting_with'];
     createdAt = json['createdAt'];
+    transportCompany = json['transportCompany'];
+    isDriver = json['is_driver'];
   }
 
   @HiveField(0)
@@ -47,6 +52,10 @@ class FirebaseChatUser {
   String? chattingWith;
   @HiveField(9)
   String? createdAt;
+  @HiveField(10)
+  String? transportCompany;
+  @HiveField(11)
+  bool? isDriver;
   String? password;
 
   Map<String, dynamic> toJson() {
@@ -61,7 +70,57 @@ class FirebaseChatUser {
     map['chatting_with'] = chattingWith;
     map['createdAt'] = createdAt;
     map['password'] = password;
+    map['transport_company'] = transportCompany;
+    map['is_driver'] = isDriver;
     return map;
+  }
+
+  factory FirebaseChatUser.fromAlogiaDocument(AlgoliaObjectSnapshot doc) {
+    String id = "";
+    String deviceToken = "";
+    String userImage = "";
+    String userEmail = "";
+    String userName = "";
+    String createdAt = "";
+    String userId = '';
+    String transportCompany = '';
+    bool isDriver = false;
+    try {
+      deviceToken = doc.data['device_token'];
+    } catch (e) {}
+    try {
+      userId = doc.data['user_id'];
+    } catch (e) {}
+    try {
+      userImage = doc.data['user_image'];
+    } catch (e) {}
+    try {
+      userEmail = doc.data['user_email'];
+    } catch (e) {}
+    try {
+      userName = doc.data['user_name'];
+    } catch (e) {}
+    try {
+      createdAt = doc.data['createdAt'];
+    } catch (e) {}
+    try {
+      userId = doc.data['user_id'];
+    } catch (e) {}
+    try {
+      isDriver = doc.data['is_driver'];
+    } catch (e) {}
+    try {
+      transportCompany = doc.data['transport_company'];
+    } catch (e) {}
+    return FirebaseChatUser(
+      userId: userId,
+      deviceToken: deviceToken,
+      userEmail: userEmail,
+      userName: userName,
+      createdAt: createdAt,
+      transportCompany: transportCompany,
+      isDriver: isDriver,
+    );
   }
 
   factory FirebaseChatUser.fromDocument(DocumentSnapshot doc) {
@@ -72,6 +131,8 @@ class FirebaseChatUser {
     String userName = "";
     String createdAt = "";
     String userId = '';
+    bool isDriver = false;
+    String transportCompany = '';
     try {
       deviceToken = doc.get('device_token');
     } catch (e) {}
@@ -93,13 +154,20 @@ class FirebaseChatUser {
     try {
       userId = doc.get('user_id');
     } catch (e) {}
+    try {
+      isDriver = doc.get('is_driver');
+    } catch (e) {}
+    try {
+      transportCompany = doc.get('transport_company');
+    } catch (e) {}
     return FirebaseChatUser(
       userId: userId,
       deviceToken: deviceToken,
       userEmail: userEmail,
       userName: userName,
       createdAt: createdAt,
+      isDriver: isDriver,
+      transportCompany: transportCompany,
     );
   }
-
 }
