@@ -268,6 +268,8 @@ class FirebaseChatManager {
       ..receiverId = receiverUser?.userId
       ..senderName = appDB.user?.userName
       ..openChatIds = recentChat?.openChatIds
+      ..systemGenerated = recentChat?.systemGenerated
+      ..systemGroupName = recentChat?.systemGroupName
       ..senderProfile = appDB.user?.userImage;
 
     ///INITIALLY FILL THE DATA
@@ -297,7 +299,7 @@ class FirebaseChatManager {
     ChatMessage messageChat,
     FirebaseChatUser? receiverUser,
   ) async {
-    debugPrint('#### sendMessage ######');
+    debugPrint('#### sendGroupMessage ######');
     debugPrint('## content = ${messageChat.message}');
     debugPrint('## type = ${messageChat.messageType}');
     debugPrint('## receiverId = ${messageChat.receiverId}');
@@ -318,6 +320,8 @@ class FirebaseChatManager {
       ..openChatIds = recentChat?.openChatIds
       ..senderProfile = appDB.user?.userImage
       ..isGroup = messageChat.isGroup
+      ..systemGroupName = recentChat?.systemGroupName
+      ..systemGenerated = recentChat?.systemGenerated
       ..groupName = messageChat.groupName;
 
     ///INITIALLY FILL THE DATA

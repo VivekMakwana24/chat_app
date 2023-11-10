@@ -229,7 +229,7 @@ class _HomePageState extends State<HomePage> {
                   Expanded(
                     flex: 2,
                     child: Container(
-                      child: Text('Welcome to Chat app'),
+                      child: Text('Welcome to GoTMS Chat App'),
                     ).centered(),
                   )
               ],
@@ -345,9 +345,9 @@ class _HomePageState extends State<HomePage> {
                   }
 
                   _filteredChatList.value = _recentChatList.value
-                      .where((element) =>
-                          (element.receiverName?.toLowerCase().contains(searchValue.toLowerCase()) ?? false) ||
-                          (element.groupName?.toLowerCase().contains(searchValue.toLowerCase()) ?? false))
+                      .where((element) => (element.isGroup ?? false)
+                          ? (element.groupName?.toLowerCase().contains(searchValue.toLowerCase()) ?? false)
+                          : (element.receiverName?.toLowerCase().contains(searchValue.toLowerCase()) ?? false))
                       .toList();
                   _filteredChatList.notifyListeners();
                 });
